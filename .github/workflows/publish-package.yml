@@ -19,6 +19,11 @@ jobs:
         with:
           node-version: 20
 
+      - name: Write .npmrc file
+        run: |
+          echo //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }} > $HOME/.npmrc
+          echo @rundown-studio:registry=https://npm.pkg.github.com >> $HOME/.npmrc
+
       - name: Install Dependencies
         run: npm ci --loglevel=error
 
