@@ -1,4 +1,4 @@
-import { RundownSnapshot, RundownStatus } from '../types'
+import { RundownSnapshot, RundownStatus } from '@rundown-studio/types'
 import { randomBytes } from 'crypto'
 import { parse } from 'date-fns'
 
