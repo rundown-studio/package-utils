@@ -8,9 +8,13 @@
     "type": "git",
     "url": "git+https://github.com/rundown-studio/package-utils.git"
   },
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "type": "module",
+  "exports": {
+    "require": "./dist/cjs/index.js",
+    "import": "./dist/esm/index.js"
+  },
+  "main": "dist/cjs/index.js",
+  "types": "dist/esm/index.d.ts",
   "files": [
     "dist",
     "README.md"
@@ -18,7 +22,9 @@
   "scripts": {
     "test": "NODE_OPTIONS=--experimental-vm-modules jest",
     "test:ci": "jest --ci",
-    "build": "tsc"
+    "build": "rm -rf ./dist && npm run build:cjs && npm run build:esm",
+    "build:cjs": "tsc --module commonjs --outDir dist/cjs/ && echo '{\"type\": \"commonjs\"}' > dist/cjs/package.json",
+    "build:esm": "tsc --module esnext --outDir dist/esm/ && echo '{\"type\": \"module\"}' > dist/esm/package.json"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",

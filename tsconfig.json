@@ -3,7 +3,7 @@
     "target": "es2016",
     "module": "esnext",
     "moduleResolution": "node",
-    "outDir": "dist",
+    "outDir": "dist/esm/",
     "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
