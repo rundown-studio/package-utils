@@ -1,4 +1,4 @@
-import { RundownSnapshot, RundownStatus } from '@rundown-studio/types'
+import { RundownSnapshot, RundownStatus, RundownCueSnapshot, CueType, CueStartMode } from '@rundown-studio/types'
 import { randomBytes } from 'crypto'
 import { parse } from 'date-fns'
 
@@ -15,4 +15,15 @@ export const getRundownDefaults = (): RundownSnapshot => ({
   status: RundownStatus.DRAFT,
   timezone: undefined,
   deletedAt: null,
+})
+
+export const getCueDefaults = (): RundownCueSnapshot => ({
+  type: CueType.CUE,
+  title: '',
+  subtitle: '',
+  startTime: null,
+  startMode: CueStartMode.FLEXIBLE,
+  duration: 600000, // 10 min
+  backgroundColor: '',
+  locked: false,
 })
