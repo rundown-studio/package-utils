@@ -1,6 +1,21 @@
-import { RundownSnapshot, RundownStatus, RundownCueSnapshot, CueType, CueStartMode } from '@rundown-studio/types'
+import { Runner, RundownSnapshot, RundownStatus, RundownCueSnapshot, CueType, CueStartMode } from '@rundown-studio/types'
 import { randomBytes } from 'crypto'
 import { parse } from 'date-fns'
+
+export const getRunnerDefaults = (): Runner => ({
+  rundownId: '',
+  timesnap: {
+    cueId: null,
+    running: false,
+    kickoff: Date.now(),
+    lastStop: Date.now(),
+    deadline: Date.now() + (10 * 60000),
+  },
+  nextCueId: null,
+  originalCues: {},
+  elapsedCues: {},
+  log: [],
+})
 
 export const getRundownDefaults = (): RundownSnapshot => ({
   name: '',
