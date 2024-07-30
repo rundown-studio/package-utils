@@ -4,7 +4,7 @@ import { RundownCue, RundownCueOrderItem, Runner, CueStartMode, CueType } from '
 /**
  * Questions
  * - remove startTime / endTime and use first cue startTime?
- * - assumption in this file: if cue
+ * - How to name startMode?
  */
 
 export enum CueRunState {
@@ -160,10 +160,12 @@ export function getSortedCues (
 function calculateTotalStartDuration (
   items: Record<RundownCue['id'], StartDuration>,
 ): StartDuration {
-  const itemsArray = Object.values(items)
+  const sdArray = Object.values(items)
+  const firstSD = sdArray[0]
+  const lastSD = sdArray[sdArray.length - 1]
   return {
-    start: itemsArray[0].start,
-    duration: itemsArray.reduce((sum: number, item: StartDuration) => sum + item.duration, 0),
+    start: firstSD.start,
+    duration: (lastSD.start.getTime() + lastSD.duration) - firstSD.start.getTime(),
   }
 }
 
