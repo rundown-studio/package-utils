@@ -1,12 +1,6 @@
 import { RundownCue, RundownCueOrderItem, Runner, CueStartMode, CueType } from '@rundown-studio/types'
 // import { applyDate, moveAfter } from '@rundown-studio/timeutils'
 
-/**
- * Questions
- * - remove startTime / endTime and use first cue startTime?
- * - How to name startMode?
- */
-
 export enum CueRunState {
   CUE_PAST = 'CUE_PAST',
   CUE_ACTIVE = 'CUE_ACTIVE',
@@ -23,7 +17,6 @@ export enum GroupRunState {
 /**
  * Glossary:
  * original - are the values as they were when the rundown was started, a "snapshot" of the moment in time
- * ideal - is the ideal timing of the show according to the values saved in the database
  * actual - is a record of what actually happened and the projected changes thereof
  */
 
@@ -37,13 +30,11 @@ export interface Timestamp {
   index: number
   state: CueRunState | GroupRunState
   original: StartDuration
-  ideal: StartDuration
   actual: StartDuration
 }
 
 export interface Timestamps {
   original: StartDuration
-  ideal: StartDuration
   actual: StartDuration
   cues: Record<RundownCue['id'], Timestamp>
 }
@@ -53,7 +44,8 @@ export interface Timestamps {
  *
  * @param  {RundownCue[]} cues
  * @param  {RundownCueOrderItem[]} cueOrder
- * @param  {Runner} runner
+ * @param  {Runner | null} runner
+ * @param  {Date} startTime - The rundown start time
  * @param  {string} [options.timezone = 'UTC']
  * @param  {Date} [options.now = new Date()]
  * @return {Timestamps}
@@ -62,6 +54,7 @@ export function createTimestamps (
   cues: RundownCue[],
   cueOrder: RundownCueOrderItem[],
   runner: Runner | null,
+  startTime: Date,
   {
     timezone = 'UTC',
     now = new Date(),
@@ -83,23 +76,20 @@ export function createTimestamps (
   // Create a list of cues (type=CueType.CUE) in order, ignoring groups
   const sortedCues = getSortedCues(cues, cueOrder)
 
-  // 1. Build the ideal timestamps from cues
-  const idealStartDurations = createIdealStartDurations(sortedCues)
+  // Build the original timestamps from runner.originalCues & cues, or copy ideal if runner=null
+  const originalStartDurations = createOriginalStartDurations(sortedCues, runner, startTime)
 
-  // 2. Build the original timestamps from runner.originalCues & cues, or copy ideal if runner=null
-  const originalStartDurations = createOriginalStartDurations(sortedCues, runner, idealStartDurations)
+  // Buid the actual timestamps from runner.timesnap, runner.elapsedCues & cues
+  const actualStartDurations = runner
+    ? createActualStartDurations(sortedCues, runner, now)
+    : originalStartDurations
 
-  // 3. Buid the actual timestamps from runner.timesnap, runner.elapsedCues & cues
-  const actualStartDurations = createActualStartDurations(sortedCues, runner, now, idealStartDurations)
-
-  // 4. Aggregate global start & duration for these three categories
+  // Aggregate global start & duration for these three categories
   const originalTotal = calculateTotalStartDuration(originalStartDurations)
-  const idealTotal = calculateTotalStartDuration(idealStartDurations)
   const actualTotal = calculateTotalStartDuration(actualStartDurations)
 
   return {
     original: originalTotal,
-    ideal: idealTotal,
     actual: actualTotal,
     cues: Object.fromEntries(
       cues.map((cue): [Timestamp['id'], Timestamp] => [
@@ -109,7 +99,6 @@ export function createTimestamps (
           index: cueIndexMap[cue.id],
           state: determineCueState(cue.id, runner),
           original: originalStartDurations[cue.id],
-          ideal: idealStartDurations[cue.id],
           actual: actualStartDurations[cue.id],
         },
       ]),
@@ -170,59 +159,43 @@ function calculateTotalStartDuration (
 }
 
 /**
- * Create ideal StartDuration records for each cue, representing is the ideal timing of the show according to the values saved in the database.
- * @param cues - An array of RundownCue objects.
- * @returns A record of ideal StartDuration objects, keyed by cue ID.
- */
-function createIdealStartDurations (
-  cues: RundownCue[],
-): Record<RundownCue['id'], StartDuration> {
-  if (!cues.length) return {}
-  if (!cues[0].startTime) throw new Error(`First cue (id=${cues[0].id}) always needs a start time`)
-
-  const sdMap: Record<RundownCue['id'], StartDuration> = {}
-  let previousEnd: Date
-
-  cues.forEach((cue) => {
-    const item = {
-      start: cue.startTime ? new Date(cue.startTime) : previousEnd,
-      duration: cue.duration,
-    }
-    previousEnd = new Date(item.start.getTime() + cue.duration)
-    sdMap[cue.id] = item
-  })
-
-  return sdMap
-}
-
-/**
- * Create original StartDuration records for each cue, representing the values as they were when the rundown was started, a "snapshot" of the moment in time.
- * @param cues - An array of RundownCue objects.
- * @param runner - The Runner object, if available.
- * @param idealStartDurations - The ideal StartDuration records.
- * @returns A record of original StartDuration objects, keyed by cue ID.
+ * Creates a map of original start times and durations for a list of cues.
+ *
+ * @param cues - An array of RundownCue objects representing the cues in the rundown.
+ * @param runner - A Runner object or null, containing original cue information if available.
+ * @returns A record mapping cue IDs to their original StartDuration objects.
+ *
+ * @description
+ * This function generates a map of original start times and durations for each cue in the rundown.
+ * It takes into account both the runner's original cue information (if available) and the cue's
+ * own properties.
  */
 function createOriginalStartDurations (
   cues: RundownCue[],
   runner: Runner | null,
-  idealStartDurations: Record<RundownCue['id'], StartDuration>,
+  startTime: Date,
 ): Record<RundownCue['id'], StartDuration> {
-  if (!runner) return idealStartDurations
   if (!cues.length) return {}
 
-  const firstOriginalCue = runner.originalCues[cues[0].id]
-  if (!firstOriginalCue?.startTime) throw new Error(`First cue (id=${cues[0].id}) always needs a start time`)
-
   const sdMap: Record<RundownCue['id'], StartDuration> = {}
-  let previousEnd: Date
+  let previousEnd: Date = startTime
 
   cues.forEach((cue) => {
-    const originalCue = runner.originalCues[cue.id]
-    const item = {
-      start: originalCue.startTime ? new Date(originalCue.startTime) : previousEnd,
-      duration: originalCue.duration,
+    const originalCue = runner?.originalCues[cue.id]
+    let item: StartDuration
+    if (originalCue) {
+      item = {
+        start: originalCue.startTime ? new Date(originalCue.startTime) : previousEnd,
+        duration: originalCue.duration,
+      }
+    } else {
+      const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
+      item = {
+        start: lockedStart || previousEnd,
+        duration: cue.duration,
+      }
     }
-    previousEnd = new Date(item.start.getTime() + cue.duration)
+    previousEnd = new Date(item.start.getTime() + item.duration)
     sdMap[cue.id] = item
   })
 
@@ -239,11 +212,9 @@ function createOriginalStartDurations (
  */
 function createActualStartDurations (
   cues: RundownCue[],
-  runner: Runner | null,
+  runner: Runner,
   now: Date,
-  idealStartDurations: Record<RundownCue['id'], StartDuration>,
 ): Record<RundownCue['id'], StartDuration> {
-  if (!runner) return idealStartDurations
   if (!cues.length) return {}
 
   const sdMap: Record<RundownCue['id'], StartDuration> = {}
@@ -265,14 +236,14 @@ function createActualStartDurations (
         duration: Math.max(now.getTime(), runner.timesnap.deadline) - runner.timesnap.kickoff,
       }
     } else {
-      const lockedStart = cue.startMode === CueStartMode.LOCKED ? cue.startTime : null
+      const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
       item = {
         start: lockedStart || previousEnd,
         duration: cue.duration,
       }
     }
 
-    previousEnd = new Date(item.start.getTime() + cue.duration)
+    previousEnd = new Date(item.start.getTime() + item.duration)
     sdMap[cue.id] = item
   })
 
