@@ -1,5 +1,7 @@
 import { RundownCue, RundownCueOrderItem, Runner, CueStartMode, CueType } from '@rundown-studio/types'
-// import { applyDate, moveAfter } from '@rundown-studio/timeutils'
+import { moveAfterWithTolerance, applyDate, getStartOfDay } from '@rundown-studio/timeutils'
+
+const TOLERANCE = 60 * 60000 // 60 min
 
 export enum CueRunState {
   CUE_PAST = 'CUE_PAST',
@@ -77,11 +79,11 @@ export function createTimestamps (
   const sortedCues = getSortedCues(cues, cueOrder)
 
   // Build the original timestamps from runner.originalCues & cues, or copy ideal if runner=null
-  const originalStartDurations = createOriginalStartDurations(sortedCues, runner, startTime)
+  const originalStartDurations = createOriginalStartDurations(startTime, sortedCues, runner, { timezone, now })
 
   // Buid the actual timestamps from runner.timesnap, runner.elapsedCues & cues
   const actualStartDurations = runner
-    ? createActualStartDurations(sortedCues, runner, now)
+    ? createActualStartDurations(sortedCues, runner, { timezone, now })
     : originalStartDurations
 
   // Aggregate global start & duration for these three categories
@@ -171,17 +173,27 @@ function calculateTotalStartDuration (
  * own properties.
  */
 function createOriginalStartDurations (
+  startTime: Date,
   cues: RundownCue[],
   runner: Runner | null,
-  startTime: Date,
+  {
+    timezone,
+    now,
+  }: {
+    timezone: string
+    now: Date
+  },
 ): Record<RundownCue['id'], StartDuration> {
   if (!cues.length) return {}
 
   const sdMap: Record<RundownCue['id'], StartDuration> = {}
-  let previousEnd: Date = startTime
+  const today = getStartOfDay(now, { timezone })
+  let previousEnd: Date = applyDate(startTime, today, { timezone })
 
   cues.forEach((cue) => {
     const originalCue = runner?.originalCues[cue.id]
+
+    // Assemble item
     let item: StartDuration
     if (originalCue) {
       item = {
@@ -195,6 +207,12 @@ function createOriginalStartDurations (
         duration: cue.duration,
       }
     }
+
+    // Make sure all cues are consecutive
+    if (item.start < previousEnd) {
+      item.start = moveAfterWithTolerance(item.start, previousEnd, TOLERANCE, { timezone })
+    }
+
     previousEnd = new Date(item.start.getTime() + item.duration)
     sdMap[cue.id] = item
   })
@@ -213,7 +231,13 @@ function createOriginalStartDurations (
 function createActualStartDurations (
   cues: RundownCue[],
   runner: Runner,
-  now: Date,
+  {
+    timezone,
+    now,
+  }: {
+    timezone: string
+    now: Date
+  },
 ): Record<RundownCue['id'], StartDuration> {
   if (!cues.length) return {}
 
@@ -241,6 +265,11 @@ function createActualStartDurations (
         start: lockedStart || previousEnd,
         duration: cue.duration,
       }
+    }
+
+    // Make sure all cues are consecutive
+    if (item.start < previousEnd) {
+      item.start = moveAfterWithTolerance(item.start, previousEnd, TOLERANCE, { timezone })
     }
 
     previousEnd = new Date(item.start.getTime() + item.duration)
