@@ -48,9 +48,9 @@ const defaultRunner = {
   },
   nextCueId: '#2',
   originalCues: {
-    '#1': _.pick(defaultCues[0], ['startTime', 'duration']),
-    '#2': _.pick(defaultCues[1], ['startTime', 'duration']),
-    '#3': _.pick(defaultCues[2], ['startTime', 'duration']),
+    '#1': _.pick(defaultCues[0], ['startTime', 'startMode', 'duration']),
+    '#2': _.pick(defaultCues[1], ['startTime', 'startMode', 'duration']),
+    '#3': _.pick(defaultCues[2], ['startTime', 'startMode', 'duration']),
   },
   elapsedCues: {},
 }
@@ -148,6 +148,90 @@ describe('createTimestamps', () => {
         actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000 },
       })
     })
+
+    it('Ignore cues not part of cue order', () => {
+      jest.setSystemTime(startTime)
+      const cues = defaultCues
+      const cueOrder = [{ id: '#1' }, { id: '#3' }]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.equal(undefined)
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000 },
+      })
+    })
+
+    it('Handle cue groups and heading', () => {
+      jest.setSystemTime(new Date('2024-07-26T09:00:00.000Z'))
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#heading',
+          type: 'heading',
+          title: 'Heading',
+        },
+        ...defaultCues,
+        {
+          ...getCueDefaults(),
+          id: '#group',
+          type: 'group',
+          title: 'Group',
+        },
+      ]
+      const cueOrder = [
+        { id: 'heading' },
+        { id: '#1' },
+        {
+          id: 'group',
+          children: [
+            { id: '#2' },
+            { id: '#3' },
+          ],
+        },
+      ]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 1,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+      })
+    })
   })
 
   describe('Running, different over/under cases, same day UTC', () => {
@@ -220,7 +304,7 @@ describe('createTimestamps', () => {
         deadline: addMinutes(startTime, 8),
       }
       runner.nextCueId = '#2'
-      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'duration'])
+      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'startMode', 'duration'])
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
@@ -280,7 +364,7 @@ describe('createTimestamps', () => {
         deadline: new Date('2024-07-26T09:15:00.000Z'),
       }
       runner.nextCueId = '#3'
-      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'duration'])
+      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'startMode', 'duration'])
       runner.elapsedCues['#1'] ={
         startTime: new Date('2024-07-26T09:00:00.000Z'),
         duration: (5 * 60000),
@@ -454,6 +538,122 @@ describe('createTimestamps', () => {
         actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
       })
     })
+
+    it('Cue inserted after creating runner with original cues, inserted cue is future', () => {
+      jest.setSystemTime(new Date('2024-07-26T09:03:00.000Z'))
+      const cues = _.cloneDeep(defaultCues)
+      const runner = _.cloneDeep(defaultRunner)
+      runner.timesnap = {
+        cueId: '#1',
+        running: true,
+        kickoff: new Date('2024-07-26T09:00:00.000Z'),
+        lastStop: new Date('2024-07-26T09:00:00.000Z'),
+        deadline: new Date('2024-07-26T09:05:00.000Z'),
+      }
+      runner.nextCueId = '#2'
+      cues.push({
+        ...getCueDefaults(),
+        id: '#2b',
+        type: 'cue',
+        title: 'Cue 2b',
+        startTime: null,
+        duration: 5 * 60000,
+      })
+      const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#2b' }, { id: '#3' }]
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_ACTIVE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_NEXT',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#2b']).to.deep.equal({
+        id: '#2b',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
+      })
+    })
+
+    it('Cue inserted after creating runner with original cues, inserted cue is active', () => {
+      jest.setSystemTime(new Date('2024-07-26T09:08:00.000Z'))
+      const cues = _.cloneDeep(defaultCues)
+      const runner = _.cloneDeep(defaultRunner)
+      runner.timesnap = {
+        cueId: '#1b',
+        running: true,
+        kickoff: new Date('2024-07-26T09:05:00.000Z'),
+        lastStop: new Date('2024-07-26T09:05:00.000Z'),
+        deadline: new Date('2024-07-26T09:10:00.000Z'),
+      }
+      runner.nextCueId = '#2'
+      runner.elapsedCues['#1'] ={
+        startTime: new Date('2024-07-26T09:00:00.000Z'),
+        duration: (5 * 60000),
+      }
+      cues.push({
+        ...getCueDefaults(),
+        id: '#1b',
+        type: 'cue',
+        title: 'Cue 1b',
+        startTime: null,
+        duration: 5 * 60000,
+      })
+      const cueOrder = [{ id: '#1' }, { id: '#1b' }, { id: '#2' }, { id: '#3' }]
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_PAST',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#1b']).to.deep.equal({
+        id: '#1b',
+        index: 3,
+        state: 'CUE_ACTIVE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_NEXT',
+        original: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
+      })
+    })
   })
 
   describe('Future date in America/Los_Angeles', () => {
@@ -571,7 +771,7 @@ describe('createTimestamps', () => {
         deadline: new Date('2024-08-12T09:15:00.000Z'),
       }
       runner.nextCueId = '#3'
-      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'duration'])
+      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'startMode', 'duration'])
       runner.elapsedCues['#1'] ={
         startTime: new Date('2024-08-12T09:00:00.000Z'),
         duration: (5 * 60000),
@@ -612,7 +812,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Not running, spanning multiple days', () => {
+    it('Spanning multiple days, not running', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:00:00.000Z')
       jest.setSystemTime(now)
@@ -666,7 +866,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Running, spanning multiple days, now is second day', () => {
+    it('Spanning multiple days, running, now is second day', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-13T10:35:00.000Z')
       jest.setSystemTime(now)
@@ -694,10 +894,10 @@ describe('createTimestamps', () => {
       }
       runner.nextCueId = null
       runner.originalCues = {
-        '#1': _.pick(cues[0], ['startTime', 'duration']),
-        '#2': _.pick(cues[1], ['startTime', 'duration']),
-        '#3': _.pick(cues[2], ['startTime', 'duration']),
-        '#4': _.pick(cues[3], ['startTime', 'duration']),
+        '#1': _.pick(cues[0], ['startTime', 'startMode', 'duration']),
+        '#2': _.pick(cues[1], ['startTime', 'startMode', 'duration']),
+        '#3': _.pick(cues[2], ['startTime', 'startMode', 'duration']),
+        '#4': _.pick(cues[3], ['startTime', 'startMode', 'duration']),
       }
       runner.elapsedCues = {
         '#1': {
@@ -715,6 +915,8 @@ describe('createTimestamps', () => {
       }
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
+
+      console.log('[createTimestamps.test.js]', timestamps.cues)
 
       expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000 })
       expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:05:00.000Z'), duration: (28 * 60 * 60000) + (12 * 60000) - (5 * 60000) })
@@ -747,13 +949,100 @@ describe('createTimestamps', () => {
         actual: { start: new Date('2024-08-13T10:12:00.000Z'), duration: 3 * 60 * 60000 },
       })
     })
+
+    it('Created before and started after a DST change, not running', () => {
+      // Daylight Saving Time ends: November 3, 2024 02:00
+      const timezone = 'America/Los_Angeles'
+      const now = new Date('2024-11-05T10:42:00.000Z')
+      jest.setSystemTime(now)
+      const cues = defaultCues
+      const cueOrder = defaultCueOrder
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000 },
+      })
+    })
+
+    it('Created before and started after a DST change, running', () => {
+      // Daylight Saving Time ends: November 3, 2024 02:00
+      const timezone = 'America/Los_Angeles'
+      const now = new Date('2024-11-05T10:42:00.000Z')
+      jest.setSystemTime(now)
+      const cues = defaultCues
+      const cueOrder = defaultCueOrder
+      const runner = _.cloneDeep(defaultRunner)
+      runner.timesnap = {
+        cueId: '#3',
+        running: true,
+        kickoff: new Date('2024-11-05T10:15:00.000Z'),
+        lastStop: new Date('2024-11-05T10:15:00.000Z'),
+        deadline: new Date('2024-11-05T10:30:00.000Z'),
+      }
+      runner.nextCueId = null
+      runner.elapsedCues = {
+        '#1': {
+          startTime: new Date('2024-11-05T10:00:00.000Z'),
+          duration: (5 * 60000),
+        },
+        '#2': {
+          startTime: new Date('2024-11-05T10:05:00.000Z'),
+          duration: (10 * 60000),
+        },
+      }
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 42 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_PAST',
+        original: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_PAST',
+        original: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_ACTIVE',
+        original: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 27 * 60000 },
+      })
+    })
   })
 })
 
-// - Ignore cues not part of cue order
 // - Cue inserted after creating runner with original cues
-// - Spanning multiple days, now is second day
-// - Spanning multiple days across DST change
 
 
 

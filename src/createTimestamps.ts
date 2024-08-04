@@ -30,7 +30,7 @@ export interface StartDuration {
 
 export interface Timestamp {
   id: RundownCue['id']
-  index: number
+  index: number // The index of the cue in the original cues array
   state: CueRunState | GroupRunState
   original: StartDuration
   actual: StartDuration
@@ -96,7 +96,7 @@ export function createTimestamps (
     original: originalTotal,
     actual: actualTotal,
     cues: Object.fromEntries(
-      cues.map((cue): [Timestamp['id'], Timestamp] => [
+      sortedCues.map((cue): [Timestamp['id'], Timestamp] => [
         cue.id,
         {
           id: cue.id,
@@ -198,8 +198,9 @@ function createOriginalStartDurations (
     // Assemble item
     let item: StartDuration
     if (originalCue) {
+      const lockedStart = originalCue.startMode === CueStartMode.FIXED ? originalCue.startTime : null
       item = {
-        start: originalCue.startTime ? new Date(originalCue.startTime) : previousEnd,
+        start: lockedStart || previousEnd,
         duration: originalCue.duration,
       }
     } else {
@@ -274,7 +275,7 @@ function createActualStartDurations (
       item.start = moveAfterWithTolerance(item.start, previousEnd, TOLERANCE, { timezone })
     }
 
-    previousEnd = new Date(item.start.getTime() + item.duration)
+    if (item.start) previousEnd = new Date(item.start.getTime() + item.duration)
     sdMap[cue.id] = item
   })
 
