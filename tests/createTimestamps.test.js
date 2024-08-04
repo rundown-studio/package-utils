@@ -916,8 +916,6 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      console.log('[createTimestamps.test.js]', timestamps.cues)
-
       expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000 })
       expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:05:00.000Z'), duration: (28 * 60 * 60000) + (12 * 60000) - (5 * 60000) })
       expect(timestamps.cues['#1']).to.deep.equal({
