@@ -1,5 +1,6 @@
 import { RundownCue, RundownCueOrderItem, Runner, CueStartMode, CueType } from '@rundown-studio/types'
 import { moveAfterWithTolerance, applyDate, getStartOfDay } from '@rundown-studio/timeutils'
+import _isEmpty from 'lodash/isEmpty'
 
 const TOLERANCE = 60 * 60000 // 60 min
 
@@ -66,9 +67,6 @@ export function createTimestamps (
   } = {},
 ): Timestamps {
   if (!(now instanceof Date)) throw new Error('`now` must be an instance of Date')
-  const tz = timezone || 'UTC'
-
-  console.log('[createTimestamps] tz', tz)
 
   // Remember the original cue index
   const cueIndexMap: Record<RundownCue['id'], number> = Object.fromEntries(
@@ -78,13 +76,17 @@ export function createTimestamps (
   // Create a list of cues (type=CueType.CUE) in order, ignoring groups
   const sortedCues = getSortedCues(cues, cueOrder)
 
-  // Build the original timestamps from runner.originalCues & cues, or copy ideal if runner=null
-  const originalStartDurations = createOriginalStartDurations(startTime, sortedCues, runner, { timezone, now })
-
   // Buid the actual timestamps from runner.timesnap, runner.elapsedCues & cues
-  const actualStartDurations = runner
-    ? createActualStartDurations(sortedCues, runner, { timezone, now })
-    : originalStartDurations
+  let actualStartDurations: Record<RundownCue['id'], StartDuration> = {}
+  if (runner) {
+    actualStartDurations = createActualStartDurations(sortedCues, runner, { timezone, now })
+  }
+
+  // Build the original timestamps from runner.originalCues & cues, or copy ideal if runner=null
+  const actualStart: Date | undefined = actualStartDurations?.[sortedCues[0].id]?.start
+  const firstDay = actualStart || now
+  const originalStartDurations = createOriginalStartDurations(startTime, sortedCues, runner, { timezone, firstDay })
+  if (_isEmpty(actualStartDurations)) actualStartDurations = originalStartDurations
 
   // Aggregate global start & duration for these three categories
   const originalTotal = calculateTotalStartDuration(originalStartDurations)
@@ -178,17 +180,17 @@ function createOriginalStartDurations (
   runner: Runner | null,
   {
     timezone,
-    now,
+    firstDay,
   }: {
     timezone: string
-    now: Date
+    firstDay: Date
   },
 ): Record<RundownCue['id'], StartDuration> {
   if (!cues.length) return {}
 
   const sdMap: Record<RundownCue['id'], StartDuration> = {}
-  const today = getStartOfDay(now, { timezone })
-  let previousEnd: Date = applyDate(startTime, today, { timezone })
+  const startOfFirstDay = getStartOfDay(firstDay, { timezone })
+  let previousEnd: Date = applyDate(startTime, startOfFirstDay, { timezone })
 
   cues.forEach((cue) => {
     const originalCue = runner?.originalCues[cue.id]
