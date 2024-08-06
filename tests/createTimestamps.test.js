@@ -1,7 +1,7 @@
 import { jest } from '@jest/globals'
 import { expect } from 'chai'
-import { createTimestamps, getCueDefaults, getRunnerDefaults } from '../dist/esm/index.js'
-import { CueStartMode } from '@rundown-studio/types'
+import { createTimestamps } from '../dist/esm/index.js'
+import { CueStartMode, getCueDefaults, getRunnerDefaults } from '@rundown-studio/types'
 import _ from 'lodash'
 import { addMinutes } from 'date-fns'
 
