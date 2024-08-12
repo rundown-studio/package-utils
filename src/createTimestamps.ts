@@ -1,8 +1,7 @@
 import { RundownCue, RundownCueOrderItem, Runner, CueStartMode, CueType } from '@rundown-studio/types'
 import { moveAfterWithTolerance, applyDate, getStartOfDay } from '@rundown-studio/timeutils'
+import { CUE_OVERLAP_TOLERANCE } from '@rundown-studio/consts'
 import _isEmpty from 'lodash/isEmpty'
-
-const TOLERANCE = 60 * 60000 // 60 min
 
 export enum CueRunState {
   CUE_PAST = 'CUE_PAST',
@@ -213,7 +212,7 @@ function createOriginalStartDurations (
 
     // Make sure all cues are consecutive
     if (item.start < previousEnd) {
-      item.start = moveAfterWithTolerance(item.start, previousEnd, TOLERANCE, { timezone })
+      item.start = moveAfterWithTolerance(item.start, previousEnd, CUE_OVERLAP_TOLERANCE, { timezone })
     }
 
     previousEnd = new Date(item.start.getTime() + item.duration)
@@ -272,7 +271,7 @@ function createActualStartDurations (
 
     // Make sure all cues are consecutive
     if (item.start < previousEnd) {
-      item.start = moveAfterWithTolerance(item.start, previousEnd, TOLERANCE, { timezone })
+      item.start = moveAfterWithTolerance(item.start, previousEnd, CUE_OVERLAP_TOLERANCE, { timezone })
     }
 
     if (item.start) previousEnd = new Date(item.start.getTime() + item.duration)

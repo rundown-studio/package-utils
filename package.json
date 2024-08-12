@@ -38,6 +38,7 @@
     "typescript-eslint": "^8.0.0-alpha.45"
   },
   "dependencies": {
+    "@rundown-studio/consts": "^0.2.6",
     "@rundown-studio/timeutils": "^0.3.0",
     "@rundown-studio/types": "^0.4.0",
     "date-fns": "^3.6.0",
