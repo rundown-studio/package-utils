@@ -48,9 +48,21 @@ const defaultRunner = {
   },
   nextCueId: '#2',
   originalCues: {
-    '#1': _.pick(defaultCues[0], ['startTime', 'startMode', 'duration']),
-    '#2': _.pick(defaultCues[1], ['startTime', 'startMode', 'duration']),
-    '#3': _.pick(defaultCues[2], ['startTime', 'startMode', 'duration']),
+    '#1': {
+      startTime: null,
+      startMode: undefined,
+      duration: 5 * 60000, // 5 min
+    },
+    '#2': {
+      startTime: null,
+      startMode: undefined,
+      duration: 10 * 60000, // 10 min
+    },
+    '#3': {
+      startTime: null,
+      startMode: undefined,
+      duration: 15 * 60000, // 15 min
+    },
   },
   elapsedCues: {},
 }
@@ -249,7 +261,7 @@ describe('createTimestamps', () => {
       }
       runner.nextCueId = '#3'
       runner.elapsedCues['#1'] ={
-        startTime: startTime,
+        startTime: startTime.toISOString(),
         duration: (10 * 60000), // 10 min
       }
 
@@ -304,7 +316,11 @@ describe('createTimestamps', () => {
         deadline: addMinutes(startTime, 8),
       }
       runner.nextCueId = '#2'
-      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'startMode', 'duration'])
+      runner.originalCues['#4'] = {
+        startTime: addMinutes(startTime, 60).toISOString(),
+        startMode: CueStartMode.FIXED,
+        duration: 30 * 60000, // 30 min
+      }
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
@@ -364,9 +380,13 @@ describe('createTimestamps', () => {
         deadline: new Date('2024-07-26T09:15:00.000Z'),
       }
       runner.nextCueId = '#3'
-      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'startMode', 'duration'])
+      runner.originalCues['#4'] = {
+        startTime: addMinutes(startTime, 60).toISOString(),
+        startMode: CueStartMode.FIXED,
+        duration: 30 * 60000, // 30 min
+      }
       runner.elapsedCues['#1'] ={
-        startTime: new Date('2024-07-26T09:00:00.000Z'),
+        startTime: '2024-07-26T09:00:00.000Z',
         duration: (5 * 60000),
       }
 
@@ -420,7 +440,7 @@ describe('createTimestamps', () => {
       }
       runner.nextCueId = '#3'
       runner.elapsedCues['#1'] ={
-        startTime: new Date('2024-07-26T08:58:00.000Z'),
+        startTime: '2024-07-26T08:58:00.000Z',
         duration: (3 * 60000),
       }
 
@@ -466,7 +486,7 @@ describe('createTimestamps', () => {
       }
       runner.nextCueId = '#3'
       runner.elapsedCues['#1'] ={
-        startTime: new Date('2024-07-26T08:58:00.000Z'),
+        startTime: '2024-07-26T08:58:00.000Z',
         duration: (3 * 60000),
       }
 
@@ -608,7 +628,7 @@ describe('createTimestamps', () => {
       }
       runner.nextCueId = '#2'
       runner.elapsedCues['#1'] ={
-        startTime: new Date('2024-07-26T09:00:00.000Z'),
+        startTime: '2024-07-26T09:00:00.000Z',
         duration: (5 * 60000),
       }
       cues.push({
@@ -771,9 +791,13 @@ describe('createTimestamps', () => {
         deadline: new Date('2024-08-12T09:15:00.000Z'),
       }
       runner.nextCueId = '#3'
-      runner.originalCues['#4'] = _.pick(cues[3], ['startTime', 'startMode', 'duration'])
+      runner.originalCues['#4'] = {
+        startTime: addMinutes(startTime, 60).toISOString(),
+        startMode: CueStartMode.FIXED,
+        duration: 30 * 60000, // 30 min
+      }
       runner.elapsedCues['#1'] ={
-        startTime: new Date('2024-08-12T09:00:00.000Z'),
+        startTime: '2024-08-12T09:00:00.000Z',
         duration: (5 * 60000),
       }
 
@@ -894,22 +918,35 @@ describe('createTimestamps', () => {
       }
       runner.nextCueId = null
       runner.originalCues = {
-        '#1': _.pick(cues[0], ['startTime', 'startMode', 'duration']),
-        '#2': _.pick(cues[1], ['startTime', 'startMode', 'duration']),
-        '#3': _.pick(cues[2], ['startTime', 'startMode', 'duration']),
-        '#4': _.pick(cues[3], ['startTime', 'startMode', 'duration']),
+        '#1': {
+          startTime: null,
+          duration: 6 * 60 * 60000 // 6h
+        },
+        '#2': {
+          startTime: null,
+          duration: 10 * 60 * 60000 // 8h
+        },
+        '#3': {
+          startTime: null,
+          duration: 3 * 60 * 60000 // 3h
+        },
+        '#4': {
+          startTime: '2024-07-26T10:00:00.000Z',
+          startMode: CueStartMode.FIXED,
+          duration: 3 * 60 * 60000 // 3h
+        },
       }
       runner.elapsedCues = {
         '#1': {
-          startTime: new Date('2024-08-12T09:05:00.000Z'),
+          startTime: '2024-08-12T09:05:00.000Z',
           duration: (6 * 60 * 60000) + (5 * 60000),
         },
         '#2': {
-          startTime: new Date('2024-08-12T15:10:00.000Z'),
+          startTime: '2024-08-12T15:10:00.000Z',
           duration: (10 * 60 * 60000) - (9 * 60000),
         },
         '#3': {
-          startTime: new Date('2024-08-13T00:51:00.000Z'),
+          startTime: '2024-08-13T00:51:00.000Z',
           duration: (3 * 60 * 60000) + (18 * 60000),
         },
       }
@@ -1002,11 +1039,11 @@ describe('createTimestamps', () => {
       runner.nextCueId = null
       runner.elapsedCues = {
         '#1': {
-          startTime: new Date('2024-11-05T10:00:00.000Z'),
+          startTime: '2024-11-05T10:00:00.000Z',
           duration: (5 * 60000),
         },
         '#2': {
-          startTime: new Date('2024-11-05T10:05:00.000Z'),
+          startTime: '2024-11-05T10:05:00.000Z',
           duration: (10 * 60000),
         },
       }
