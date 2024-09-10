@@ -74,6 +74,7 @@ export function createTimestamps (
 
   // Create a list of cues (type=CueType.CUE) in order, ignoring groups
   const sortedCues = getSortedCues(cues, cueOrder)
+  const sortedCueIds = sortedCues.map((c) => c.id)
 
   // Buid the actual timestamps from runner.timesnap, runner.elapsedCues & cues
   let actualStartDurations: Record<RundownCue['id'], StartDuration> = {}
@@ -100,7 +101,7 @@ export function createTimestamps (
         {
           id: cue.id,
           index: cueIndexMap[cue.id],
-          state: determineCueState(cue.id, runner),
+          state: determineCueState(cue.id, runner, sortedCueIds),
           original: originalStartDurations[cue.id],
           actual: actualStartDurations[cue.id],
         },
@@ -246,11 +247,13 @@ function createActualStartDurations (
   if (!cues.length) return {}
 
   const sdMap: Record<RundownCue['id'], StartDuration> = {}
+  const sortedCueIds = cues.map((c) => c.id)
   let previousEnd: Date
 
   cues.forEach((cue) => {
     const elapsedCue = runner.elapsedCues[cue.id]
     const isCurrent = runner.timesnap.cueId === cue.id
+    const isPast = sortedCueIds.indexOf(cue.id) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
 
     let item: StartDuration
     if (elapsedCue) {
@@ -262,6 +265,11 @@ function createActualStartDurations (
       item = {
         start: new Date(runner.timesnap.kickoff),
         duration: Math.max(now.getTime(), runner.timesnap.deadline) - runner.timesnap.kickoff,
+      }
+    } else if (isPast) {
+      item = {
+        start: previousEnd || new Date(runner.timesnap.kickoff),
+        duration: 0,
       }
     } else {
       const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
@@ -287,20 +295,22 @@ function createActualStartDurations (
  * Determine the state of a cue based on the runner.
  * @param cueId - The ID of the cue in question.
  * @param runner - The Runner object, if available.
+ * @param sortedCueIds - List of sorted cue ids.
  * @returns The CueRunState of the cue.
  */
 function determineCueState (
   cueId: RundownCue['id'],
   runner: Runner | null,
+  sortedCueIds: RundownCue['id'][],
 ): CueRunState {
   if (!runner) return CueRunState.CUE_FUTURE
 
-  const isPast = Boolean(runner.elapsedCues[cueId])
+  const isPast = sortedCueIds.indexOf(cueId) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
   const isActive = runner.timesnap.cueId === cueId
   const isNext = runner.nextCueId === cueId
 
+  if (isNext) return CueRunState.CUE_NEXT
   if (isPast) return CueRunState.CUE_PAST
   if (isActive) return CueRunState.CUE_ACTIVE
-  if (isNext) return CueRunState.CUE_NEXT
   return CueRunState.CUE_FUTURE
 }

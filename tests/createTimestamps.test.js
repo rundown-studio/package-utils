@@ -1174,6 +1174,7 @@ describe('createTimestamps', () => {
         lastStop: startTime,
         deadline: addMinutes(startTime, 15),
       }
+      runner.nextCueId = null
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
