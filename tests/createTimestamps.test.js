@@ -110,6 +110,50 @@ describe('createTimestamps', () => {
       })
     })
 
+    it('Not running, already ran', () => {
+      jest.setSystemTime(startTime)
+      const cues = defaultCues
+      const cueOrder = defaultCueOrder
+      const runner = _.cloneDeep(defaultRunner)
+      runner.timesnap = {
+        cueId: null,
+        running: false,
+        kickoff: startTime,
+        lastStop: startTime,
+        deadline: addMinutes(startTime, 15),
+      }
+      runner.elapsedCues['#3'] = {
+        startTime: startTime.toISOString(),
+        duration: (15 * 60000), // 15 min
+      }
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_PAST',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_PAST',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_PAST',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000 },
+      })
+    })
+
     it('Not running, runner is null, with locked cue', () => {
       jest.setSystemTime(startTime)
       const cues = [
@@ -1076,7 +1120,6 @@ describe('createTimestamps', () => {
     })
   })
 
-  // TODO: rename this tests
   describe('Next cue/Jump to cue starting and jumping cases', () => {
     it('Jump to the past', () => {
       jest.setSystemTime(addMinutes(startTime, 6))

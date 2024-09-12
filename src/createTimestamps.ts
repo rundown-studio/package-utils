@@ -253,7 +253,7 @@ function createActualStartDurations (
   cues.forEach((cue) => {
     const elapsedCue = runner.elapsedCues[cue.id]
     const isCurrent = runner.timesnap.cueId === cue.id
-    const isPast = sortedCueIds.indexOf(cue.id) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
+    const isPast = runner.timesnap.cueId === null || sortedCueIds.indexOf(cue.id) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
 
     let item: StartDuration
     if (elapsedCue) {
@@ -304,6 +304,7 @@ function determineCueState (
   sortedCueIds: RundownCue['id'][],
 ): CueRunState {
   if (!runner) return CueRunState.CUE_FUTURE
+  if (runner.timesnap.cueId === null) return CueRunState.CUE_PAST
 
   const isPast = sortedCueIds.indexOf(cueId) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
   const isActive = runner.timesnap.cueId === cueId
