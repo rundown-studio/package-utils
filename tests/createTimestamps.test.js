@@ -1121,7 +1121,7 @@ describe('createTimestamps', () => {
   })
 
   describe('Next cue/Jump to cue starting and jumping cases', () => {
-    it('Jump to the past', () => {
+    it('Future jump to the past', () => {
       jest.setSystemTime(addMinutes(startTime, 6))
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
@@ -1165,6 +1165,56 @@ describe('createTimestamps', () => {
         actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
       })
     })
+
+    it('Did jump to the past', () => {
+      jest.setSystemTime(addMinutes(startTime, 15))
+      const cues = _.cloneDeep(defaultCues)
+      const cueOrder = _.cloneDeep(defaultCueOrder)
+      const runner = _.cloneDeep(defaultRunner)
+      runner.timesnap = {
+        cueId: '#1',
+        running: true,
+        kickoff: addMinutes(startTime, 15),
+        lastStop: addMinutes(startTime, 15),
+        deadline: addMinutes(startTime, 20),
+      }
+      runner.nextCueId = '#2'
+      runner.elapsedCues['#1'] = {
+        startTime: startTime.toISOString(),
+        duration: (5 * 60000), // 5 min
+      }
+      runner.elapsedCues['#2'] = {
+        startTime: addMinutes(startTime, 5).toISOString(),
+        duration: (10 * 60000), // 10 min
+      }
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:15:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_ACTIVE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_NEXT',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 15 * 60000 },
+      })
+    })
+
     it('Jump to the future', () => {
       jest.setSystemTime(addMinutes(startTime, 3))
       const cues = _.cloneDeep(defaultCues)
@@ -1205,6 +1255,7 @@ describe('createTimestamps', () => {
         actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
       })
     })
+
     it('Start/Be in the future, all before should be CUE_PAST', () => {
       jest.setSystemTime(addMinutes(startTime, 3))
       const cues = _.cloneDeep(defaultCues)

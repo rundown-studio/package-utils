@@ -254,17 +254,18 @@ function createActualStartDurations (
     const elapsedCue = runner.elapsedCues[cue.id]
     const isCurrent = runner.timesnap.cueId === cue.id
     const isPast = runner.timesnap.cueId === null || sortedCueIds.indexOf(cue.id) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
+    const isFuture = !isPast && !isCurrent
 
     let item: StartDuration
-    if (elapsedCue) {
-      item = {
-        start: new Date(elapsedCue.startTime),
-        duration: elapsedCue.duration,
-      }
-    } else if (isCurrent) {
+    if (isCurrent) {
       item = {
         start: new Date(runner.timesnap.kickoff),
         duration: Math.max(now.getTime(), runner.timesnap.deadline) - runner.timesnap.kickoff,
+      }
+    } else if (elapsedCue && !isFuture) {
+      item = {
+        start: new Date(elapsedCue.startTime),
+        duration: elapsedCue.duration,
       }
     } else if (isPast) {
       item = {
