@@ -198,7 +198,7 @@ function createOriginalStartDurations (
     // Assemble item
     let item: StartDuration
     if (originalCue) {
-      const lockedStart = originalCue.startMode === CueStartMode.FIXED && cue.startTime
+      const lockedStart = cue.startMode === CueStartMode.FIXED && cue.startTime
         ? new Date(cue.startTime)
         : null
       item = {
