@@ -480,6 +480,70 @@ describe('createTimestamps', () => {
         actual: { start: new Date('2024-07-26T10:30:00.000Z'), duration: 10 * 60000 },
       })
     })
+    
+    it('Starting on time, edited cue from flexible to fixed', () => {
+      jest.setSystemTime(addMinutes(startTime, 3))
+      const cues = [
+        ...defaultCues,
+        {
+          ...getCueDefaults(),
+          id: '#4',
+          type: 'cue',
+          title: 'Cue 4',
+          startTime: addMinutes(startTime, 60), // 10:00 AM
+          startMode: CueStartMode.FIXED,
+          duration: 20 * 60000, // 20 min
+        }
+      ]
+      const cueOrder = [...defaultCueOrder, { id: '#4' }]
+      const runner = _.cloneDeep(defaultRunner)
+      runner.timesnap = {
+        cueId: '#1',
+        running: true,
+        kickoff: startTime,
+        lastStop: startTime,
+        deadline: addMinutes(startTime, 5),
+      }
+      runner.nextCueId = '#2'
+      runner.originalCues['#4'] = {
+        startTime: addMinutes(startTime, 30).toISOString(),
+        startMode: CueStartMode.FLEXIBLE,
+        duration: 20 * 60000,
+      }
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 80 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 80 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_ACTIVE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_NEXT',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+      })
+      expect(timestamps.cues['#4']).to.deep.equal({
+        id: '#4',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 20 * 60000 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 20 * 60000 },
+      })
+    })
 
     it('Running overtime, conflicting with locked cue start', () => {
       jest.setSystemTime(new Date('2024-07-26T09:50:00.000Z'))
