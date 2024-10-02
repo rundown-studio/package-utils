@@ -203,7 +203,7 @@ function createOriginalStartDurations (
         : null
       item = {
         start: lockedStart || previousEnd,
-        duration: lockedStart ? cue.duration : originalCue.duration,
+        duration: originalCue.duration,
       }
     } else {
       const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
