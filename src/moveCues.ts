@@ -1,5 +1,28 @@
 import { Rundown, RundownCueOrderItem } from '@rundown-studio/types'
 
+/**
+ * Moves selected cues to a new position within the rundown's cue order.
+ * This function reorders the cues based on a specified destination index and
+ * validates that group headers cannot be moved into another group.
+ *
+ * @async
+ * @function
+ * @param {RundownCueOrderItem[]} cueOrder - The original array representing the current order of cues.
+ * @param {Array<Rundown['id']>} selectedCues - An array of IDs for the cues that should be moved.
+ * @param {string} destination - A string representing the target position in the form "mainIndex.subIndex".
+ *                                - `mainIndex` refers to the position of the cue or group in the main order.
+ *                                - `subIndex` (optional) refers to the position within a group's children.
+ *
+ * @throws {Error} Throws an error if a group header is attempted to be moved inside another group.
+ *
+ * @return {Promise<RundownCueOrderItem[]>} - A promise that resolves to the new order of cues (`newCueOrder`)
+ *                                            after the selected cues have been moved.
+ *
+ * @description
+ * - Parses the destination to determine the main and sub-level positions.
+ * - Removes the selected cues from their original positions and inserts them at the destination.
+ * - Ensures that groups are not improperly nested within other groups.
+ */
 export async function moveCues (
   cueOrder: RundownCueOrderItem[],
   selectedCues: Array<Rundown['id']>,
