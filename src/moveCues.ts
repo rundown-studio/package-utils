@@ -1,82 +1,96 @@
 import { Rundown, RundownCueOrderItem } from '@rundown-studio/types'
 
-/**
- * Moves selected cues to a new position within the rundown's cues order.
- * This function reorders the cues based on a given destination string and validates
- * that group headers cannot be nested within other groups.
- *
- * @async
- * @function
- * @param {RundownCueOrderItem[]} cueOrder - Original cue order, representing actual position of each cue.
- * @param {Array<string>} selectedCues - Array of IDs for the cues to be moved.
- * @param {string} destination - A string representing the target index position in the form "\d+\.?\d*"
- *                               (e.g., "4" for a main level position or "4.2" for a position within a group).
- *
- * @throws {Error} Will throw an error if a group header is moved into another group, as nested groups are not allowed.
- *
- * @return {Promise<RundownCueOrderItem[]>} - A promise that resolves to the new order of cues (`newCuesOrder`)
- *                                             after the selected cues have been moved.
- *
- * @description
- * This function:
- * - Retrieves the rundown cues order from the service.
- * - Identifies and collects the selected cues and their current positions within the rundown.
- * - Validates the destination for group header movements to prevent nested groups.
- * - Removes selected cues from their original positions.
- * - Inserts the selected cues into the specified position based on `destination`.
- *
- * @example
- * // Moves selected cues to position after index 4.2
- * await moveCues('rundown123', ['cueId1', 'cueId2'], '4.2')
- */
 export async function moveCues (
   cueOrder: RundownCueOrderItem[],
   selectedCues: Array<Rundown['id']>,
   destination: string,
 ): Promise<RundownCueOrderItem[]> {
-  const newCuesOrder = [...cueOrder]
-  const parsedInput = destination.split('.').map(Number) // e.g., '4.2' becomes [4, 2]
-  const mainIndex = parsedInput[0] - 1 // Adjust to 0-based index
-  const subIndex = parsedInput[1] !== undefined ? parsedInput[1] - 1 : null
+  const selectedItems = selectCueOrderItems(cueOrder, selectedCues)
+  const parsedInput = destination.split('.').map(Number)
+  const mainIndex = parsedInput[0]
+  const subIndex = parsedInput[1]
 
-  const selectedCueIds = new Set(selectedCues)
-  const selectedItems = []
-
-  // Flatten cuesOrder for easier manipulation
-  for (const [i, cue] of newCuesOrder.entries()) {
-    if (selectedCueIds.has(cue.id)) {
-      selectedItems.push({ item: cue, index: i })
-      continue
-    }
-    if (cue.children) {
-      const childrenToRemove: Array<number> = []
-      for (const [j, child] of cue.children.entries()) {
-        if (selectedCueIds.has(child.id)) {
-          selectedItems.push({ item: child, groupIndex: i, childIndex: j })
-          childrenToRemove.push(j)
-        }
-      }
-      cue.children = cue.children.filter((_, idx) => !childrenToRemove.includes(idx))
-    }
-  }
-
-  if (selectedItems.some(({ item }) => item.children) && subIndex !== null) {
+  // Error handling: prevent adding a group into another group
+  if (selectedItems.find((i) => i.children) && subIndex) {
     throw new Error('Cannot move a group header inside another group')
   }
 
-  for (const { index, groupIndex, childIndex } of selectedItems.reverse()) {
-    if (index !== undefined) {
-      newCuesOrder.splice(index, 1)
-    } else if (groupIndex !== undefined && childIndex !== undefined) {
-      newCuesOrder[groupIndex].children?.splice(childIndex, 1)
+  const newCueOrder: RundownCueOrderItem[] = []
+  let idx = 0
+
+  if (mainIndex == 0) {
+    newCueOrder.push(...selectedItems)
+  }
+
+  for (const cueOrderItem of cueOrder) {
+    idx++
+    if (!cueOrderItem.children) {
+      if (!selectedCues.includes(cueOrderItem.id)) {
+        newCueOrder.push(cueOrderItem)
+      }
+      if (idx == mainIndex && subIndex == undefined) newCueOrder.push(...selectedItems)
+    } else {
+      const children = []
+      let childIdx = 0
+      if (idx == mainIndex && subIndex == 0) children.push(...selectedItems)
+      for (const cueOrderItemChildren of cueOrderItem.children) {
+        childIdx++
+        if (!selectedCues.includes(cueOrderItemChildren.id)) {
+          children.push(cueOrderItemChildren)
+        }
+        if (idx == mainIndex && childIdx == subIndex) children.push(...selectedItems)
+      }
+      if (mainIndex == idx && subIndex > childIdx) {
+        children.push(...selectedItems)
+      }
+      if (!selectedCues.includes(cueOrderItem.id)) {
+        newCueOrder.push({ id: cueOrderItem.id, children })
+      }
+      if (idx == mainIndex && subIndex == undefined) newCueOrder.push(...selectedItems)
     }
   }
 
-  if (subIndex !== null) {
-    newCuesOrder[mainIndex].children?.splice(subIndex + 1, 0, ...selectedItems.map(({ item }) => item))
-  } else {
-    newCuesOrder.splice(mainIndex + 1, 0, ...selectedItems.map(({ item }) => item))
+  if (mainIndex > idx) {
+    newCueOrder.push(...selectedItems)
   }
 
-  return newCuesOrder
+  return newCueOrder
+}
+
+/**
+ * Selects and extracts cue order items based on their IDs, and determines if any of the selected items are groups.
+ *
+ * @function
+ * @param {RundownCueOrderItem[]} cueOrder - The original array of cue order items.
+ * @param {Array<Rundown['id']>} selectedCues - An array of IDs representing the cues to be selected.
+ * @return {{ items: RundownCueOrderItem[], hasGroups: boolean }} - An object containing:
+ *   - `items`: The selected cue items.
+ *   - `hasGroups`: A boolean indicating whether any of the selected items are groups.
+ */
+function selectCueOrderItems (
+  cueOrder: RundownCueOrderItem[],
+  selectedCues: Array<Rundown['id']>,
+): RundownCueOrderItem[] {
+  const items: RundownCueOrderItem[] = []
+
+  for (const cueOrderItem of cueOrder) {
+    // If the current item is in the selectedCues list, add it to the items array
+    if (selectedCues.includes(cueOrderItem.id)) {
+      items.push(cueOrderItem)
+      continue
+    }
+
+    // If the current item has no children, skip to the next item
+    if (!cueOrderItem.children) continue
+
+    for (const child of cueOrderItem.children) {
+      // If the child is in the selectedCues list, add it to the items array
+      if (selectedCues.includes(child.id)) {
+        // If the current item has children, mark that there are groups
+        items.push(child)
+      }
+    }
+  }
+
+  return items
 }
