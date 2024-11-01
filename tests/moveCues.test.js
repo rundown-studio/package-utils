@@ -216,7 +216,7 @@ describe('moveCues', () => {
     ])
   })
 
-  it.only('moves group inside group', async () => {
+  it('moves group inside group', async () => {
     const selectedCues = ['group1']
     const destination = '3.1'
     try {
@@ -224,5 +224,86 @@ describe('moveCues', () => {
     } catch (error) {
       expect(error.message).to.equal('Cannot move a group header inside another group')
     }
+  })
+
+  it('moves selected cue to a higher number', async () => {
+    const selectedCues = ['cue5']
+    const destination = '100'
+    const newCueOrder = await moveCues(cueOrder, selectedCues, destination)
+
+    expect(newCueOrder).to.deep.equal([
+      { id: 'cue1' },
+      { id: 'cue2' },
+      {
+        id: 'group1',
+        children: [
+          { id: 'cue3' },
+          { id: 'cue4' },
+        ],
+      },
+      {
+        id: 'group2',
+        children: [
+          { id: 'cue6' },
+          { id: 'cue7' },
+        ],
+      },
+      { id: 'cue8' },
+      { id: 'cue5' },
+    ])
+  })
+
+  it.only('moves many selected cue to another position', async () => {
+    const selectedCues = ['cue2', 'group2', 'cue5', 'cue4']
+    const destination = '1'
+    const newCueOrder = await moveCues(cueOrder, selectedCues, destination)
+
+    expect(newCueOrder).to.deep.equal([
+      { id: 'cue1' },
+      { id: 'cue2' },
+      { id: 'cue4' },
+      { id: 'cue5' },
+      {
+        id: 'group2',
+        children: [
+          { id: 'cue6' },
+          { id: 'cue7' },
+        ],
+      },
+      {
+        id: 'group1',
+        children: [
+          { id: 'cue3' },
+        ],
+      },
+      { id: 'cue8' },
+    ])
+  })
+
+  it('moves selected cues to a begining of group', async () => {
+    const selectedCues = ['cue5']
+    const destination = '3.0'
+    const newCueOrder = await moveCues(cueOrder, selectedCues, destination)
+
+    expect(newCueOrder).to.deep.equal([
+      { id: 'cue1' },
+      { id: 'cue2' },
+      {
+        id: 'group1',
+        children: [
+          { id: 'cue5' },
+          { id: 'cue3' },
+          { id: 'cue4' },
+        ],
+      },
+      {
+        id: 'group2',
+        children: [
+          { id: 'cue6' },
+          { id: 'cue7' },
+        ],
+      },
+      { id: 'cue8' },
+    ])
   })
 })
