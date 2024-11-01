@@ -28,7 +28,8 @@ export async function moveCues (
   selectedCues: Array<Rundown['id']>,
   destination: string,
 ): Promise<RundownCueOrderItem[]> {
-  const selectedItems = selectCueOrderItems(cueOrder, selectedCues)
+  const selectedCueIds = new Set(selectedCues)
+  const selectedItems = selectCueOrderItems(cueOrder, selectedCueIds)
   const parsedInput = destination.split('.').map(Number)
   const mainIndex = parsedInput[0]
   const subIndex = parsedInput[1]
@@ -48,7 +49,7 @@ export async function moveCues (
   for (const cueOrderItem of cueOrder) {
     idx++
     if (!cueOrderItem.children) {
-      if (!selectedCues.includes(cueOrderItem.id)) {
+      if (!selectedCueIds.has(cueOrderItem.id)) {
         newCueOrder.push(cueOrderItem)
       }
       if (idx == mainIndex && subIndex == undefined) newCueOrder.push(...selectedItems)
@@ -58,7 +59,7 @@ export async function moveCues (
       if (idx == mainIndex && subIndex == 0) children.push(...selectedItems)
       for (const cueOrderItemChildren of cueOrderItem.children) {
         childIdx++
-        if (!selectedCues.includes(cueOrderItemChildren.id)) {
+        if (!selectedCueIds.has(cueOrderItemChildren.id)) {
           children.push(cueOrderItemChildren)
         }
         if (idx == mainIndex && childIdx == subIndex) children.push(...selectedItems)
@@ -66,7 +67,7 @@ export async function moveCues (
       if (mainIndex == idx && subIndex > childIdx) {
         children.push(...selectedItems)
       }
-      if (!selectedCues.includes(cueOrderItem.id)) {
+      if (!selectedCueIds.has(cueOrderItem.id)) {
         newCueOrder.push({ id: cueOrderItem.id, children })
       }
       if (idx == mainIndex && subIndex == undefined) newCueOrder.push(...selectedItems)
@@ -85,20 +86,20 @@ export async function moveCues (
  *
  * @function
  * @param {RundownCueOrderItem[]} cueOrder - The original array of cue order items.
- * @param {Array<Rundown['id']>} selectedCues - An array of IDs representing the cues to be selected.
+ * @param {Set<Rundown['id']>} selectedCues - An array of IDs representing the cues to be selected.
  * @return {{ items: RundownCueOrderItem[], hasGroups: boolean }} - An object containing:
  *   - `items`: The selected cue items.
  *   - `hasGroups`: A boolean indicating whether any of the selected items are groups.
  */
 function selectCueOrderItems (
   cueOrder: RundownCueOrderItem[],
-  selectedCues: Array<Rundown['id']>,
+  selectedCues: Set<Rundown['id']>,
 ): RundownCueOrderItem[] {
   const items: RundownCueOrderItem[] = []
 
   for (const cueOrderItem of cueOrder) {
     // If the current item is in the selectedCues list, add it to the items array
-    if (selectedCues.includes(cueOrderItem.id)) {
+    if (selectedCues.has(cueOrderItem.id)) {
       items.push(cueOrderItem)
       continue
     }
@@ -108,7 +109,7 @@ function selectCueOrderItems (
 
     for (const child of cueOrderItem.children) {
       // If the child is in the selectedCues list, add it to the items array
-      if (selectedCues.includes(child.id)) {
+      if (selectedCues.has(child.id)) {
         // If the current item has children, mark that there are groups
         items.push(child)
       }
