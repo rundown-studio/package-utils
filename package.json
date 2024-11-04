@@ -1,6 +1,6 @@
 {
   "name": "@rundown-studio/utils",
-  "version": "0.4.11",
+  "version": "0.4.12",
   "description": "Shared helper functions for the Rundown Studio project",
   "license": "ISC",
   "author": "Lukas Hermann <hey@lukashermann.dev>",
