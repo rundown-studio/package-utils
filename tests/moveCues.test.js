@@ -626,4 +626,32 @@ describe('moveCues', () => {
       { id: 'cue6' },
     ])
   })
+
+
+  it('move selected cue to unexistent group position', async () => {
+    const selectedCues = ['cue2']
+    const destination = '4.1'
+    const newCueOrder = await moveCues(cueOrder, selectedCues, destination)
+
+    expect(newCueOrder).to.deep.equal([
+      { id: 'cue1' },
+      {
+        id: 'group3',
+        children: [
+          { id: 'cue3.1' },
+          { id: 'cue3.2' },
+        ],
+      },
+      { id: 'cue4' },
+      { id: 'cue2' },
+      {
+        id: 'group5',
+        children: [
+          { id: 'cue5.1' },
+          { id: 'cue5.2' },
+        ],
+      },
+      { id: 'cue6' },
+    ])
+  })
 })

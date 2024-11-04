@@ -38,6 +38,12 @@ export async function moveCues (
     if (!item.children) {
       // Add the item to the new order if it hasn't been selected for moving
       if (!selectedCueIds.has(item.id)) newCueOrder.push(item)
+
+      // Edge case of wrong input, adding a subIndex in a normal cue number
+      // Instead of removing the cue, it will be added after
+      if (currentIndex == mainIndex && subIndex !== undefined) {
+        newCueOrder.push(...selectedItems)
+      }
     } else {
       // The item has children (it's a group)
       const children = []
