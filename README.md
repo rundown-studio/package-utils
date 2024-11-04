@@ -1,4 +1,4 @@
-# Stagetimer Shared Utils
+# Rundown Studio Shared Utils
 
 ## Install
 
