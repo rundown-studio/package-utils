@@ -28,46 +28,58 @@ export async function moveCues (
   const newCueOrder: RundownCueOrderItem[] = []
   let currentIndex = 0
 
+  // If the destination is the very beginning of the rundown, insert the selected items first
   if (mainIndex === 0) newCueOrder.push(...selectedItems)
 
   for (const item of cueOrder) {
     currentIndex++
 
+    // If the item has no children (it's a single cue)
     if (!item.children) {
+      // Add the item to the new order if it hasn't been selected for moving
       if (!selectedCueIds.has(item.id)) newCueOrder.push(item)
-      if (currentIndex === mainIndex && subIndex === undefined) {
-        newCueOrder.push(...selectedItems)
-      }
     } else {
+      // The item has children (it's a group)
       const children = []
       let childIndex = 0
 
+      // If the destination is the beginning of this group, insert selected items
       if (currentIndex === mainIndex && subIndex === 0) {
         children.push(...selectedItems)
       }
 
+      // Iterate through each child of the group
       for (const child of item.children) {
         childIndex++
+
+        // Add the child to the group if it hasn't been selected for moving
         if (!selectedCueIds.has(child.id)) children.push(child)
+
+        // If the current and child indices match the destination, insert selected items
         if (currentIndex === mainIndex && childIndex === subIndex) {
           children.push(...selectedItems)
         }
       }
 
+      // If the subIndex is greater than the last child's index, insert selected items at the end
       if (mainIndex === currentIndex && subIndex > childIndex) {
         children.push(...selectedItems)
       }
 
+      // Add the group to the new order if it hasn't been selected for moving
       if (!selectedCueIds.has(item.id)) {
         newCueOrder.push({ id: item.id, children })
       }
+    }
 
-      if (currentIndex === mainIndex && subIndex === undefined) {
-        newCueOrder.push(...selectedItems)
-      }
+    // If the current index matches the mainIndex and there's no subIndex,
+    // insert the selected items
+    if (currentIndex === mainIndex && subIndex === undefined) {
+      newCueOrder.push(...selectedItems)
     }
   }
 
+  // If the destination index is beyond the last item, append the selected items at the end
   if (mainIndex > currentIndex) newCueOrder.push(...selectedItems)
 
   return newCueOrder
