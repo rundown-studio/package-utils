@@ -203,13 +203,13 @@ function createOriginalStartDurations (
         : null
       item = {
         start: lockedStart || previousEnd,
-        duration: originalCue.duration,
+        duration: originalCue.duration || 0,
       }
     } else {
       const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
       item = {
         start: lockedStart || previousEnd,
-        duration: cue.duration,
+        duration: cue.duration || 0,
       }
     }
 
@@ -265,7 +265,7 @@ function createActualStartDurations (
     } else if (elapsedCue && !isFuture) {
       item = {
         start: new Date(elapsedCue.startTime),
-        duration: elapsedCue.duration,
+        duration: elapsedCue.duration || 0,
       }
     } else if (isPast) {
       item = {
@@ -276,7 +276,7 @@ function createActualStartDurations (
       const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
       item = {
         start: lockedStart || previousEnd,
-        duration: cue.duration,
+        duration: cue.duration || 0,
       }
     }
 

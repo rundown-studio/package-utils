@@ -205,6 +205,34 @@ describe('createTimestamps', () => {
       })
     })
 
+    it('Add a cue with `null` duration, should default to 0s', () => {
+      jest.setSystemTime(startTime)
+      const cues = [
+        ...defaultCues,
+        {
+          ...getCueDefaults(),
+          id: '#4',
+          type: 'cue',
+          title: 'Cue 4',
+          startTime: addMinutes(startTime, 60), // 10 AM
+          startMode: CueStartMode.FIXED,
+          duration: null,
+        },
+      ]
+      const cueOrder = [...defaultCueOrder, { id: '#4' }]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.cues['#4']).to.deep.equal({
+        id: '#4',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 0 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 0 },
+      })
+    })
+
     it('Ignore cues not part of cue order', () => {
       jest.setSystemTime(startTime)
       const cues = defaultCues
