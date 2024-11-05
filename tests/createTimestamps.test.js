@@ -205,7 +205,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Sdd a cue with `null` duration, should default to 0s', () => {
+    it('Add a cue with `null` duration, should default to 0s', () => {
       jest.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
