@@ -66,6 +66,7 @@ export function createTimestamps (
   } = {},
 ): Timestamps {
   if (!(now instanceof Date)) throw new Error('`now` must be an instance of Date')
+  if (!cues.length) throw new Error('Cannot create timestamps for empty cues array')
 
   // Remember the original cue index
   const cueIndexMap: Record<RundownCue['id'], number> = Object.fromEntries(
@@ -153,6 +154,7 @@ export function getSortedCues (
 function calculateTotalStartDuration (
   items: Record<RundownCue['id'], StartDuration>,
 ): StartDuration {
+  if (_isEmpty(items)) throw new Error('Cannot calculate duration for empty items')
   const sdArray = Object.values(items)
   const firstSD = sdArray[0]
   const lastSD = sdArray[sdArray.length - 1]
