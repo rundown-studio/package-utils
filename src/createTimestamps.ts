@@ -1,6 +1,5 @@
 import { RundownCue, RundownCueOrderItem, Runner, CueStartMode, CueType } from '@rundown-studio/types'
-import { moveAfterWithTolerance, applyDate, getStartOfDay } from '@rundown-studio/timeutils'
-import { CUE_OVERLAP_TOLERANCE } from '@rundown-studio/consts'
+import { applyDate, getStartOfDay, addDays } from '@rundown-studio/timeutils'
 import _isEmpty from 'lodash/isEmpty'
 
 export enum CueRunState {
@@ -196,28 +195,25 @@ function createOriginalStartDurations (
 
   cues.forEach((cue) => {
     const originalCue = runner?.originalCues[cue.id]
+    const daysToAdd = cue.startDatePlus || 0
+    const adjustedStartTime = cue.startTime && applyDate(cue.startTime, addDays(firstDay, daysToAdd), { timezone })
 
     // Assemble item
     let item: StartDuration
     if (originalCue) {
-      const lockedStart = cue.startMode === CueStartMode.FIXED && cue.startTime
-        ? new Date(cue.startTime)
+      const lockedStart = cue.startMode === CueStartMode.FIXED && adjustedStartTime
+        ? new Date(adjustedStartTime)
         : null
       item = {
         start: lockedStart || previousEnd,
         duration: originalCue.duration || 0,
       }
     } else {
-      const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
+      const lockedStart = cue.startMode === CueStartMode.FIXED ? adjustedStartTime : null
       item = {
         start: lockedStart || previousEnd,
         duration: cue.duration || 0,
       }
-    }
-
-    // Make sure all cues are consecutive
-    if (item.start < previousEnd) {
-      item.start = moveAfterWithTolerance(item.start, previousEnd, CUE_OVERLAP_TOLERANCE, { timezone })
     }
 
     previousEnd = new Date(item.start.getTime() + item.duration)
@@ -257,6 +253,8 @@ function createActualStartDurations (
     const isCurrent = runner.timesnap.cueId === cue.id
     const isPast = runner.timesnap.cueId === null || sortedCueIds.indexOf(cue.id) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
     const isFuture = !isPast && !isCurrent
+    const daysToAdd = cue.startDatePlus || 0
+    const adjustedStartTime = cue.startTime && applyDate(cue.startTime, addDays(now, daysToAdd), { timezone })
 
     let item: StartDuration
     if (isCurrent) {
@@ -275,16 +273,11 @@ function createActualStartDurations (
         duration: 0,
       }
     } else {
-      const lockedStart = cue.startMode === CueStartMode.FIXED ? cue.startTime : null
+      const lockedStart = cue.startMode === CueStartMode.FIXED ? adjustedStartTime : null
       item = {
         start: lockedStart || previousEnd,
         duration: cue.duration || 0,
       }
-    }
-
-    // Make sure all cues are consecutive
-    if (item.start < previousEnd) {
-      item.start = moveAfterWithTolerance(item.start, previousEnd, CUE_OVERLAP_TOLERANCE, { timezone })
     }
 
     if (item.start) previousEnd = new Date(item.start.getTime() + item.duration)
