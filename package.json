@@ -40,7 +40,7 @@
   "dependencies": {
     "@rundown-studio/consts": "^0.3.0",
     "@rundown-studio/timeutils": "^0.5.4",
-    "@rundown-studio/types": "^0.4.2",
+    "@rundown-studio/types": "^0.5.1",
     "date-fns": "^4.1.0",
     "lodash": "^4.17.21"
   }
