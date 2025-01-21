@@ -196,7 +196,7 @@ function createOriginalStartDurations (
   cues.forEach((cue) => {
     const originalCue = runner?.originalCues[cue.id]
     const daysToAdd = cue.startDatePlus || 0
-    const adjustedStartTime = cue.startTime && applyDate(cue.startTime, addDays(firstDay, daysToAdd), { timezone })
+    const adjustedStartTime = cue.startTime && applyDate(cue.startTime, addDays(firstDay, daysToAdd, { timezone }), { timezone })
 
     // Assemble item
     let item: StartDuration
@@ -254,7 +254,7 @@ function createActualStartDurations (
     const isPast = runner.timesnap.cueId === null || sortedCueIds.indexOf(cue.id) < sortedCueIds.indexOf(runner.timesnap.cueId || '')
     const isFuture = !isPast && !isCurrent
     const daysToAdd = cue.startDatePlus || 0
-    const adjustedStartTime = cue.startTime && applyDate(cue.startTime, addDays(now, daysToAdd), { timezone })
+    const adjustedStartTime = cue.startTime && applyDate(cue.startTime, addDays(now, daysToAdd, { timezone }), { timezone })
 
     let item: StartDuration
     if (isCurrent) {
