@@ -1067,6 +1067,7 @@ describe('createTimestamps', () => {
         type: 'cue',
         title: 'Cue 4',
         startTime: new Date('2024-07-26T10:00:00.000Z'),
+        startDatePlus: 1,
         startMode: CueStartMode.FIXED,
         duration: 3 * 60 * 60000 // 3h
       }
@@ -1121,6 +1122,7 @@ describe('createTimestamps', () => {
         type: 'cue',
         title: 'Cue 4',
         startTime: new Date('2024-07-26T10:00:00.000Z'),
+        startDatePlus: 1,
         startMode: CueStartMode.FIXED,
         duration: 3 * 60 * 60000 // 3h
       }
@@ -1470,20 +1472,329 @@ describe('createTimestamps', () => {
       })
     })
   })
+
+  describe('Multiple day event, using startDatePlus (+1d button)', () => {
+    it('Two hours before, keep same day.', () => {
+      jest.setSystemTime(startTime)
+      const cues = [
+        ...defaultCues,
+        {
+          ...getCueDefaults(),
+          id: '#4',
+          type: 'cue',
+          title: 'Cue 4',
+          startTime: null,
+          duration: 120 * 60000, // 120 min (2h)
+        },
+        {
+          ...getCueDefaults(),
+          id: '#5',
+          type: 'cue',
+          title: 'Cue 5',
+          startTime: startTime, // 9 AM,
+          startMode: CueStartMode.FIXED,
+          startDatePlus: 0,
+          duration: 20 * 60000, // 20 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#6',
+          type: 'cue',
+          title: 'Cue 6',
+          startTime: null,
+          duration: 25 * 60000, // 25 min
+        },
+      ]
+      const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 45 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 45 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+      })
+      expect(timestamps.cues['#4']).to.deep.equal({
+        id: '#4',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+      })
+      expect(timestamps.cues['#5']).to.deep.equal({
+        id: '#5',
+        index: 4,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 },
+      })
+    })
+
+    it('Two hours before, but with +1 on startDatePlus', () => {
+      jest.setSystemTime(startTime)
+      const cues = [
+        ...defaultCues,
+        {
+          ...getCueDefaults(),
+          id: '#4',
+          type: 'cue',
+          title: 'Cue 4',
+          startTime: null,
+          duration: 120 * 60000, // 120 min (2h)
+        },
+        {
+          ...getCueDefaults(),
+          id: '#5',
+          type: 'cue',
+          title: 'Cue 5',
+          startTime: startTime, // 9 AM,
+          startMode: CueStartMode.FIXED,
+          startDatePlus: 1,
+          duration: 20 * 60000, // 20 min
+        },
+      ]
+      const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 20) * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 20) * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+      })
+      expect(timestamps.cues['#4']).to.deep.equal({
+        id: '#4',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+      })
+      expect(timestamps.cues['#5']).to.deep.equal({
+        id: '#5',
+        index: 4,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+      })
+    })
+
+    it('Two hours before, but with +1 on startDatePlus, following soft cue', () => {
+      jest.setSystemTime(startTime)
+      const cues = [
+        ...defaultCues,
+        {
+          ...getCueDefaults(),
+          id: '#4',
+          type: 'cue',
+          title: 'Cue 4',
+          startTime: null,
+          duration: 120 * 60000, // 120 min (2h)
+        },
+        {
+          ...getCueDefaults(),
+          id: '#5',
+          type: 'cue',
+          title: 'Cue 5',
+          startTime: startTime, // 9 AM,
+          startMode: CueStartMode.FIXED,
+          startDatePlus: 1,
+          duration: 20 * 60000, // 20 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#6',
+          type: 'cue',
+          title: 'Cue 6',
+          startTime: null,
+          duration: 25 * 60000, // 25 min
+        },
+      ]
+      const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 45) * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 45) * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+      })
+      expect(timestamps.cues['#4']).to.deep.equal({
+        id: '#4',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+      })
+      expect(timestamps.cues['#5']).to.deep.equal({
+        id: '#5',
+        index: 4,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+      })
+      expect(timestamps.cues['#6']).to.deep.equal({
+        id: '#6',
+        index: 5,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
+        actual: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
+      })
+    })
+
+    it('Two hours before, but with +1 on startDatePlus, following soft cue, and hard start back on first day', () => {
+      jest.setSystemTime(startTime)
+      const cues = [
+        ...defaultCues,
+        {
+          ...getCueDefaults(),
+          id: '#4',
+          type: 'cue',
+          title: 'Cue 4',
+          startTime: null,
+          duration: 120 * 60000, // 120 min (2h)
+        },
+        {
+          ...getCueDefaults(),
+          id: '#5',
+          type: 'cue',
+          title: 'Cue 5',
+          startTime: startTime, // 9 AM,
+          startMode: CueStartMode.FIXED,
+          startDatePlus: 1,
+          duration: 20 * 60000, // 20 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#6',
+          type: 'cue',
+          title: 'Cue 6',
+          startTime: null,
+          duration: 25 * 60000, // 25 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#7',
+          type: 'cue',
+          title: 'Cue 7',
+          startTime: startTime, // 9 AM,
+          startMode: CueStartMode.FIXED,
+          startDatePlus: 0,
+          duration: 30 * 60000, // 30 min
+        },
+      ]
+      const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }, { id: '#7' }]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+      })
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+      })
+      expect(timestamps.cues['#4']).to.deep.equal({
+        id: '#4',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+      })
+      expect(timestamps.cues['#5']).to.deep.equal({
+        id: '#5',
+        index: 4,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+      })
+      expect(timestamps.cues['#6']).to.deep.equal({
+        id: '#6',
+        index: 5,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
+        actual: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
+      })
+      expect(timestamps.cues['#7']).to.deep.equal({
+        id: '#7',
+        index: 6,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 },
+      })
+    })
+  })
 })
-
-// - Cue inserted after creating runner with original cues
-
-
-
-
-
-
-
-
-
-
-
-
-
-
