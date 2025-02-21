@@ -1,6 +1,8 @@
 import { RundownCue, RundownCueOrderItem, Runner, CueStartMode, CueType } from '@rundown-studio/types'
 import { applyDate, getStartOfDay, addDays } from '@rundown-studio/timeutils'
 import _isEmpty from 'lodash/isEmpty'
+import { differenceInCalendarDays } from 'date-fns'
+import { tz } from '@date-fns/tz'
 
 export enum CueRunState {
   CUE_PAST = 'CUE_PAST',
@@ -24,6 +26,7 @@ export enum GroupRunState {
 export interface StartDuration {
   start: Date
   duration: number
+  daysPlus: number // Difference in days to the event start
 }
 
 export interface Timestamp {
@@ -160,6 +163,7 @@ function calculateTotalStartDuration (
   return {
     start: firstSD.start,
     duration: (lastSD.start.getTime() + lastSD.duration) - firstSD.start.getTime(),
+    daysPlus: 0, // Always 0 for rundown total
   }
 }
 
@@ -190,8 +194,9 @@ function createOriginalStartDurations (
   if (!cues.length) return {}
 
   const sdMap: Record<RundownCue['id'], StartDuration> = {}
-  const startOfFirstDay = getStartOfDay(firstDay, { timezone })
-  let previousEnd: Date = applyDate(startTime, startOfFirstDay, { timezone })
+  const eventFirstDay = getStartOfDay(firstDay, { timezone })
+  const eventStart: Date = applyDate(startTime, eventFirstDay, { timezone })
+  let previousEnd = eventStart
 
   cues.forEach((cue) => {
     const originalCue = runner?.originalCues[cue.id]
@@ -204,15 +209,19 @@ function createOriginalStartDurations (
       const lockedStart = cue.startMode === CueStartMode.FIXED && adjustedStartTime
         ? new Date(adjustedStartTime)
         : null
+      const start = lockedStart || previousEnd
       item = {
-        start: lockedStart || previousEnd,
+        start,
         duration: originalCue.duration || 0,
+        daysPlus: differenceInCalendarDays(start, eventStart, { in: tz(timezone) }),
       }
     } else {
       const lockedStart = cue.startMode === CueStartMode.FIXED ? adjustedStartTime : null
+      const start = lockedStart || previousEnd
       item = {
-        start: lockedStart || previousEnd,
+        start,
         duration: cue.duration || 0,
+        daysPlus: differenceInCalendarDays(start, eventStart, { in: tz(timezone) }),
       }
     }
 
@@ -246,7 +255,13 @@ function createActualStartDurations (
 
   const sdMap: Record<RundownCue['id'], StartDuration> = {}
   const sortedCueIds = cues.map((c) => c.id)
-  let previousEnd: Date
+
+  // Find the start time of the first elapsed cue, or fall back to kickoff time
+  const firstElapsedCue = cues.find((cue) => runner.elapsedCues[cue.id])
+  const eventStart: Date = firstElapsedCue
+    ? new Date(runner.elapsedCues[firstElapsedCue.id].startTime)
+    : new Date(runner.timesnap.kickoff)
+  let previousEnd = eventStart
 
   cues.forEach((cue) => {
     const elapsedCue = runner.elapsedCues[cue.id]
@@ -258,25 +273,33 @@ function createActualStartDurations (
 
     let item: StartDuration
     if (isCurrent) {
+      const start = new Date(runner.timesnap.kickoff)
       item = {
-        start: new Date(runner.timesnap.kickoff),
+        start,
         duration: Math.max(now.getTime(), runner.timesnap.deadline) - runner.timesnap.kickoff,
+        daysPlus: differenceInCalendarDays(start, eventStart, { in: tz(timezone) }),
       }
     } else if (elapsedCue && !isFuture) {
+      const start = new Date(elapsedCue.startTime)
       item = {
-        start: new Date(elapsedCue.startTime),
+        start,
         duration: elapsedCue.duration || 0,
+        daysPlus: differenceInCalendarDays(start, eventStart, { in: tz(timezone) }),
       }
     } else if (isPast) {
+      const start = previousEnd || new Date(runner.timesnap.kickoff)
       item = {
-        start: previousEnd || new Date(runner.timesnap.kickoff),
+        start,
         duration: 0,
+        daysPlus: differenceInCalendarDays(start, eventStart, { in: tz(timezone) }),
       }
     } else {
       const lockedStart = cue.startMode === CueStartMode.FIXED ? adjustedStartTime : null
+      const start = lockedStart || previousEnd
       item = {
-        start: lockedStart || previousEnd,
+        start,
         duration: cue.duration || 0,
+        daysPlus: differenceInCalendarDays(start, eventStart, { in: tz(timezone) }),
       }
     }
 

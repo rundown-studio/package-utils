@@ -85,28 +85,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -129,28 +129,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -173,35 +173,35 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000 },
-        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000 },
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
       })
     })
 
@@ -228,8 +228,8 @@ describe('createTimestamps', () => {
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 0 },
-        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 0 },
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 0, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 0, daysPlus: 0 },
       })
     })
 
@@ -241,22 +241,22 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.equal(undefined)
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -292,28 +292,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
   })
@@ -339,28 +339,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -396,38 +396,38 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:03:00.000Z'), duration: 87 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:03:00.000Z'), duration: 87 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:03:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:03:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:08:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:08:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:18:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:18:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000 },
-        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000 },
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
       })
     })
-    
+
     it('Starting 3min late, with locked cue and flexible after', () => {
       jest.setSystemTime(addMinutes(startTime, 3))
       const cues = [
@@ -470,45 +470,45 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 105 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:03:00.000Z'), duration: 97 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 105 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:03:00.000Z'), duration: 97 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:03:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:03:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:08:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:08:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:18:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:18:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T10:05:00.000Z'), duration: 30 * 60000 },
-        actual: { start: new Date('2024-07-26T10:05:00.000Z'), duration: 25 * 60000 },
+        original: { start: new Date('2024-07-26T10:05:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:05:00.000Z'), duration: 25 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#5']).to.deep.equal({
         id: '#5',
         index: 4,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T10:35:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T10:30:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T10:35:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:30:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
     })
-    
+
     it('Starting on time, edited cue from flexible to fixed', () => {
       jest.setSystemTime(addMinutes(startTime, 3))
       const cues = [
@@ -541,35 +541,35 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 80 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 80 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 80 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 80 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 20 * 60000 },
-        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 20 * 60000 },
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 },
       })
     })
 
@@ -609,36 +609,36 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 45 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 45 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:50:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:50:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       // Note: There's no notable flag showing the 5m conflict between #3 and #4
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000 },
-        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000 },
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
       })
     })
 
@@ -663,28 +663,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T08:58:00.000Z'), duration: 32 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T08:58:00.000Z'), duration: 32 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T08:58:00.000Z'), duration: 3 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T08:58:00.000Z'), duration: 3 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:01:00.000Z'), duration: 14 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:01:00.000Z'), duration: 14 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -709,28 +709,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T08:58:00.000Z'), duration: 32 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T08:58:00.000Z'), duration: 32 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T08:58:00.000Z'), duration: 3 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T08:58:00.000Z'), duration: 3 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:01:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:01:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:11:00.000Z'), duration: 19 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:11:00.000Z'), duration: 19 * 60000, daysPlus: 0 },
       })
     })
 
@@ -751,28 +751,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:03:00.000Z'), duration: 27 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:03:00.000Z'), duration: 27 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:03:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:03:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:08:00.000Z'), duration: 7 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:08:00.000Z'), duration: 7 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -800,35 +800,35 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2b']).to.deep.equal({
         id: '#2b',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -860,35 +860,35 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 35 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#1b']).to.deep.equal({
         id: '#1b',
         index: 3,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:10:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
   })
@@ -904,28 +904,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -950,35 +950,35 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000 },
-        actual: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000 },
+        original: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
       })
     })
 
@@ -1020,36 +1020,36 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 45 * 60000 },
+        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 45 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-08-12T09:50:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:50:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       // Note: There's no notable flag showing the 5m conflict between #3 and #4
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000 },
-        actual: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000 },
+        original: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
       })
     })
 
@@ -1076,35 +1076,35 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000 },
-        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000 },
+        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000 },
-        actual: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000 },
+        original: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000 },
-        actual: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000 },
+        original: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000 },
-        actual: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000 },
+        original: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
       })
     })
 
@@ -1172,35 +1172,35 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:05:00.000Z'), duration: (28 * 60 * 60000) + (12 * 60000) - (5 * 60000) })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:05:00.000Z'), duration: (28 * 60 * 60000) + (12 * 60000) - (5 * 60000), daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000 },
-        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: (6 * 60 * 60000) + (5 * 60000) },
+        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: (6 * 60 * 60000) + (5 * 60000), daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000 },
-        actual: { start: new Date('2024-08-12T15:10:00.000Z'), duration: (10 * 60 * 60000) - (9 * 60000) },
+        original: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-12T15:10:00.000Z'), duration: (10 * 60 * 60000) - (9 * 60000), daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000 },
-        actual: { start: new Date('2024-08-13T00:51:00.000Z'), duration: (3 * 60 * 60000) + (18 * 60000) },
+        original: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-08-13T00:51:00.000Z'), duration: (3 * 60 * 60000) + (18 * 60000), daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000 },
-        actual: { start: new Date('2024-08-13T10:12:00.000Z'), duration: 3 * 60 * 60000 },
+        original: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-08-13T10:12:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
       })
     })
 
@@ -1215,28 +1215,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -1269,28 +1269,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 42 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 42 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 27 * 60000 },
+        original: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 27 * 60000, daysPlus: 0 },
       })
     })
   })
@@ -1316,28 +1316,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -1365,28 +1365,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:15:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:15:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:20:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -1406,28 +1406,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_NEXT',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
@@ -1447,28 +1447,28 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_PAST',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 0, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_ACTIVE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
   })
@@ -1510,42 +1510,42 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 45 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 45 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 45 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 45 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
-        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#5']).to.deep.equal({
         id: '#5',
         index: 4,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 },
       })
     })
 
@@ -1577,42 +1577,42 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 20) * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 20) * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 20) * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 20) * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
-        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#5']).to.deep.equal({
         id: '#5',
         index: 4,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
-        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 1 },
       })
     })
 
@@ -1652,49 +1652,49 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 45) * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 45) * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 45) * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: (24 * 60 + 45) * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
-        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#5']).to.deep.equal({
         id: '#5',
         index: 4,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
-        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 1 },
       })
       expect(timestamps.cues['#6']).to.deep.equal({
         id: '#6',
         index: 5,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
-        actual: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
+        original: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000, daysPlus: 1 },
       })
     })
 
@@ -1744,56 +1744,56 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
-        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
-        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000 },
+        original: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:30:00.000Z'), duration: 120 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#5']).to.deep.equal({
         id: '#5',
         index: 4,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
-        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000 },
+        original: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-07-27T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 1 },
       })
       expect(timestamps.cues['#6']).to.deep.equal({
         id: '#6',
         index: 5,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
-        actual: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000 },
+        original: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-07-27T09:20:00.000Z'), duration: 25 * 60000, daysPlus: 1 },
       })
       expect(timestamps.cues['#7']).to.deep.equal({
         id: '#7',
         index: 6,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 },
-        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
       })
     })
   })
