@@ -77,7 +77,7 @@ describe('createTimestamps', () => {
   })
 
   describe('Not running, default cases, same day UTC', () => {
-    it('Not running, runner is null', () => {
+    it('Not running, PRESHOW', () => {
       jest.setSystemTime(startTime)
       const cues = defaultCues
       const cueOrder = defaultCueOrder
@@ -110,7 +110,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Not running, already ran', () => {
+    it('Not running, ENDED', () => {
       jest.setSystemTime(startTime)
       const cues = defaultCues
       const cueOrder = defaultCueOrder
@@ -154,7 +154,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Not running, runner is null, with locked cue', () => {
+    it('Not running, PRESHOW, with hard cue', () => {
       jest.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
@@ -364,7 +364,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Starting 3min late, with locked cue', () => {
+    it('Starting 3min late, with hard cue', () => {
       jest.setSystemTime(addMinutes(startTime, 3))
       const cues = [
         ...defaultCues,
@@ -428,7 +428,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Starting 3min late, with locked cue and flexible after', () => {
+    it('Starting 3min late, with hard cue and flexible after', () => {
       jest.setSystemTime(addMinutes(startTime, 3))
       const cues = [
         ...defaultCues,
@@ -573,7 +573,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Running overtime, conflicting with locked cue start', () => {
+    it('Running overtime, conflicting with hard cue start', () => {
       jest.setSystemTime(new Date('2024-07-26T09:50:00.000Z'))
       const cues = [
         ...defaultCues,
@@ -894,7 +894,7 @@ describe('createTimestamps', () => {
   })
 
   describe('Future date in America/Los_Angeles', () => {
-    it('Not running, runner is null', () => {
+    it('Not running, PRESHOW', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:00:00.000Z')
       jest.setSystemTime(now)
@@ -904,32 +904,32 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
-    it('Not running, runner is null, with locked cue', () => {
+    it('Not running, PRESHOW, with hard cue', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:10:21.000Z')
       jest.setSystemTime(now)
@@ -950,39 +950,39 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 90 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 },
       })
     })
 
-    it('Running overtime, conflicting with locked cue start', () => {
+    it('Running overtime, conflicting with hard cue start', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:50:00.000Z')
       jest.setSystemTime(now)
@@ -1053,7 +1053,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Spanning multiple days, not running', () => {
+    it('Spanning multiple days, PRESHOW', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:00:00.000Z')
       jest.setSystemTime(now)
@@ -1076,39 +1076,39 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000, daysPlus: 0 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-08-12T09:00:00.000Z'), duration: 28 * 60 * 60000, daysPlus: 0 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 28 * 60 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 28 * 60 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T09:00:00.000Z'), duration: 6 * 60 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 6 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 6 * 60 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-12T15:00:00.000Z'), duration: 10 * 60 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T15:00:00.000Z'), duration: 10 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T15:00:00.000Z'), duration: 10 * 60 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-08-13T01:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-27T01:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-27T01:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#4']).to.deep.equal({
         id: '#4',
         index: 3,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
-        actual: { start: new Date('2024-08-13T10:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
+        original: { start: new Date('2024-07-27T10:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
+        actual: { start: new Date('2024-07-27T10:00:00.000Z'), duration: 3 * 60 * 60000, daysPlus: 1 },
       })
     })
 
-    it('Spanning multiple days, running, now is second day', () => {
+    it('Spanning multiple days, ONAIR, now is second day', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-13T10:35:00.000Z')
       jest.setSystemTime(now)
@@ -1204,7 +1204,7 @@ describe('createTimestamps', () => {
       })
     })
 
-    it('Created before and started after a DST change, not running', () => {
+    it('Created before and now is after a DST change, PRESHOW', () => {
       // Daylight Saving Time ends: November 3, 2024 02:00
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-11-05T10:42:00.000Z')
@@ -1215,32 +1215,32 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime, { timezone, now })
 
-      expect(timestamps.original).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
-      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-11-05T10:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 30 * 60000, daysPlus: 0 })
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-11-05T10:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#2']).to.deep.equal({
         id: '#2',
         index: 1,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-11-05T10:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
       })
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
         state: 'CUE_FUTURE',
-        original: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
-        actual: { start: new Date('2024-11-05T10:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
     })
 
-    it('Created before and started after a DST change, running', () => {
+    it('Created before and started after a DST change, ONAIR', () => {
       // Daylight Saving Time ends: November 3, 2024 02:00
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-11-05T10:42:00.000Z')
