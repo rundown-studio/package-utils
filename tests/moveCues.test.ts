@@ -492,7 +492,7 @@ describe('moveCues', () => {
     try {
       await moveCues(cueOrder, selectedCues, destination)
     } catch (error) {
-      expect(error.message).to.equal('Cannot move a group header inside another group')
+      expect((error as Error).message).to.equal('Cannot move a group header inside another group')
     }
   })
 
