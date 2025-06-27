@@ -1,5 +1,5 @@
-import { expect } from 'chai'
-import { moveCues } from '../dist/esm/index.js'
+import {describe, it, expect} from 'vitest'
+import {moveCues} from '../src/moveCues'
 
 /**
  * npm run test -- tests/moveCues.test.js

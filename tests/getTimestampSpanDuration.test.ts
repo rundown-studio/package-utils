@@ -1,5 +1,7 @@
-import { getTimestampSpanDuration } from '../dist/esm/getTimestampSpanDuration';
-import { addMilliseconds } from 'date-fns';
+import {describe, it, expect} from 'vitest';
+import {addMilliseconds} from 'date-fns';
+import {getTimestampSpanDuration} from '../src/getTimestampSpanDuration';
+import {Timestamp} from "../src";
 
 /**
  * npm run test -- tests/getTimestampSpanDuration.test.js
@@ -37,7 +39,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 2000 // 2 seconds
         }
       }
-    ];
+    ] as Timestamp[];
 
     // Expected total duration: 5000 + 3000 + 2000 = 10000ms
     // But the function uses differenceInMilliseconds between first timestamp start and
@@ -62,7 +64,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 3000
         }
       }
-    ];
+    ] as Timestamp[];
 
     // Moment adjustment for cue2
     const moment = { cueId: 'cue2', left: 4000 };
@@ -88,7 +90,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 3000
         }
       }
-    ];
+    ] as Timestamp[];
 
     // Negative moment adjustment for cue2
     const moment = { cueId: 'cue2', left: -4000 };
@@ -114,7 +116,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 3000
         }
       }
-    ];
+    ] as Timestamp[];
 
     // Moment adjustment for non-existent cue
     const moment = { cueId: 'nonexistent', left: 4000 };
@@ -133,7 +135,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 5000
         }
       }
-    ];
+    ] as Timestamp[];
 
     // Expected duration: 5000ms
     const result = getTimestampSpanDuration(timestamps);
@@ -149,7 +151,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 5000
         }
       }
-    ];
+    ] as Timestamp[];
 
     const moment = { cueId: 'cue1', left: 7000 };
 
@@ -174,7 +176,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 0
         }
       }
-    ];
+    ] as Timestamp[];
 
     // Expected duration: 0ms
     const result = getTimestampSpanDuration(timestamps);
@@ -204,7 +206,7 @@ describe('getTimestampSpanDuration', () => {
           duration: 2000
         }
       }
-    ];
+    ] as Timestamp[];
 
     const moment = { cueId: 'cue2', left: 6000 };
 

@@ -1,4 +1,7 @@
-import { getChildrenTimestamps } from '../dist/esm/getChildrenTimestamps';
+import {describe, it, expect} from 'vitest'
+import {getChildrenTimestamps} from '../src/getChildrenTimestamps';
+import {CueRunState} from "../src";
+import {RundownCueOrderItem} from "@rundown-studio/types";
 
 /**
  * npm run test -- tests/getChildrenTimestamps.test.js
@@ -13,28 +16,28 @@ describe('getChildrenTimestamps', () => {
       'child1': {
         id: 'child1',
         index: 1,
-        state: 'CUE_PAST',
+        state: CueRunState.CUE_PAST,
         original: { start: new Date(), duration: 500, daysPlus: 0 },
         actual: { start: new Date(), duration: 500, daysPlus: 0 }
       },
       'child2': {
         id: 'child2',
         index: 2,
-        state: 'CUE_ACTIVE',
+        state: CueRunState.CUE_ACTIVE,
         original: { start: new Date(), duration: 300, daysPlus: 0 },
         actual: { start: new Date(), duration: 300, daysPlus: 0 }
       },
       'child3': {
         id: 'child3',
         index: 3,
-        state: 'CUE_NEXT',
+        state: CueRunState.CUE_NEXT,
         original: { start: new Date(), duration: 200, daysPlus: 0 },
         actual: { start: new Date(), duration: 200, daysPlus: 0 }
       },
       'otherChild1': {
         id: 'otherChild1',
         index: 4,
-        state: 'CUE_FUTURE',
+        state: CueRunState.CUE_FUTURE,
         original: { start: new Date(), duration: 400, daysPlus: 0 },
         actual: { start: new Date(), duration: 400, daysPlus: 0 }
       }
@@ -63,7 +66,7 @@ describe('getChildrenTimestamps', () => {
     {
       id: 'parent4' // Testing with undefined children
     }
-  ];
+  ] as unknown as  RundownCueOrderItem[];
 
   it('should return all child timestamps for the specified parent', () => {
     const result = getChildrenTimestamps('parent1', mockTimestamps, mockCueOrder);
@@ -107,9 +110,9 @@ describe('getChildrenTimestamps', () => {
     // Create modified timestamps with a missing entry
     const incompleteTimestamps = {
       ...mockTimestamps,
-      cues: { ...mockTimestamps.cues }
+      cues: mockTimestamps.cues
     };
-    delete incompleteTimestamps.cues['child2'];
+    delete (incompleteTimestamps.cues as never)['child2'];
 
     // Should not throw but will include undefined in the result
     const result = getChildrenTimestamps('parent1', incompleteTimestamps, mockCueOrder);
