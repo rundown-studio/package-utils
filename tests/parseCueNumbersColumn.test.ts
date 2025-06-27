@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {parseCueNumbersColumn} from '../src/csv-import/parse-cue-numbers-column'
+import {parseCueNumbersColumn} from '../src/csv-import/parseCueNumbersColumn'
 
 describe('parseCueNumbersColumn', () => {
   describe('Input validation', () => {

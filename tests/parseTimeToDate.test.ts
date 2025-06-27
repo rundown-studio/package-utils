@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {parseTimeToDate} from '../src/csv-import/parse-time-to-date'
+import {parseTimeToDate} from '../src/csv-import/parseTimeToDate'
 
 describe('parseTimeToDate', () => {
   const referenceDate = new Date('2024-01-15T12:00:00')

@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {parseDurationToMs} from '../src/csv-import/parse-duration-to-ms'
+import {parseDurationToMs} from '../src/csv-import/parseDurationToMs'
 
 describe('parseDurationToMs', () => {
   it('should return undefined for undefined input', () => {
