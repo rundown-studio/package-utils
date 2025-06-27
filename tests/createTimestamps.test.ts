@@ -1,13 +1,13 @@
-import {vi, beforeAll, afterAll, describe, it, expect} from 'vitest'
-import {getCueDefaults, RundownCue} from '@rundown-studio/types'
-import {createTimestamps} from '../src/createTimestamps'
+import { vi, beforeAll, afterAll, describe, it, expect } from 'vitest'
+import { getCueDefaults, CueType, RundownCue } from '@rundown-studio/types'
+import { createTimestamps } from '../src/createTimestamps'
 
 const startTime = new Date('2024-07-26T09:00:00.000Z')
 const defaultCues = [
   {
     ...getCueDefaults(),
     id: '#1',
-    type: 'cue',
+    type: CueType.CUE,
     title: 'Cue 1',
     startTime: null,
     duration: 5 * 60000, // 5 min
@@ -15,7 +15,7 @@ const defaultCues = [
   {
     ...getCueDefaults(),
     id: '#2',
-    type: 'cue',
+    type: CueType.CUE,
     title: 'Cue 2',
     startTime: null,
     duration: 10 * 60000, // 10 min
@@ -23,7 +23,7 @@ const defaultCues = [
   {
     ...getCueDefaults(),
     id: '#3',
-    type: 'cue',
+    type: CueType.CUE,
     title: 'Cue 3',
     startTime: null,
     duration: 15 * 60000, // 15 min
