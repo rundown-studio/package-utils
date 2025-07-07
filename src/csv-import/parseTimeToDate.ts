@@ -55,6 +55,44 @@ type Options = {
   timezone?: string
 }
 
+/**
+ * Parses a string representation of time or date-time into a JavaScript Date object.
+ *
+ * This function supports a wide variety of time and date-time formats commonly found in CSV files
+ * and other data sources. It attempts to intelligently parse the input using multiple strategies.
+ *
+ * @param {unknown} input - The string to parse. If not a string or empty, returns undefined.
+ * @param {Object} options - Parsing options
+ * @param {Date} [options.referenceDate] - Optional reference date to use when parsing time-only inputs.
+ *                                         If provided, the date portion of the result will be set to this date.
+ * @param {string} [options.timezone] - Optional timezone identifier to use for parsing.
+ *
+ * @returns {Date|undefined} A Date object if parsing was successful, undefined otherwise.
+ *
+ * @example
+ * // Supported formats include (but are not limited to):
+ *
+ * // ISO 8601 and similar
+ * parseTimeToDate('2022-01-01T20:30:00Z')           // Full ISO string
+ * parseTimeToDate('2022-01-01 20:30')               // ISO-like format
+ *
+ * // Date-time combinations
+ * parseTimeToDate('01/01/2022 20:30')               // MM/DD/YYYY format
+ * parseTimeToDate('01-01-2022 20:30')               // MM-DD-YYYY format
+ * parseTimeToDate('2022-01-01 8:30 PM')             // With AM/PM
+ *
+ * // Time-only formats (uses referenceDate if provided)
+ * parseTimeToDate('20:30')                          // 24-hour format
+ * parseTimeToDate('8:30 PM')                        // 12-hour with AM/PM
+ * parseTimeToDate('8:30:15 PM')                     // With seconds
+ * parseTimeToDate('8 PM')                           // Single hour with AM/PM
+ * parseTimeToDate('20')                             // Single hour in 24-hour format
+ *
+ * // The function handles validation and returns undefined for invalid inputs:
+ * parseTimeToDate('25:30')                          // Invalid hour
+ * parseTimeToDate('20:60')                          // Invalid minute
+ * parseTimeToDate('13:30 PM')                       // Invalid 12-hour format
+ */
 export function parseTimeToDate (input?: unknown, {
   referenceDate,
   timezone,
