@@ -66,7 +66,7 @@ describe('getChildrenTimestamps', () => {
     {
       id: 'parent4' // Testing with undefined children
     }
-  ] as unknown as  RundownCueOrderItem[];
+  ] as RundownCueOrderItem[];
 
   it('should return all child timestamps for the specified parent', () => {
     const result = getChildrenTimestamps('parent1', mockTimestamps, mockCueOrder);
