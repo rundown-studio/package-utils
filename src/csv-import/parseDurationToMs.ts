@@ -1,4 +1,4 @@
-import { addSeconds, addMinutes, addHours, differenceInMilliseconds } from 'date-fns'
+import { hmsToMilliseconds } from '@rundown-studio/timeutils'
 
 /**
  * Parses a string representation of a duration and converts it to milliseconds.
@@ -50,32 +50,27 @@ export function parseDurationToMs (input?: unknown): number | undefined {
   }
 
   try {
-    // Helper to convert time components to milliseconds using date-fns
-    const toMilliseconds = (hours = 0, minutes = 0, seconds = 0) => {
-      const baseDate = new Date(0) // Unix epoch
-      const resultDate = addSeconds(
-        addMinutes(
-          addHours(baseDate, hours),
-          minutes,
-        ),
-        seconds,
-      )
-      return differenceInMilliseconds(resultDate, baseDate)
-    }
-
     // Pattern 1: Colon-separated formats (HH:MM:SS, MM:SS)
     const colonMatch = normalized.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/)
     if (colonMatch) {
-      const [, hours, minutes, seconds] = colonMatch.map((x) => x ? parseInt(x, 10) : undefined)
+      const [, hours = 0, minutes = 0, seconds] = colonMatch.map((x) => x ? parseInt(x, 10) : undefined)
 
       if (seconds !== undefined) {
         // HH:MM:SS format
         if (minutes && (minutes >= 60 || seconds >= 60)) return undefined
-        return toMilliseconds(hours, minutes, seconds)
+        return hmsToMilliseconds({
+          hours,
+          minutes,
+          seconds,
+        })
       } else {
         // MM:SS format
         if (minutes && minutes >= 60) return undefined
-        return toMilliseconds(0, hours, minutes)
+        return hmsToMilliseconds({
+          hours,
+          minutes,
+          seconds: 0,
+        })
       }
     }
 
@@ -83,7 +78,11 @@ export function parseDurationToMs (input?: unknown): number | undefined {
     const quoteMatch = normalized.match(/^(\d+)'$/)
     if (quoteMatch) {
       const minutes = parseInt(quoteMatch[1], 10)
-      return toMilliseconds(0, minutes, 0)
+      return hmsToMilliseconds({
+        hours: 0,
+        minutes,
+        seconds: 0,
+      })
     }
 
     // Pattern 3: Text-based formats with explicit units
@@ -94,10 +93,11 @@ export function parseDurationToMs (input?: unknown): number | undefined {
     }
 
     if (textComponents.hours !== null || textComponents.minutes !== null || textComponents.seconds !== null) {
-      return toMilliseconds(
-        textComponents.hours || 0,
-        textComponents.minutes || 0,
-        textComponents.seconds || 0,
+      return hmsToMilliseconds({
+        hours: textComponents.hours ?? 0,
+        minutes: textComponents.minutes ?? 0,
+        seconds: textComponents.seconds ?? 0,
+      },
       )
     }
 
@@ -107,14 +107,23 @@ export function parseDurationToMs (input?: unknown): number | undefined {
       const value = parseInt(singleUnitMatch[1], 10)
       const unitMap = { h: [value, 0, 0], m: [0, value, 0], s: [0, 0, value] }
       const [hours, minutes, seconds] = unitMap[singleUnitMatch[2] as keyof typeof unitMap]
-      return toMilliseconds(hours, minutes, seconds)
+      return hmsToMilliseconds({
+        hours,
+        minutes,
+        seconds,
+      })
     }
 
     // Pattern 5: Plain number (assumes minutes)
     const plainNumberMatch = normalized.match(/^(\d+)$/)
     if (plainNumberMatch) {
       const minutes = parseInt(plainNumberMatch[1], 10)
-      return toMilliseconds(0, minutes, 0)
+
+      return hmsToMilliseconds({
+        hours: 0,
+        minutes,
+        seconds: 0,
+      })
     }
 
     return undefined
