@@ -50,7 +50,15 @@ function setTimeOnDate (baseDate: Date, hour: number, minute: number, second: nu
   return applyDate(timeDate, baseDate, { timezone })
 }
 
-export function parseTimeToDate (input?: unknown, referenceDate?: Date, timezone?: string): Date | undefined {
+type Options = {
+  referenceDate?: Date
+  timezone?: string
+}
+
+export function parseTimeToDate (input?: unknown, {
+  referenceDate,
+  timezone,
+}: Options = {}): Date | undefined {
   if (!input || typeof input !== 'string') {
     return undefined
   }
