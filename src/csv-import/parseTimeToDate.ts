@@ -206,6 +206,10 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
       }
     }
 
+    const date = Date.parse(input)
+
+    if (!isNaN(date)) return new Date(date)
+
     return undefined
   } catch {
     return undefined
