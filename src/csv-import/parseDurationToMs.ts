@@ -1,6 +1,6 @@
 import { addSeconds, addMinutes, addHours, differenceInMilliseconds } from 'date-fns'
 
-export function parseDurationToMs (input?: unknown) {
+export function parseDurationToMs (input?: unknown): number | undefined {
   if (!input || typeof input !== 'string') {
     return undefined
   }
@@ -27,16 +27,16 @@ export function parseDurationToMs (input?: unknown) {
     // Pattern 1: Colon-separated formats (HH:MM:SS, MM:SS)
     const colonMatch = normalized.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/)
     if (colonMatch) {
-      const [, first, second, third] = colonMatch.map((x) => x ? parseInt(x, 10) : undefined)
+      const [, hours, minutes, seconds] = colonMatch.map((x) => x ? parseInt(x, 10) : undefined)
 
-      if (third !== undefined) {
+      if (seconds !== undefined) {
         // HH:MM:SS format
-        if (second && (second >= 60 || third >= 60)) return undefined
-        return toMilliseconds(first, second, third)
+        if (minutes && (minutes >= 60 || seconds >= 60)) return undefined
+        return toMilliseconds(hours, minutes, seconds)
       } else {
         // MM:SS format
-        if (second && second >= 60) return undefined
-        return toMilliseconds(0, first, second)
+        if (minutes && minutes >= 60) return undefined
+        return toMilliseconds(0, hours, minutes)
       }
     }
 
