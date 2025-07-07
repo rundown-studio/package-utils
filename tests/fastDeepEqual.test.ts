@@ -82,11 +82,12 @@ describe('fastDeepEqual', () => {
 
     // Log performance results for informational purposes
     console.info(`
-=== Performance Comparison (1000 iterations) ===
-JSON.stringify:  ${duration1.toFixed(1)}ms
-fast-deep-equal: ${duration2.toFixed(1)}ms
-fastDeepEqual:   ${duration3.toFixed(1)}ms
-====================================================`)
+---
+## Performance Comparison (1000 iterations)
+- JSON.stringify:  \`${duration1.toFixed(1)}ms\`
+- fast-deep-equal: \`${duration2.toFixed(1)}ms\`
+- fastDeepEqual:   \`${duration3.toFixed(1)}ms\`
+---`)
 
     // Only check that our implementation works correctly, not performance
     // Performance can vary significantly in CI environments
