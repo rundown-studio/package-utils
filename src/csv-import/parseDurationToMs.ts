@@ -1,5 +1,44 @@
 import { addSeconds, addMinutes, addHours, differenceInMilliseconds } from 'date-fns'
 
+/**
+ * Parses a string representation of a duration and converts it to milliseconds.
+ * This function supports multiple duration formats including colon-separated times,
+ * text-based formats with units, single unit formats, and plain numbers.
+ *
+ * @param input - The input to parse. Should be a string representing a duration.
+ * @returns The duration in milliseconds, or undefined if parsing fails.
+ *
+ * @example
+ * // Colon-separated formats
+ * parseDurationToMs('1:30:45') // 1h 30m 45s = 5,445,000ms
+ * parseDurationToMs('5:30')    // 5m 30s = 330,000ms
+ *
+ * @example
+ * // Single quote notation for minutes
+ * parseDurationToMs("90'")     // 90m = 5,400,000ms
+ *
+ * @example
+ * // Text-based formats with explicit units
+ * parseDurationToMs('2 hours 30 minutes') // 2h 30m = 9,000,000ms
+ * parseDurationToMs('1h 20m 30s')         // 1h 20m 30s = 4,830,000ms
+ *
+ * @example
+ * // Single unit formats
+ * parseDurationToMs('90m')     // 90m = 5,400,000ms
+ * parseDurationToMs('45s')     // 45s = 45,000ms
+ * parseDurationToMs('2h')      // 2h = 7,200,000ms
+ *
+ * @example
+ * // Plain number (assumes minutes)
+ * parseDurationToMs('90')      // 90m = 5,400,000ms
+ *
+ * @example
+ * // Invalid inputs
+ * parseDurationToMs('')        // undefined
+ * parseDurationToMs(null)      // undefined
+ * parseDurationToMs(undefined) // undefined
+ * parseDurationToMs(123)       // undefined (not a string)
+ */
 export function parseDurationToMs (input?: unknown): number | undefined {
   if (!input || typeof input !== 'string') {
     return undefined
@@ -84,7 +123,16 @@ export function parseDurationToMs (input?: unknown): number | undefined {
   }
 }
 
-// Helper function to extract time components from text
+/**
+ * Helper function to extract time components from text.
+ * Searches for patterns like "2 hours", "30 mins", "45s" in the input text.
+ * Used internally by parseDurationToMs to handle text-based duration formats.
+ *
+ * @param text - The text to search for time components.
+ * @param unitPatterns - Array of regex patterns for time units (e.g., ['hours?', 'hrs?', 'h']).
+ * @returns The extracted numeric value, or null if no match is found.
+ * @private
+ */
 function extractTimeComponent (text: string, unitPatterns: string[]) {
   for (const pattern of unitPatterns) {
     const regex = new RegExp(`(\\d+)\\s*${pattern}`, 'i')
