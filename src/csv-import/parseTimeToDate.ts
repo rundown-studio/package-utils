@@ -1,4 +1,5 @@
 import { parse, isValid, parseISO } from 'date-fns'
+import { applyDate, getStartOfDay } from '@rundown-studio/timeutils' // Helper function to validate date components
 
 // Helper function to validate date components
 function isValidDate (year: number, month: number, day: number): boolean {
@@ -39,14 +40,17 @@ function createValidatedDate (year: number, month: number, day: number, hour: nu
 }
 
 // Helper function to set time on today's date
-function setTimeOnDate (baseDate: Date, hour: number, minute: number, second: number): Date | undefined {
+function setTimeOnDate (baseDate: Date, hour: number, minute: number, second: number, timezone?: string): Date | undefined {
   if (!isValidTime(hour, minute, second)) return undefined
 
-  const result = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate(), hour, minute, second)
-  return isValid(result) ? result : undefined
+  const timeDate = new Date()
+  timeDate.setUTCHours(hour, minute, second, 0)
+
+  // Apply the date from baseDate to the time
+  return applyDate(timeDate, baseDate, { timezone })
 }
 
-export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | undefined {
+export function parseTimeToDate (input?: unknown, referenceDate?: Date, timezone?: string): Date | undefined {
   if (!input || typeof input !== 'string') {
     return undefined
   }
@@ -56,10 +60,7 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
     return undefined
   }
 
-  const today = referenceDate
-    ? new Date(referenceDate.getFullYear(), referenceDate.getMonth(), referenceDate.getDate())
-    : new Date()
-  today.setHours(0, 0, 0, 0)
+  const today = getStartOfDay(referenceDate ?? new Date(), { timezone })
 
   try {
     // First try parsing with parseISO for proper ISO strings
@@ -73,6 +74,7 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
             parsedISO.getHours(),
             parsedISO.getMinutes(),
             parsedISO.getSeconds(),
+            timezone,
           )
         }
 
@@ -153,7 +155,7 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
       const hour24 = convertTo24Hour(hour12, ampm)
       if (hour24 === undefined) return undefined
 
-      return setTimeOnDate(today, hour24, minute, second)
+      return setTimeOnDate(today, hour24, minute, second, timezone)
     }
 
     // Pattern 5: 24-hour time (HH:MM[:SS])
@@ -163,7 +165,7 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
       const minute = parseInt(time24Match[2], 10)
       const second = time24Match[3] ? parseInt(time24Match[3], 10) : 0
 
-      return setTimeOnDate(today, hour, minute, second)
+      return setTimeOnDate(today, hour, minute, second, timezone)
     }
 
     // Pattern 6: Single hour with AM/PM (H AM/PM)
@@ -175,7 +177,7 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
       const hour24 = convertTo24Hour(hour12, ampm)
       if (hour24 === undefined) return undefined
 
-      return setTimeOnDate(today, hour24, 0, 0)
+      return setTimeOnDate(today, hour24, 0, 0, timezone)
     }
 
     // Pattern 7: Single hour in 24-hour format (H or HH)
@@ -184,17 +186,8 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
       const hour = parseInt(singleHour24Match[1], 10)
       if (hour > 23) return undefined
 
-      // Create a new date with the same date components as the reference date
-      // but with the specified hour
-      return new Date(
-        today.getFullYear(),
-        today.getMonth(),
-        today.getDate(),
-        hour,
-        0,
-        0,
-        0,
-      )
+      // Use setTimeOnDate to handle timezone correctly
+      return setTimeOnDate(today, hour, 0, 0, timezone)
     }
 
     // Pattern 8: Fallback to date-fns for additional format support
@@ -227,7 +220,7 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
             && !formatStr.includes('dd-MM')
 
           if (isTimeOnlyFormat) {
-            return setTimeOnDate(today, parsed.getHours(), parsed.getMinutes(), parsed.getSeconds())
+            return setTimeOnDate(today, parsed.getHours(), parsed.getMinutes(), parsed.getSeconds(), timezone)
           }
           return parsed
         }
@@ -250,6 +243,7 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
           parsedDate.getHours(),
           parsedDate.getMinutes(),
           parsedDate.getSeconds(),
+          timezone,
         )
       }
 
