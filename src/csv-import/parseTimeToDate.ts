@@ -1,4 +1,4 @@
-import { parse, isValid } from 'date-fns'
+import { parse, isValid, parseISO } from 'date-fns'
 
 // Helper function to validate date components
 function isValidDate (year: number, month: number, day: number): boolean {
@@ -62,6 +62,26 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
   today.setHours(0, 0, 0, 0)
 
   try {
+    // First try parsing with parseISO for proper ISO strings
+    try {
+      const parsedISO = parseISO(normalized)
+
+      if (isValid(parsedISO)) {
+        if (referenceDate) {
+          return setTimeOnDate(
+            today,
+            parsedISO.getHours(),
+            parsedISO.getMinutes(),
+            parsedISO.getSeconds(),
+          )
+        }
+
+        return parsedISO
+      }
+    } catch {
+      // Continue to other parsing methods
+    }
+
     // Pattern 1: YYYY-MM-DD HH:MM[:SS] [AM/PM]
     const isoMatch = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i)
     if (isoMatch) {
@@ -164,7 +184,17 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
       const hour = parseInt(singleHour24Match[1], 10)
       if (hour > 23) return undefined
 
-      return setTimeOnDate(today, hour, 0, 0)
+      // Create a new date with the same date components as the reference date
+      // but with the specified hour
+      return new Date(
+        today.getFullYear(),
+        today.getMonth(),
+        today.getDate(),
+        hour,
+        0,
+        0,
+        0,
+      )
     }
 
     // Pattern 8: Fallback to date-fns for additional format support
@@ -208,7 +238,23 @@ export function parseTimeToDate (input?: unknown, referenceDate?: Date): Date | 
 
     const date = Date.parse(input)
 
-    if (!isNaN(date)) return new Date(date)
+    if (!isNaN(date)) {
+      const parsedDate = new Date(date)
+
+      // Check if the parsed date might be just a time (year is 1970 or some other default)
+      // If so, apply the time to the reference date instead
+      if (referenceDate) {
+        // This is likely just a time, so use the reference date
+        return setTimeOnDate(
+          today,
+          parsedDate.getHours(),
+          parsedDate.getMinutes(),
+          parsedDate.getSeconds(),
+        )
+      }
+
+      return parsedDate
+    }
 
     return undefined
   } catch {

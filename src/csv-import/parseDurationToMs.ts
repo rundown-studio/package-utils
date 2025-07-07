@@ -67,9 +67,9 @@ export function parseDurationToMs (input?: unknown): number | undefined {
         // MM:SS format
         if (minutes && minutes >= 60) return undefined
         return hmsToMilliseconds({
-          hours,
-          minutes,
-          seconds: 0,
+          hours: 0,
+          minutes: hours,
+          seconds: minutes,
         })
       }
     }
