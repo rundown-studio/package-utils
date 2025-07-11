@@ -42,7 +42,7 @@ const defaultCues = [
     startTime: null,
     duration: 15 * 60000, // 15 min
   },
-] as unknown as RundownCue[]
+] as RundownCue[]
 const defaultCueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
 const defaultRunner = {
   ...getRunnerDefaults(),
