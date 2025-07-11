@@ -1,5 +1,5 @@
-import { expect } from "chai";
-import { getResizedImageURL } from '../dist/esm/index.js';
+import {describe, it, expect} from 'vitest';
+import {getResizedImageURL} from '../src/getResizedImageURL';
 
 describe("getResizedImageURL", () => {
   it("Simple case with real image", () => {

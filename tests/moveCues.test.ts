@@ -1,11 +1,12 @@
-import { expect } from 'chai'
-import { moveCues } from '../dist/esm/index.js'
+import { describe, it, expect } from 'vitest'
+import { moveCues } from '../src/moveCues'
+import { RundownCueOrderItem } from '@rundown-studio/types'
 
 /**
  * npm run test -- tests/moveCues.test.js
  */
 
-const cueOrder = [
+const cueOrder: RundownCueOrderItem[] = [
   { id: 'cue1' },
   { id: 'cue2' },
   {
@@ -492,7 +493,7 @@ describe('moveCues', () => {
     try {
       await moveCues(cueOrder, selectedCues, destination)
     } catch (error) {
-      expect(error.message).to.equal('Cannot move a group header inside another group')
+      expect((error as Error).message).to.equal('Cannot move a group header inside another group')
     }
   })
 

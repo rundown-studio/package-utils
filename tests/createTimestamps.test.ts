@@ -1,12 +1,19 @@
-import { jest } from '@jest/globals'
-import { expect } from 'chai'
-import { createTimestamps } from '../dist/esm/index.js'
-import { CueStartMode, getCueDefaults, getRunnerDefaults } from '@rundown-studio/types'
+import {createTimestamps} from '../src/createTimestamps'
+import {
+  CueStartMode,
+  getCueDefaults,
+  getRunnerDefaults,
+  RundownCue,
+  RundownCueOrderItem,
+  Runner,
+  CueType
+} from '@rundown-studio/types'
 import _ from 'lodash'
-import { addMinutes } from 'date-fns'
+import {addMinutes} from 'date-fns'
+import {vi, afterAll, beforeAll, describe, expect, it} from 'vitest'
 
 /**
- * npm run test -- tests/createTimestamps.test.js
+ * npm run test -- tests/createTimestamps.test.ts
  */
 
 const startTime = new Date('2024-07-26T09:00:00.000Z')
@@ -35,8 +42,8 @@ const defaultCues = [
     startTime: null,
     duration: 15 * 60000, // 15 min
   },
-]
-const defaultCueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }]
+] as RundownCue[]
+const defaultCueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
 const defaultRunner = {
   ...getRunnerDefaults(),
   timesnap: {
@@ -65,20 +72,20 @@ const defaultRunner = {
     },
   },
   elapsedCues: {},
-}
+} as unknown as Runner
 
 describe('createTimestamps', () => {
   beforeAll(() => {
-    jest.useFakeTimers()
+    vi.useFakeTimers()
   })
 
   afterAll(() => {
-    jest.useRealTimers()
+    vi.useRealTimers()
   })
 
   describe('Not running, default cases, same day UTC', () => {
     it('Not running, PRESHOW', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = defaultCues
       const cueOrder = defaultCueOrder
       const runner = null
@@ -111,7 +118,7 @@ describe('createTimestamps', () => {
     })
 
     it('Not running, ENDED', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = defaultCues
       const cueOrder = defaultCueOrder
       const runner = _.cloneDeep(defaultRunner)
@@ -155,7 +162,7 @@ describe('createTimestamps', () => {
     })
 
     it('Not running, PRESHOW, with hard cue', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
         {
@@ -167,7 +174,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
 
@@ -206,7 +213,7 @@ describe('createTimestamps', () => {
     })
 
     it('Add a cue with `null` duration, should default to 0s', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
         {
@@ -218,7 +225,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: null,
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
 
@@ -234,7 +241,7 @@ describe('createTimestamps', () => {
     })
 
     it('Ignore cues not part of cue order', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = defaultCues
       const cueOrder = [{ id: '#1' }, { id: '#3' }]
       const runner = null
@@ -261,7 +268,7 @@ describe('createTimestamps', () => {
     })
 
     it('Handle cue groups and heading', () => {
-      jest.setSystemTime(new Date('2024-07-26T09:00:00.000Z'))
+      vi.setSystemTime(new Date('2024-07-26T09:00:00.000Z'))
       const cues = [
         {
           ...getCueDefaults(),
@@ -276,7 +283,7 @@ describe('createTimestamps', () => {
           type: 'group',
           title: 'Group',
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [
         { id: 'heading' },
         { id: '#1' },
@@ -320,7 +327,7 @@ describe('createTimestamps', () => {
 
   describe('Running, different over/under cases, same day UTC', () => {
     it('First cue went 5min over', () => {
-      jest.setSystemTime(addMinutes(startTime, 12))
+      vi.setSystemTime(addMinutes(startTime, 12))
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
@@ -365,7 +372,7 @@ describe('createTimestamps', () => {
     })
 
     it('Starting 3min late, with hard cue', () => {
-      jest.setSystemTime(addMinutes(startTime, 3))
+      vi.setSystemTime(addMinutes(startTime, 3))
       const cues = [
         ...defaultCues,
         {
@@ -377,7 +384,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -429,7 +436,7 @@ describe('createTimestamps', () => {
     })
 
     it('Starting 3min late, with hard cue and flexible after', () => {
-      jest.setSystemTime(addMinutes(startTime, 3))
+      vi.setSystemTime(addMinutes(startTime, 3))
       const cues = [
         ...defaultCues,
         {
@@ -448,7 +455,7 @@ describe('createTimestamps', () => {
           title: 'Cue 5',
           duration: 10 * 60000, // 10 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }]
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -510,7 +517,7 @@ describe('createTimestamps', () => {
     })
 
     it('Starting on time, edited cue from flexible to fixed', () => {
-      jest.setSystemTime(addMinutes(startTime, 3))
+      vi.setSystemTime(addMinutes(startTime, 3))
       const cues = [
         ...defaultCues,
         {
@@ -522,7 +529,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 20 * 60000, // 20 min
         }
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -574,7 +581,7 @@ describe('createTimestamps', () => {
     })
 
     it('Running overtime, conflicting with hard cue start', () => {
-      jest.setSystemTime(new Date('2024-07-26T09:50:00.000Z'))
+      vi.setSystemTime(new Date('2024-07-26T09:50:00.000Z'))
       const cues = [
         ...defaultCues,
         {
@@ -586,7 +593,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -643,7 +650,7 @@ describe('createTimestamps', () => {
     })
 
     it('Started 2m early, went 2m under in #1, fixed by extending #2 by 4m', () => {
-      jest.setSystemTime(new Date('2024-07-26T09:05:00.000Z'))
+      vi.setSystemTime(new Date('2024-07-26T09:05:00.000Z'))
       const cues = _.cloneDeep(defaultCues)
       cues[1].duration = (14 * 60000)
       const cueOrder = _.cloneDeep(defaultCueOrder)
@@ -689,7 +696,7 @@ describe('createTimestamps', () => {
     })
 
     it('Started 2m early, went 2m under in #1, fixed by extending #3 by 4m', () => {
-      jest.setSystemTime(new Date('2024-07-26T09:05:00.000Z'))
+      vi.setSystemTime(new Date('2024-07-26T09:05:00.000Z'))
       const cues = _.cloneDeep(defaultCues)
       cues[2].duration = (19 * 60000)
       const cueOrder = _.cloneDeep(defaultCueOrder)
@@ -735,7 +742,7 @@ describe('createTimestamps', () => {
     })
 
     it('Started 3m late, fixed by shortening #2 by 3m', () => {
-      jest.setSystemTime(new Date('2024-07-26T09:05:00.000Z'))
+      vi.setSystemTime(new Date('2024-07-26T09:05:00.000Z'))
       const cues = _.cloneDeep(defaultCues)
       cues[1].duration = (7 * 60000)
       const cueOrder = _.cloneDeep(defaultCueOrder)
@@ -777,7 +784,7 @@ describe('createTimestamps', () => {
     })
 
     it('Cue inserted after creating runner with original cues, inserted cue is future', () => {
-      jest.setSystemTime(new Date('2024-07-26T09:03:00.000Z'))
+      vi.setSystemTime(new Date('2024-07-26T09:03:00.000Z'))
       const cues = _.cloneDeep(defaultCues)
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -791,11 +798,11 @@ describe('createTimestamps', () => {
       cues.push({
         ...getCueDefaults(),
         id: '#2b',
-        type: 'cue',
+        type: CueType.CUE,
         title: 'Cue 2b',
         startTime: null,
         duration: 5 * 60000,
-      })
+      } as RundownCue)
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#2b' }, { id: '#3' }]
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
@@ -833,7 +840,7 @@ describe('createTimestamps', () => {
     })
 
     it('Cue inserted after creating runner with original cues, inserted cue is active', () => {
-      jest.setSystemTime(new Date('2024-07-26T09:08:00.000Z'))
+      vi.setSystemTime(new Date('2024-07-26T09:08:00.000Z'))
       const cues = _.cloneDeep(defaultCues)
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -851,11 +858,11 @@ describe('createTimestamps', () => {
       cues.push({
         ...getCueDefaults(),
         id: '#1b',
-        type: 'cue',
+        type: CueType.CUE,
         title: 'Cue 1b',
         startTime: null,
         duration: 5 * 60000,
-      })
+      } as RundownCue)
       const cueOrder = [{ id: '#1' }, { id: '#1b' }, { id: '#2' }, { id: '#3' }]
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
@@ -897,7 +904,7 @@ describe('createTimestamps', () => {
     it('Not running, PRESHOW', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:00:00.000Z')
-      jest.setSystemTime(now)
+      vi.setSystemTime(now)
       const cues = defaultCues
       const cueOrder = defaultCueOrder
       const runner = null
@@ -932,7 +939,7 @@ describe('createTimestamps', () => {
     it('Not running, PRESHOW, with hard cue', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:10:21.000Z')
-      jest.setSystemTime(now)
+      vi.setSystemTime(now)
       const cues = [
         ...defaultCues,
         {
@@ -944,7 +951,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
 
@@ -985,7 +992,7 @@ describe('createTimestamps', () => {
     it('Running overtime, conflicting with hard cue start', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:50:00.000Z')
-      jest.setSystemTime(now)
+      vi.setSystemTime(now)
       const cues = [
         ...defaultCues,
         {
@@ -997,7 +1004,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -1056,7 +1063,7 @@ describe('createTimestamps', () => {
     it('Spanning multiple days, PRESHOW', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-12T09:00:00.000Z')
-      jest.setSystemTime(now)
+      vi.setSystemTime(now)
       const cues = _.cloneDeep(defaultCues)
       cues[0].duration = 6 * 60 * 60000 // 6h
       cues[1].duration = 10 * 60 * 60000 // 8h
@@ -1064,7 +1071,7 @@ describe('createTimestamps', () => {
       cues[3] = {
         ...getCueDefaults(),
         id: '#4',
-        type: 'cue',
+        type: CueType.CUE,
         title: 'Cue 4',
         startTime: new Date('2024-07-26T10:00:00.000Z'),
         startDatePlus: 1,
@@ -1111,7 +1118,7 @@ describe('createTimestamps', () => {
     it('Spanning multiple days, ONAIR, now is second day', () => {
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-08-13T10:35:00.000Z')
-      jest.setSystemTime(now)
+      vi.setSystemTime(now)
       const cues = _.cloneDeep(defaultCues)
       cues[0].duration = 6 * 60 * 60000 // 6h
       cues[1].duration = 10 * 60 * 60000 // 8h
@@ -1119,13 +1126,13 @@ describe('createTimestamps', () => {
       cues[3] = {
         ...getCueDefaults(),
         id: '#4',
-        type: 'cue',
+        type: CueType.CUE,
         title: 'Cue 4',
         startTime: new Date('2024-07-26T10:00:00.000Z'),
         startDatePlus: 1,
         startMode: CueStartMode.FIXED,
         duration: 3 * 60 * 60000 // 3h
-      }
+      } as RundownCue
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
       runner.timesnap = {
@@ -1208,7 +1215,7 @@ describe('createTimestamps', () => {
       // Daylight Saving Time ends: November 3, 2024 02:00
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-11-05T10:42:00.000Z')
-      jest.setSystemTime(now)
+      vi.setSystemTime(now)
       const cues = defaultCues
       const cueOrder = defaultCueOrder
       const runner = null
@@ -1244,7 +1251,7 @@ describe('createTimestamps', () => {
       // Daylight Saving Time ends: November 3, 2024 02:00
       const timezone = 'America/Los_Angeles'
       const now = new Date('2024-11-05T10:42:00.000Z')
-      jest.setSystemTime(now)
+      vi.setSystemTime(now)
       const cues = defaultCues
       const cueOrder = defaultCueOrder
       const runner = _.cloneDeep(defaultRunner)
@@ -1297,7 +1304,7 @@ describe('createTimestamps', () => {
 
   describe('Next cue/Jump to cue starting and jumping cases', () => {
     it('Future jump to the past', () => {
-      jest.setSystemTime(addMinutes(startTime, 6))
+      vi.setSystemTime(addMinutes(startTime, 6))
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
@@ -1342,7 +1349,7 @@ describe('createTimestamps', () => {
     })
 
     it('Did jump to the past', () => {
-      jest.setSystemTime(addMinutes(startTime, 15))
+      vi.setSystemTime(addMinutes(startTime, 15))
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
@@ -1391,7 +1398,7 @@ describe('createTimestamps', () => {
     })
 
     it('Jump to the future', () => {
-      jest.setSystemTime(addMinutes(startTime, 3))
+      vi.setSystemTime(addMinutes(startTime, 3))
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
@@ -1432,7 +1439,7 @@ describe('createTimestamps', () => {
     })
 
     it('Start/Be in the future, all before should be CUE_PAST', () => {
-      jest.setSystemTime(addMinutes(startTime, 3))
+      vi.setSystemTime(addMinutes(startTime, 3))
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
@@ -1475,7 +1482,7 @@ describe('createTimestamps', () => {
 
   describe('Multiple day event, using startDatePlus (+1d button)', () => {
     it('Two hours before, keep same day.', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
         {
@@ -1504,7 +1511,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 25 * 60000, // 25 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }]
       const runner = null
 
@@ -1550,7 +1557,7 @@ describe('createTimestamps', () => {
     })
 
     it('Two hours before, but with +1 on startDatePlus', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
         {
@@ -1571,7 +1578,7 @@ describe('createTimestamps', () => {
           startDatePlus: 1,
           duration: 20 * 60000, // 20 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }]
       const runner = null
 
@@ -1617,7 +1624,7 @@ describe('createTimestamps', () => {
     })
 
     it('Two hours before, but with +1 on startDatePlus, following soft cue', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
         {
@@ -1646,7 +1653,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 25 * 60000, // 25 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }]
       const runner = null
 
@@ -1699,7 +1706,7 @@ describe('createTimestamps', () => {
     })
 
     it('Two hours before, but with +1 on startDatePlus, following soft cue, and hard start back on first day', () => {
-      jest.setSystemTime(startTime)
+      vi.setSystemTime(startTime)
       const cues = [
         ...defaultCues,
         {
@@ -1738,7 +1745,7 @@ describe('createTimestamps', () => {
           startDatePlus: 0,
           duration: 30 * 60000, // 30 min
         },
-      ]
+      ] as RundownCue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }, { id: '#7' }]
       const runner = null
 

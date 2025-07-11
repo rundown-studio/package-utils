@@ -12,13 +12,18 @@ export default [
     },
   },
 
-  // Typescript sepcific
+  // TypeScript specific
   ...tseslint.configs.recommended,
   {
     name: 'typescript-eslint/overwrites',
     files: ['src/**/*.ts'],
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/explicit-function-return-type': 'off',
+      '@typescript-eslint/no-unused-vars': ['warn', {
+        argsIgnorePattern: '^_',
+        varsIgnorePattern: '^_',
+      }],
     }
   },
 
@@ -35,11 +40,10 @@ export default [
   {
     name: 'global/stylistic',
     files: [
-      'src/**/*.js',
       'src/**/*.ts',
     ],
     rules: {
-      ...stylistic.configs['recommended-flat'].rules,
+      ...stylistic.configs['recommended'].rules,
       '@stylistic/quotes': ['warn', 'single'],
       '@stylistic/semi': ['warn', 'never'],
       '@stylistic/indent': ['warn', 2, { SwitchCase: 1 }],
@@ -51,12 +55,13 @@ export default [
     },
   },
 
-  // Special rules for test
+  // Special rules for tests
   {
-    name: 'eslint/js/tests',
-    files: ['tests/**/*.js'],
+    name: 'eslint/tests',
+    files: ['tests/**/*.ts'],
     rules: {
       '@typescript-eslint/no-unused-expressions': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
     }
   },
 
@@ -69,6 +74,7 @@ export default [
       '**/*.OBSOLETE.*',
       '**/*.TEMP.*',
       'dist/*',
+      'node_modules/*',
     ],
   },
 ]
