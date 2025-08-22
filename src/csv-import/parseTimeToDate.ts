@@ -1,5 +1,5 @@
 import { parse, isValid, parseISO } from 'date-fns'
-import { applyDate, getStartOfDay, parse as timeutilsParse, format, getTimezoneOffset } from '@rundown-studio/timeutils' // Helper function to validate date components
+import { getStartOfDay, parse as timeutilsParse, format, getTimezoneOffset } from '@rundown-studio/timeutils' // Helper function to validate date components
 
 // Helper function to validate date components
 function isValidDate (year: number, month: number, day: number): boolean {
@@ -40,16 +40,16 @@ function createValidatedDate (year: number, month: number, day: number, hour: nu
 }
 
 // Helper function to validate timezone
-function validateTimezone(timezone: string): { isValid: boolean; error?: string } {
+function validateTimezone (timezone: string): { isValid: boolean, error?: string } {
   try {
     // Test the timezone by attempting to get offset for current time
     getTimezoneOffset(timezone, new Date())
     return { isValid: true }
   } catch (error) {
     if (error instanceof Error && error.message.includes('Invalid time zone')) {
-      return { 
-        isValid: false, 
-        error: `Invalid timezone "${timezone}". Please use a valid IANA timezone identifier (e.g., "America/New_York", "Europe/Berlin", "UTC").`
+      return {
+        isValid: false,
+        error: `Invalid timezone "${timezone}". Please use a valid IANA timezone identifier (e.g., "America/New_York", "Europe/Berlin", "UTC").`,
       }
     }
     // Re-throw unexpected errors
@@ -63,14 +63,14 @@ function setTimeOnDate (baseDate: Date, hour: number, minute: number, second: nu
 
   // Format the time components into a parseable string
   const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}:${second.toString().padStart(2, '0')}`
-  
+
   // Get the date string in the target timezone to ensure correct date context
   const dateStr = format(baseDate, 'yyyy-MM-dd', { timezone: timezone || 'UTC' })
-  
+
   // Combine date and time, then parse in the specified timezone
   const dateTimeStr = `${dateStr} ${timeStr}`
-  
-  // Parse the combined string in the specified timezone - this correctly interprets 
+
+  // Parse the combined string in the specified timezone - this correctly interprets
   // the time as local time in that timezone and returns UTC
   return timeutilsParse(dateTimeStr, 'yyyy-MM-dd HH:mm:ss', baseDate, { timezone: timezone || 'UTC' })
 }
