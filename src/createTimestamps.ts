@@ -1,10 +1,10 @@
 import type { RundownCue, RundownCueOrderItem, Runner } from '@rundown-studio/types'
 import { RunnerState, CueType, CueStartMode } from '@rundown-studio/types'
 import { applyDate, getStartOfDay, addDays } from '@rundown-studio/timeutils'
-import _isEmpty from 'lodash/isEmpty'
 import { differenceInCalendarDays } from 'date-fns'
 import { tz } from '@date-fns/tz'
 import { getRunnerState } from './getRunnerState'
+import _ from 'lodash'
 
 export enum CueRunState {
   CUE_PAST = 'CUE_PAST',
@@ -179,7 +179,7 @@ export function getSortedCues (
 function calculateTotalStartDuration (
   items: Record<RundownCue['id'], StartDuration>,
 ): StartDuration {
-  if (_isEmpty(items)) throw new Error('Cannot calculate duration for empty items')
+  if (_.isEmpty(items)) throw new Error('Cannot calculate duration for empty items')
   const sdArray = Object.values(items)
   const firstSD = sdArray[0]
   const lastSD = sdArray[sdArray.length - 1]
