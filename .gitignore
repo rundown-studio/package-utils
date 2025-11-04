@@ -22,6 +22,7 @@ dist/
 
 # Misc
 .DS_Store
+.claude
 
 # JetBrains IDEs
 .idea
