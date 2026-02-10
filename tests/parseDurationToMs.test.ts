@@ -21,8 +21,10 @@ describe('parseDurationToMs', () => {
     expect(parseDurationToMs('01:30:15')).toBe(5415000)
   })
 
-  it('should parse MM:SS format correctly', () => {
-    expect(parseDurationToMs('45:20')).toBe(2720000)
+  it('should parse HH:MM format correctly', () => {
+    expect(parseDurationToMs('1:10')).toBe(4200000) // 1h 10m
+    expect(parseDurationToMs('01:10')).toBe(4200000) // 1h 10m
+    expect(parseDurationToMs('5:30')).toBe(19800000) // 5h 30m
   })
 
   it('should return undefined for invalid colon-separated formats', () => {

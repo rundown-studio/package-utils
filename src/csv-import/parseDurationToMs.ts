@@ -11,7 +11,7 @@ import { hmsToMilliseconds } from '@rundown-studio/timeutils'
  * @example
  * // Colon-separated formats
  * parseDurationToMs('1:30:45') // 1h 30m 45s = 5,445,000ms
- * parseDurationToMs('5:30')    // 5m 30s = 330,000ms
+ * parseDurationToMs('5:30')    // 5h 30m = 19,800,000ms
  *
  * @example
  * // Single quote notation for minutes
@@ -50,7 +50,7 @@ export function parseDurationToMs (input?: unknown): number | undefined {
   }
 
   try {
-    // Pattern 1: Colon-separated formats (HH:MM:SS, MM:SS)
+    // Pattern 1: Colon-separated formats (HH:MM:SS, HH:MM)
     const colonMatch = normalized.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/)
     if (colonMatch) {
       const [, hours = 0, minutes = 0, seconds] = colonMatch.map((x) => x ? parseInt(x, 10) : undefined)
@@ -64,12 +64,12 @@ export function parseDurationToMs (input?: unknown): number | undefined {
           seconds,
         })
       } else {
-        // MM:SS format
+        // HH:MM format
         if (minutes && minutes >= 60) return undefined
         return hmsToMilliseconds({
-          hours: 0,
-          minutes: hours,
-          seconds: minutes,
+          hours,
+          minutes,
+          seconds: 0,
         })
       }
     }
