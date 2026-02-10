@@ -3,10 +3,10 @@ import { parseDurationToMs } from '../parseDurationToMs'
 
 describe('parseDurationToMs', () => {
   describe('Colon-separated formats', () => {
-    it('should parse MM:SS format', () => {
-      expect(parseDurationToMs('1:30')).toBe(90000) // 1 min 30 sec
-      expect(parseDurationToMs('5:45')).toBe(345000) // 5 min 45 sec
-      expect(parseDurationToMs('0:30')).toBe(30000) // 30 sec
+    it('should parse HH:MM format', () => {
+      expect(parseDurationToMs('1:30')).toBe(5400000) // 1h 30m
+      expect(parseDurationToMs('5:45')).toBe(20700000) // 5h 45m
+      expect(parseDurationToMs('0:30')).toBe(1800000) // 30m
     })
 
     it('should parse HH:MM:SS format', () => {
@@ -16,12 +16,12 @@ describe('parseDurationToMs', () => {
     })
 
     it('should handle single digit values', () => {
-      expect(parseDurationToMs('1:5')).toBe(65000) // 1 min 5 sec
+      expect(parseDurationToMs('1:5')).toBe(3900000) // 1h 5m
       expect(parseDurationToMs('1:5:3')).toBe(3903000) // 1h 5m 3s
     })
 
     it('should validate time values', () => {
-      expect(parseDurationToMs('1:60')).toBeUndefined() // Invalid minutes
+      expect(parseDurationToMs('1:60')).toBeUndefined() // Invalid: 60 minutes
       expect(parseDurationToMs('1:30:60')).toBeUndefined() // Invalid seconds
       expect(parseDurationToMs('25:30:45')).toBeDefined() // Hours can be > 24
     })
@@ -128,7 +128,7 @@ describe('parseDurationToMs', () => {
     })
 
     it('should handle zero values', () => {
-      expect(parseDurationToMs('0:00')).toBe(0)
+      expect(parseDurationToMs('0:00')).toBe(0) // 0h 0m
       expect(parseDurationToMs('0h 0m 0s')).toBe(0)
       expect(parseDurationToMs('0')).toBe(0)
     })
@@ -136,11 +136,11 @@ describe('parseDurationToMs', () => {
 
   describe('Real-world examples', () => {
     it('should handle common broadcast durations', () => {
-      expect(parseDurationToMs('0:30')).toBe(30000) // 30 second spot
-      expect(parseDurationToMs('1:00')).toBe(60000) // 1 minute spot
-      expect(parseDurationToMs('2:30')).toBe(150000) // 2.5 minute segment
-      expect(parseDurationToMs('30:00')).toBe(1800000) // 30 minute show
-      expect(parseDurationToMs('1:30:00')).toBe(5400000) // 90 minute movie
+      expect(parseDurationToMs('0:30')).toBe(1800000) // 30 minutes
+      expect(parseDurationToMs('1:00')).toBe(3600000) // 1 hour
+      expect(parseDurationToMs('2:30')).toBe(9000000) // 2h 30m
+      expect(parseDurationToMs('30:00')).toBe(108000000) // 30 hours
+      expect(parseDurationToMs('1:30:00')).toBe(5400000) // 1h 30m 0s
     })
 
     it('should handle various user input styles', () => {

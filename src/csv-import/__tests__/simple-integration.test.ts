@@ -23,7 +23,7 @@ describe('CSV Import Utilities Integration', () => {
 
   describe('parseDurationToMs functionality', () => {
     it('should parse common duration formats correctly', () => {
-      expect(parseDurationToMs('1:30')).toBe(90000) // 1 min 30 sec
+      expect(parseDurationToMs('1:30')).toBe(5400000) // 1h 30m
       expect(parseDurationToMs('1:30:45')).toBe(5445000) // 1h 30m 45s
       expect(parseDurationToMs('90m')).toBe(5400000) // 90 minutes
       expect(parseDurationToMs('90\'')).toBe(5400000) // 90 minutes
@@ -73,7 +73,7 @@ describe('CSV Import Utilities Integration', () => {
 
       // All should parse successfully
       expect(parsedTime).toBeDefined()
-      expect(parsedDuration).toBe(90000)
+      expect(parsedDuration).toBe(5400000)
       expect(cueNumbers['0']).toBe('1')
 
       // Verify we get actual Date objects and numbers
