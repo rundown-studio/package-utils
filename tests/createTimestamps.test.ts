@@ -1806,7 +1806,7 @@ describe('createTimestamps', () => {
   })
 
   describe('settings.skipDuringShow', () => {
-    it('Skipped cue is excluded from timestamps and calculations', () => {
+    it('Skipped cue appears in output but does not affect timing chain', () => {
       vi.setSystemTime(startTime)
       const cues = [
         {
@@ -1840,12 +1840,9 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      // Cue #2 should not appear in timestamps
-      expect(timestamps.cues['#2']).to.be.undefined
-      // Total duration should be 20 min (5 + 15), not 30
+      // Total duration should be 20 min (5 + 15), excluding skipped cue
       expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
       expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
-      // Cue #3 should start right after Cue #1
       expect(timestamps.cues['#1']).to.deep.equal({
         id: '#1',
         index: 0,
@@ -1853,6 +1850,15 @@ describe('createTimestamps', () => {
         original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
         actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
       })
+      // Skipped cue appears with its own duration, start inherits previousEnd
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 1,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+      })
+      // Cue #3 starts right after Cue #1, as if #2 doesn't exist
       expect(timestamps.cues['#3']).to.deep.equal({
         id: '#3',
         index: 2,
@@ -1893,7 +1899,7 @@ describe('createTimestamps', () => {
       expect(timestamps.original.duration).to.equal(15 * 60000)
     })
 
-    it('Skipped cue is excluded during active show', () => {
+    it('Skipped cue appears but does not affect timing during active show', () => {
       vi.setSystemTime(startTime)
       const cues = [
         {
@@ -1935,6 +1941,7 @@ describe('createTimestamps', () => {
         nextCueId: '#3', // #2 is skipped, so next is #3
         originalCues: {
           '#1': { startTime: null, startMode: undefined, duration: 5 * 60000 },
+          '#2': { startTime: null, startMode: undefined, duration: 10 * 60000 },
           '#3': { startTime: null, startMode: undefined, duration: 15 * 60000 },
         },
         elapsedCues: {},
@@ -1942,10 +1949,15 @@ describe('createTimestamps', () => {
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
 
-      expect(timestamps.cues['#2']).to.be.undefined
-      expect(Object.keys(timestamps.cues)).to.deep.equal(['#1', '#3'])
+      // All 3 cues appear in the output
+      expect(Object.keys(timestamps.cues)).to.deep.equal(['#1', '#2', '#3'])
       expect(timestamps.cues['#1'].state).to.equal('CUE_ACTIVE')
+      expect(timestamps.cues['#2']).to.not.be.undefined
       expect(timestamps.cues['#3'].state).to.equal('CUE_NEXT')
+      // Cue #3 starts right after #1, not after #2
+      expect(timestamps.cues['#3'].actual.start).to.deep.equal(
+        new Date(startTime.getTime() + 5 * 60000),
+      )
     })
   })
 })
