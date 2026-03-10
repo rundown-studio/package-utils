@@ -114,9 +114,10 @@ export function createTimestamps (
     actualStartDurations = createActualStartDurations(sortedCues, runner!, { timezone, now, showStart: actualShowStart })
   }
 
-  // Aggregate global start & duration
-  const originalTotal = calculateTotalStartDuration(originalStartDurations)
-  const actualTotal = calculateTotalStartDuration(actualStartDurations)
+  // Aggregate global start & duration (excluding skipped cues)
+  const skippedCueIds = new Set(sortedCues.filter((c) => c.settings?.skipDuringShow).map((c) => c.id))
+  const originalTotal = calculateTotalStartDuration(_.omitBy(originalStartDurations, (_v, id) => skippedCueIds.has(id)))
+  const actualTotal = calculateTotalStartDuration(_.omitBy(actualStartDurations, (_v, id) => skippedCueIds.has(id)))
 
   return {
     original: originalTotal,
@@ -158,8 +159,7 @@ export function getSortedCues (
   function traverse (items: RundownCueOrderItem[]) {
     for (const item of items) {
       const cue = cueMap.get(item.id)
-      // Ensure we skip over any cues that the user has set to skipDuringShow
-      if (cue && cue.type === CueType.CUE && !cue.settings?.skipDuringShow) {
+      if (cue && cue.type === CueType.CUE) {
         sortedCues.push(cue)
       }
       if (item.children) {
@@ -234,7 +234,9 @@ function createOriginalStartDurations (
       : differenceInCalendarDays(start, showStart, { in: tz(timezone) })
 
     const item: StartDuration = { start, duration, daysPlus }
-    previousEnd = new Date(start.getTime() + duration)
+    if (!cue.settings?.skipDuringShow) {
+      previousEnd = new Date(start.getTime() + duration)
+    }
     sdMap[cue.id] = item
   })
 
@@ -297,7 +299,9 @@ function createActualStartDurations (
       : differenceInCalendarDays(start, showStart, { in: tz(timezone) })
 
     const item: StartDuration = { start, duration, daysPlus }
-    previousEnd = new Date(start.getTime() + duration)
+    if (!cue.settings?.skipDuringShow) {
+      previousEnd = new Date(start.getTime() + duration)
+    }
     sdMap[cue.id] = item
   })
 
