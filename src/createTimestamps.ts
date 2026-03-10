@@ -158,7 +158,8 @@ export function getSortedCues (
   function traverse (items: RundownCueOrderItem[]) {
     for (const item of items) {
       const cue = cueMap.get(item.id)
-      if (cue && cue.type === CueType.CUE) {
+      // Ensure we skip over any cues that the user has set to skipDuringShow
+      if (cue && cue.type === CueType.CUE && !cue.settings?.skipDuringShow) {
         sortedCues.push(cue)
       }
       if (item.children) {

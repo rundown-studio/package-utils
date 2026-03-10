@@ -1804,4 +1804,148 @@ describe('createTimestamps', () => {
       })
     })
   })
+
+  describe('settings.skipDuringShow', () => {
+    it('Skipped cue is excluded from timestamps and calculations', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1',
+          startTime: null,
+          duration: 5 * 60000, // 5 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2 (skipped)',
+          startTime: null,
+          duration: 10 * 60000, // 10 min
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#3',
+          type: 'cue',
+          title: 'Cue 3',
+          startTime: null,
+          duration: 15 * 60000, // 15 min
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      // Cue #2 should not appear in timestamps
+      expect(timestamps.cues['#2']).to.be.undefined
+      // Total duration should be 20 min (5 + 15), not 30
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
+      // Cue #3 should start right after Cue #1
+      expect(timestamps.cues['#1']).to.deep.equal({
+        id: '#1',
+        index: 0,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:00:00.000Z'), duration: 5 * 60000, daysPlus: 0 },
+      })
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+      })
+    })
+
+    it('skipDuringShow=false is not skipped', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1',
+          startTime: null,
+          duration: 5 * 60000,
+          settings: { skipDuringShow: false },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2',
+          startTime: null,
+          duration: 10 * 60000,
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }] as RundownCueOrderItem[]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.cues['#1']).to.not.be.undefined
+      expect(timestamps.cues['#2']).to.not.be.undefined
+      expect(timestamps.original.duration).to.equal(15 * 60000)
+    })
+
+    it('Skipped cue is excluded during active show', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1',
+          startTime: null,
+          duration: 5 * 60000,
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2 (skipped)',
+          startTime: null,
+          duration: 10 * 60000,
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#3',
+          type: 'cue',
+          title: 'Cue 3',
+          startTime: null,
+          duration: 15 * 60000,
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
+      const runner = {
+        ...getRunnerDefaults(),
+        timesnap: {
+          cueId: '#1',
+          running: true,
+          kickoff: startTime,
+          lastStop: startTime,
+          deadline: new Date(startTime.getTime() + 5 * 60000),
+        },
+        nextCueId: '#3', // #2 is skipped, so next is #3
+        originalCues: {
+          '#1': { startTime: null, startMode: undefined, duration: 5 * 60000 },
+          '#3': { startTime: null, startMode: undefined, duration: 15 * 60000 },
+        },
+        elapsedCues: {},
+      } as unknown as Runner
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      expect(timestamps.cues['#2']).to.be.undefined
+      expect(Object.keys(timestamps.cues)).to.deep.equal(['#1', '#3'])
+      expect(timestamps.cues['#1'].state).to.equal('CUE_ACTIVE')
+      expect(timestamps.cues['#3'].state).to.equal('CUE_NEXT')
+    })
+  })
 })
