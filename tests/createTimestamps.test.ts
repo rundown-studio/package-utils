@@ -1959,5 +1959,72 @@ describe('createTimestamps', () => {
         new Date(startTime.getTime() + 5 * 60000),
       )
     })
+
+    it('Children of a skipped group parent are also skipped from timing', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1',
+          startTime: null,
+          duration: 5 * 60000, // 5 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#group',
+          type: 'group',
+          title: 'Group (skipped)',
+          startTime: null,
+          duration: 0,
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2 (child of skipped group)',
+          startTime: null,
+          duration: 10 * 60000, // 10 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#3',
+          type: 'cue',
+          title: 'Cue 3',
+          startTime: null,
+          duration: 15 * 60000, // 15 min
+        },
+      ] as RundownCue[]
+      const cueOrder = [
+        { id: '#1' },
+        { id: '#group', children: [{ id: '#2' }] },
+        { id: '#3' },
+      ] as RundownCueOrderItem[]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      // Total duration should be 20 min (5 + 15), excluding #2 which is child of skipped group
+      expect(timestamps.original).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
+      expect(timestamps.actual).to.deep.equal({ start: new Date('2024-07-26T09:00:00.000Z'), duration: 20 * 60000, daysPlus: 0 })
+      // Cue #2 still appears in output with its duration
+      expect(timestamps.cues['#2']).to.deep.equal({
+        id: '#2',
+        index: 2,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 10 * 60000, daysPlus: 0 },
+      })
+      // Cue #3 starts right after Cue #1, as if #2 doesn't exist in the timing chain
+      expect(timestamps.cues['#3']).to.deep.equal({
+        id: '#3',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+      })
+    })
   })
 })

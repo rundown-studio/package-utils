@@ -82,6 +82,7 @@ export function createTimestamps (
   // Create a list of cues (type=CueType.CUE) in order, ignoring groups
   const sortedCues = getSortedCues(cues, cueOrder)
   const sortedCueIds = sortedCues.map((c) => c.id)
+  const skippedCueIds = getSkippedCueIds(cues, cueOrder)
 
   // Determine the actual start time and day based on runner state
   let actualShowStart: Date
@@ -102,7 +103,7 @@ export function createTimestamps (
   const originalShowStart: Date = applyDate(startTime, actualShowStart, { timezone })
 
   // Build the original timestamps
-  const originalStartDurations = createOriginalStartDurations(sortedCues, runner, { timezone, showStart: originalShowStart })
+  const originalStartDurations = createOriginalStartDurations(sortedCues, runner, { timezone, showStart: originalShowStart, skippedCueIds })
 
   // Build the actual timestamps
   let actualStartDurations: Record<RundownCue['id'], StartDuration>
@@ -111,11 +112,10 @@ export function createTimestamps (
     actualStartDurations = originalStartDurations
   } else {
     // During show and after, calculate actual durations from runner data
-    actualStartDurations = createActualStartDurations(sortedCues, runner!, { timezone, now, showStart: actualShowStart })
+    actualStartDurations = createActualStartDurations(sortedCues, runner!, { timezone, now, showStart: actualShowStart, skippedCueIds })
   }
 
-  // Aggregate global start & duration (excluding skipped cues)
-  const skippedCueIds = new Set(sortedCues.filter((c) => c.settings?.skipDuringShow).map((c) => c.id))
+  // Aggregate global start & duration (excluding skipped cues, including children of skipped parents)
   const originalTotal = calculateTotalStartDuration(_.omitBy(originalStartDurations, (_v, id) => skippedCueIds.has(id)))
   const actualTotal = calculateTotalStartDuration(_.omitBy(actualStartDurations, (_v, id) => skippedCueIds.has(id)))
 
@@ -173,6 +173,33 @@ export function getSortedCues (
 }
 
 /**
+ * Collects IDs of cues that should be skipped, including children of skipped parents.
+ */
+function getSkippedCueIds (
+  cues: RundownCue[],
+  cueOrder: RundownCueOrderItem[],
+): Set<RundownCue['id']> {
+  const cueMap = new Map(cues.map((cue) => [cue.id, cue]))
+  const skipped = new Set<RundownCue['id']>()
+
+  function collectSkipped (items: RundownCueOrderItem[], parentSkipped: boolean) {
+    for (const item of items) {
+      const cue = cueMap.get(item.id)
+      const isSkipped = parentSkipped || !!cue?.settings?.skipDuringShow
+      if (isSkipped && cue) {
+        skipped.add(cue.id)
+      }
+      if (item.children) {
+        collectSkipped(item.children, isSkipped)
+      }
+    }
+  }
+
+  collectSkipped(cueOrder, false)
+  return skipped
+}
+
+/**
  * Calculate the total duration of a list of cues.
  * @param items - An array of RundownCue or RunnerCue objects.
  * @returns The start time and total duration in milliseconds.
@@ -209,9 +236,11 @@ function createOriginalStartDurations (
   {
     timezone,
     showStart,
+    skippedCueIds,
   }: {
     timezone: string
     showStart: Date
+    skippedCueIds: Set<RundownCue['id']>
   },
 ): Record<RundownCue['id'], StartDuration> {
   if (!cues.length) return {}
@@ -234,7 +263,7 @@ function createOriginalStartDurations (
       : differenceInCalendarDays(start, showStart, { in: tz(timezone) })
 
     const item: StartDuration = { start, duration, daysPlus }
-    if (!cue.settings?.skipDuringShow) {
+    if (!skippedCueIds.has(cue.id)) {
       previousEnd = new Date(start.getTime() + duration)
     }
     sdMap[cue.id] = item
@@ -258,10 +287,12 @@ function createActualStartDurations (
     timezone,
     now,
     showStart,
+    skippedCueIds,
   }: {
     timezone: string
     now: Date
     showStart: Date
+    skippedCueIds: Set<RundownCue['id']>
   },
 ): Record<RundownCue['id'], StartDuration> {
   if (!cues.length) return {}
@@ -299,7 +330,7 @@ function createActualStartDurations (
       : differenceInCalendarDays(start, showStart, { in: tz(timezone) })
 
     const item: StartDuration = { start, duration, daysPlus }
-    if (!cue.settings?.skipDuringShow) {
+    if (!skippedCueIds.has(cue.id)) {
       previousEnd = new Date(start.getTime() + duration)
     }
     sdMap[cue.id] = item
