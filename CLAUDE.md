@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-`@rundown-studio/utils` is a shared utility package for [Rundown Studio](https://github.com/rundown-studio/rundown-studio) — a broadcast/production rundown management system (React + Firebase + real-time collaboration). This package provides pure functions for timestamp calculation, cue ordering, snapshot parsing, CSV import, and other rundown-related operations. It is used across the client, functions, and compute-engine services.
+`@rundown-studio/utils` is a shared utility package for [Rundown Studio](https://github.com/rundown-studio/rundown-studio) — a broadcast/production rundown management system (React + Firebase + real-time collaboration). Provides pure functions for timestamp calculation, cue ordering, snapshot parsing, CSV import, and other rundown-related operations. Used across the client, functions, and compute-engine services.
 
-Published to GitHub Packages npm registry. Consumed by the main [Rundown Studio](https://github.com/rundown-studio/rundown-studio) app. Depends on sibling packages: `@rundown-studio/types`, `@rundown-studio/consts`, `@rundown-studio/timeutils`.
+Published to GitHub Packages npm registry. Depends on sibling packages: `@rundown-studio/types`, `@rundown-studio/consts`, `@rundown-studio/timeutils`.
 
 ## Commands
 
@@ -21,7 +21,7 @@ All utilities are exported from `src/index.ts` as a flat namespace. No internal 
 
 **Core domain concept:** A rundown has an ordered list of cues (with groups/headings). A runner tracks live playback state. `createTimestamps()` is the central function — it combines cues, cue order, runner state, and start time to produce "original" (planned) and "actual" (live) timestamp data for each cue.
 
-Key types come from `@rundown-studio/types`: `RundownCue`, `RundownCueOrderItem`, `Runner`. Time utilities from `@rundown-studio/timeutils`. Timezone handling uses `date-fns` + `@date-fns/tz`.
+Key types come from `@rundown-studio/types`: `RundownCue`, `RundownCueOrderItem`, `Runner`. Time utilities from `@rundown-studio/timeutils`. Timezone handling is critical throughout — always use `date-fns` + `@date-fns/tz` with explicit timezone parameters, never bare `new Date()` arithmetic for time-of-day operations.
 
 ## Code Style
 
