@@ -2177,5 +2177,75 @@ describe('createTimestamps', () => {
         new Date('2024-07-26T09:15:00.000Z').getTime(),
       )
     })
+
+    it('All cues skipped — should not throw', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1 (skipped)',
+          startTime: null,
+          duration: 5 * 60000,
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2 (skipped)',
+          startTime: null,
+          duration: 10 * 60000,
+          settings: { skipDuringShow: true },
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }] as RundownCueOrderItem[]
+      const runner = null
+
+      // Should not crash — a user could reasonably skip all cues
+      expect(() => createTimestamps(cues, cueOrder, runner, startTime)).to.not.throw()
+    })
+
+    it('Skipped fixed-start cue — next cue should not jump backwards', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1',
+          startTime: null,
+          duration: 5 * 60000, // 5 min, ends at 09:05
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2 (skipped, fixed at 09:30)',
+          startTime: new Date('2024-07-26T09:30:00.000Z'),
+          startMode: CueStartMode.FIXED,
+          duration: 10 * 60000, // 10 min
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#3',
+          type: 'cue',
+          title: 'Cue 3',
+          startTime: null,
+          duration: 15 * 60000, // 15 min
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      // Cue 3 should start after cue 1 (09:05), not after the skipped fixed cue (09:40)
+      // But it should never start *before* cue 1 ends
+      expect(timestamps.cues['#3'].original.start.getTime())
+        .to.be.greaterThanOrEqual(new Date('2024-07-26T09:05:00.000Z').getTime())
+    })
   })
 })

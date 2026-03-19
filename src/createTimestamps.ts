@@ -115,7 +115,7 @@ export function createTimestamps (
     actualStartDurations = createActualStartDurations(sortedCues, runner!, { timezone, now, showStart: actualShowStart, skippedCueIds })
   }
 
-  // Aggregate global start & duration (excluding skipped cues, including children of skipped parents)
+  // Aggregate global start & duration (excluding skipped cues and children of skipped parents)
   const originalTotal = calculateTotalStartDuration(_.omitBy(originalStartDurations, (_v, id) => skippedCueIds.has(id)))
   const actualTotal = calculateTotalStartDuration(_.omitBy(actualStartDurations, (_v, id) => skippedCueIds.has(id)))
 
@@ -207,7 +207,7 @@ function getSkippedCueIds (
 function calculateTotalStartDuration (
   items: Record<RundownCue['id'], StartDuration>,
 ): StartDuration {
-  if (_.isEmpty(items)) throw new Error('Cannot calculate duration for empty items')
+  if (_.isEmpty(items)) return { start: new Date(0), duration: 0, daysPlus: 0 }
   const sdArray = Object.values(items)
   const firstSD = sdArray[0]
   const lastSD = sdArray[sdArray.length - 1]
@@ -257,7 +257,7 @@ function createOriginalStartDurations (
     const hardStart = cue.startMode === CueStartMode.FIXED ? (adjustedStartTime ?? null) : null
     const start: Date = hardStart || previousEnd
 
-    const duration = originalCue?.duration || cue.duration || 0
+    const duration = originalCue?.duration ?? cue.duration ?? 0
     const daysPlus = cue.startMode === CueStartMode.FIXED
       ? (cue.startDatePlus || 0)
       : differenceInCalendarDays(start, showStart, { in: tz(timezone) })
@@ -319,10 +319,10 @@ function createActualStartDurations (
       duration = 0
     } else if (cue.startMode === CueStartMode.FIXED && cue.startTime) {
       start = applyDate(cue.startTime, addDays(getStartOfDay(showStart, { timezone }), cue.startDatePlus || 0, { timezone }), { timezone })
-      duration = cue.duration || 0
+      duration = cue.duration ?? 0
     } else {
       start = previousEnd
-      duration = cue.duration || 0
+      duration = cue.duration ?? 0
     }
 
     const daysPlus = cue.startMode === CueStartMode.FIXED
