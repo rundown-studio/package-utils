@@ -1805,7 +1805,7 @@ describe('createTimestamps', () => {
     })
   })
 
-  describe('settings.skipDuringShow', () => {
+  describe('Skipped cues (skipDuringShow)', () => {
     it('Skipped cue appears in output but does not affect timing chain', () => {
       vi.setSystemTime(startTime)
       const cues = [
@@ -2025,6 +2025,157 @@ describe('createTimestamps', () => {
         original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
         actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
       })
+    })
+
+    it('Two consecutive skipped cues do not affect timing', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1',
+          startTime: null,
+          duration: 5 * 60000, // 5 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2 (skipped)',
+          startTime: null,
+          duration: 10 * 60000, // 10 min
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#3',
+          type: 'cue',
+          title: 'Cue 3 (skipped)',
+          startTime: null,
+          duration: 7 * 60000, // 7 min
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#4',
+          type: 'cue',
+          title: 'Cue 4',
+          startTime: null,
+          duration: 15 * 60000, // 15 min
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }, { id: '#4' }] as RundownCueOrderItem[]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      // Total duration: 5 + 15 = 20 min (both skipped cues excluded)
+      expect(timestamps.original.duration).to.equal(20 * 60000)
+      expect(timestamps.actual.duration).to.equal(20 * 60000)
+      // Both skipped cues still appear, starting where cue 1 ends
+      expect(timestamps.cues['#2'].original.start).to.deep.equal(new Date('2024-07-26T09:05:00.000Z'))
+      expect(timestamps.cues['#3'].original.start).to.deep.equal(new Date('2024-07-26T09:05:00.000Z'))
+      // Cue 4 starts right after cue 1
+      expect(timestamps.cues['#4']).to.deep.equal({
+        id: '#4',
+        index: 3,
+        state: 'CUE_FUTURE',
+        original: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+        actual: { start: new Date('2024-07-26T09:05:00.000Z'), duration: 15 * 60000, daysPlus: 0 },
+      })
+    })
+
+    it('First cue skipped — show starts with second cue', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1 (skipped)',
+          startTime: null,
+          duration: 5 * 60000, // 5 min
+          settings: { skipDuringShow: true },
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2',
+          startTime: null,
+          duration: 10 * 60000, // 10 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#3',
+          type: 'cue',
+          title: 'Cue 3',
+          startTime: null,
+          duration: 15 * 60000, // 15 min
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      // Total duration: 10 + 15 = 25 min (first cue excluded)
+      expect(timestamps.original.duration).to.equal(25 * 60000)
+      expect(timestamps.actual.duration).to.equal(25 * 60000)
+      // Show total starts at the show start time (cue 2 inherits it)
+      expect(timestamps.original.start).to.deep.equal(new Date('2024-07-26T09:00:00.000Z'))
+      // Skipped first cue still appears at show start
+      expect(timestamps.cues['#1'].original.start).to.deep.equal(new Date('2024-07-26T09:00:00.000Z'))
+      // Cue 2 starts at show start (as if cue 1 wasn't there)
+      expect(timestamps.cues['#2'].original.start).to.deep.equal(new Date('2024-07-26T09:00:00.000Z'))
+      expect(timestamps.cues['#3'].original.start).to.deep.equal(new Date('2024-07-26T09:10:00.000Z'))
+    })
+
+    it('Last cue skipped — show ends with second-to-last cue', () => {
+      vi.setSystemTime(startTime)
+      const cues = [
+        {
+          ...getCueDefaults(),
+          id: '#1',
+          type: 'cue',
+          title: 'Cue 1',
+          startTime: null,
+          duration: 5 * 60000, // 5 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#2',
+          type: 'cue',
+          title: 'Cue 2',
+          startTime: null,
+          duration: 10 * 60000, // 10 min
+        },
+        {
+          ...getCueDefaults(),
+          id: '#3',
+          type: 'cue',
+          title: 'Cue 3 (skipped)',
+          startTime: null,
+          duration: 15 * 60000, // 15 min
+          settings: { skipDuringShow: true },
+        },
+      ] as RundownCue[]
+      const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
+      const runner = null
+
+      const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
+
+      // Total duration: 5 + 10 = 15 min (last cue excluded)
+      expect(timestamps.original.duration).to.equal(15 * 60000)
+      expect(timestamps.actual.duration).to.equal(15 * 60000)
+      // Skipped last cue still appears, starting after cue 2
+      expect(timestamps.cues['#3'].original.start).to.deep.equal(new Date('2024-07-26T09:15:00.000Z'))
+      expect(timestamps.cues['#3'].original.duration).to.equal(15 * 60000)
+      // Show ends at 09:15 (after cue 2), not 09:30
+      expect(timestamps.original.start.getTime() + timestamps.original.duration).to.equal(
+        new Date('2024-07-26T09:15:00.000Z').getTime(),
+      )
     })
   })
 })
