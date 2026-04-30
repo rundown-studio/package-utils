@@ -38,13 +38,18 @@ export function parseSnapshot (
     data[key] = data?.[key]?.toDate?.() || _parseDate(data?.[key]) || data?.[key]
     if (data[key] === undefined) data[key] = defaults?.[key]
   }
-  const parsed = {
+  // Prefer explicit `createdAt` / `updatedAt` fields on the document over the
+  // snapshot's metadata. The web Firestore SDK does not expose `createTime` /
+  // `updateTime` on snapshots, so reading from the field is the only way to
+  // get these timestamps client-side. Falls back to snapshot metadata for
+  // backwards compatibility with documents that don't carry the field.
+  const parsed: ParsedDocument = {
     ...defaults,
     id: snapshot.id,
     ...data,
     ...overwrite,
-    createdAt: snapshot.createTime?.toDate(),
-    updatedAt: snapshot.updateTime?.toDate(),
+    createdAt: data?.createdAt?.toDate?.() ?? _parseDate(data?.createdAt) ?? snapshot.createTime?.toDate(),
+    updatedAt: data?.updatedAt?.toDate?.() ?? _parseDate(data?.updatedAt) ?? snapshot.updateTime?.toDate(),
   }
   return pick.length ? _.pick(parsed, pick) : parsed
 }
