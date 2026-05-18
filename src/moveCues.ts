@@ -3,19 +3,40 @@ import { Rundown, RundownCueOrderItem } from '@rundown-studio/types'
 /**
  * Moves selected cues to a new position within the rundown's cue order.
  *
- * @async
- * @function
- * @param {RundownCueOrderItem[]} cueOrder - The original array of cue order items.
- * @param {Array<Rundown['id']>} selectedCues - IDs of the cues to move.
- * @param {string} destination - Target position formatted as "mainIndex.subIndex".
- * @throws {Error} If a group header is attempted to be moved inside another group.
- * @return {Promise<RundownCueOrderItem[]>} - The reordered cue array.
+ * @deprecated Use `moveCuesAfter(cues, sourceCueIds, targetCueId)` instead.
+ *
+ * The `"mainIndex.subIndex"` destination string is awkward to build: the
+ * caller has to know the visible index (with group offsets), and
+ * "start" / "end" rely on undocumented sentinels (`"0"` and
+ * `String(Number.MAX_SAFE_INTEGER)`). The replacement takes a concrete
+ * `targetCueId` (with `null` = move to start) — unambiguous around groups.
+ *
+ * Canonical implementation: `functions/src/models/cue/CueUtils.ts` in the
+ * rundown-studio repo. Signature:
+ *
+ *     moveCuesAfter(
+ *       cues: RundownCueOrderItem[],
+ *       sourceCueIds: Array<RundownCue['id']>,
+ *       targetCueId: RundownCue['id'] | null,  // null = start
+ *     ): RundownCueOrderItem[]
+ *
+ * Migration:
+ *   - `moveCues(co, ids, "0")` → `moveCuesAfter(co, ids, null)`
+ *   - `moveCues(co, ids, MAX_SAFE_INT_STR)` → resolve the last top-level cue
+ *     id, then `moveCuesAfter(co, ids, lastId)`. (No native "end" sentinel.)
+ *
+ * @param cueOrder    - The original array of cue order items.
+ * @param selectedCues - IDs of the cues to move.
+ * @param destination - `"mainIndex.subIndex"`. `"0"` = before first;
+ *                      very large numbers = after last.
+ * @throws {Error} If a group header is moved inside another group.
+ * @returns The reordered cue array.
  */
-export async function moveCues (
+export function moveCues (
   cueOrder: RundownCueOrderItem[],
   selectedCues: Array<Rundown['id']>,
   destination: string,
-): Promise<RundownCueOrderItem[]> {
+): RundownCueOrderItem[] {
   const selectedCueIds = new Set(selectedCues)
   const selectedItems = selectCueItems(cueOrder, selectedCueIds)
   const [mainIndex, subIndex] = destination.split('.').map(Number)
