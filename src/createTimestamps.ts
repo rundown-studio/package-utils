@@ -1,4 +1,4 @@
-import type { RundownCue, RundownCueOrderItem, Runner } from '@rundown-studio/types'
+import type { Cue, RundownCueOrderItem, Runner } from '@rundown-studio/types'
 import { RunnerState, CueType, CueStartMode } from '@rundown-studio/types'
 import { applyDate, getStartOfDay, addDays } from '@rundown-studio/timeutils'
 import { differenceInCalendarDays } from 'date-fns'
@@ -32,7 +32,7 @@ export interface StartDuration {
 }
 
 export interface Timestamp {
-  id: RundownCue['id']
+  id: Cue['id']
   index: number // The index of the cue in the original cues array
   state: CueRunState | GroupRunState
   original: StartDuration
@@ -42,13 +42,13 @@ export interface Timestamp {
 export interface Timestamps {
   original: StartDuration
   actual: StartDuration
-  cues: Record<RundownCue['id'], Timestamp>
+  cues: Record<Cue['id'], Timestamp>
 }
 
 /**
  * Create timestamps from rundown and runner data
  *
- * @param  {RundownCue[]} cues
+ * @param  {Cue[]} cues
  * @param  {RundownCueOrderItem[]} cueOrder
  * @param  {Runner | null} runner
  * @param  {Date} startTime - The rundown start time
@@ -57,7 +57,7 @@ export interface Timestamps {
  * @return {Timestamps}
  */
 export function createTimestamps (
-  cues: RundownCue[],
+  cues: Cue[],
   cueOrder: RundownCueOrderItem[],
   runner: Runner | null,
   startTime: Date,
@@ -75,8 +75,8 @@ export function createTimestamps (
   const runnerState = getRunnerState(runner)
 
   // Remember the original cue index
-  const cueIndexMap: Record<RundownCue['id'], number> = Object.fromEntries(
-    cues.map((cue, index): [RundownCue['id'], number] => [cue.id, index]),
+  const cueIndexMap: Record<Cue['id'], number> = Object.fromEntries(
+    cues.map((cue, index): [Cue['id'], number] => [cue.id, index]),
   )
 
   // Create a list of cues (type=CueType.CUE) in order, ignoring groups
@@ -106,7 +106,7 @@ export function createTimestamps (
   const originalStartDurations = createOriginalStartDurations(sortedCues, runner, { timezone, showStart: originalShowStart, skippedCueIds })
 
   // Build the actual timestamps
-  let actualStartDurations: Record<RundownCue['id'], StartDuration>
+  let actualStartDurations: Record<Cue['id'], StartDuration>
   if (runnerState === RunnerState.PRESHOW) {
     // During preshow, actual matches original
     actualStartDurations = originalStartDurations
@@ -140,9 +140,9 @@ export function createTimestamps (
 /**
  * Creates a sorted, flat list of cues from a hierarchical cue order structure.
  *
- * @param cues - An array of all RundownCue objects.
+ * @param cues - An array of all Cue objects.
  * @param cueOrder - A hierarchical structure representing the order of cues, potentially including groups.
- * @returns A flat array of RundownCue objects, sorted according to the cueOrder and containing only cues of type CueType.CUE.
+ * @returns A flat array of Cue objects, sorted according to the cueOrder and containing only cues of type CueType.CUE.
  *
  * @description
  * This function traverses the hierarchical cueOrder structure and creates a flat list of cues.
@@ -150,11 +150,11 @@ export function createTimestamps (
  * The resulting array maintains the order specified in the cueOrder structure, including nested orders within groups.
  */
 export function getSortedCues (
-  cues: RundownCue[],
+  cues: Cue[],
   cueOrder: RundownCueOrderItem[],
-): RundownCue[] {
+): Cue[] {
   const cueMap = new Map(cues.map((cue) => [cue.id, cue]))
-  const sortedCues: RundownCue[] = []
+  const sortedCues: Cue[] = []
 
   function traverse (items: RundownCueOrderItem[]) {
     for (const item of items) {
@@ -176,11 +176,11 @@ export function getSortedCues (
  * Collects IDs of cues that should be skipped, including children of skipped parents.
  */
 function getSkippedCueIds (
-  cues: RundownCue[],
+  cues: Cue[],
   cueOrder: RundownCueOrderItem[],
-): Set<RundownCue['id']> {
+): Set<Cue['id']> {
   const cueMap = new Map(cues.map((cue) => [cue.id, cue]))
-  const skipped = new Set<RundownCue['id']>()
+  const skipped = new Set<Cue['id']>()
 
   function collectSkipped (items: RundownCueOrderItem[], parentSkipped: boolean) {
     for (const item of items) {
@@ -201,11 +201,11 @@ function getSkippedCueIds (
 
 /**
  * Calculate the total duration of a list of cues.
- * @param items - An array of RundownCue or RunnerCue objects.
+ * @param items - An array of Cue or RunnerCue objects.
  * @returns The start time and total duration in milliseconds.
  */
 function calculateTotalStartDuration (
-  items: Record<RundownCue['id'], StartDuration>,
+  items: Record<Cue['id'], StartDuration>,
 ): StartDuration {
   if (_.isEmpty(items)) return { start: new Date(0), duration: 0, daysPlus: 0 }
   const sdArray = Object.values(items)
@@ -221,7 +221,7 @@ function calculateTotalStartDuration (
 /**
  * Creates a map of original start times and durations for a list of cues.
  *
- * @param cues - An array of RundownCue objects representing the cues in the rundown.
+ * @param cues - An array of Cue objects representing the cues in the rundown.
  * @param runner - A Runner object or null, containing original cue information if available.
  * @returns A record mapping cue IDs to their original StartDuration objects.
  *
@@ -231,7 +231,7 @@ function calculateTotalStartDuration (
  * own properties.
  */
 function createOriginalStartDurations (
-  cues: RundownCue[],
+  cues: Cue[],
   runner: Runner | null,
   {
     timezone,
@@ -240,12 +240,12 @@ function createOriginalStartDurations (
   }: {
     timezone: string
     showStart: Date
-    skippedCueIds: Set<RundownCue['id']>
+    skippedCueIds: Set<Cue['id']>
   },
-): Record<RundownCue['id'], StartDuration> {
+): Record<Cue['id'], StartDuration> {
   if (!cues.length) return {}
 
-  const sdMap: Record<RundownCue['id'], StartDuration> = {}
+  const sdMap: Record<Cue['id'], StartDuration> = {}
   const startOfFirstDay = getStartOfDay(showStart, { timezone })
   let previousEnd = new Date(showStart)
 
@@ -274,14 +274,14 @@ function createOriginalStartDurations (
 
 /**
  * Create actual StartDuration records for each cue, representing what actually happened and the projected changes thereof.
- * @param cues - An array of RundownCue objects.
+ * @param cues - An array of Cue objects.
  * @param runner - The Runner object, if available.
  * @param now - The current time.
  * @param idealStartDurations - The ideal StartDuration records.
  * @returns A record of actual StartDuration objects, keyed by cue ID.
  */
 function createActualStartDurations (
-  cues: RundownCue[],
+  cues: Cue[],
   runner: Runner,
   {
     timezone,
@@ -292,12 +292,12 @@ function createActualStartDurations (
     timezone: string
     now: Date
     showStart: Date
-    skippedCueIds: Set<RundownCue['id']>
+    skippedCueIds: Set<Cue['id']>
   },
-): Record<RundownCue['id'], StartDuration> {
+): Record<Cue['id'], StartDuration> {
   if (!cues.length) return {}
 
-  const sdMap: Record<RundownCue['id'], StartDuration> = {}
+  const sdMap: Record<Cue['id'], StartDuration> = {}
   const sortedCueIds = cues.map((c) => c.id)
   let previousEnd = new Date(showStart)
 
@@ -347,9 +347,9 @@ function createActualStartDurations (
  * @returns The CueRunState of the cue.
  */
 function determineCueRunState (
-  cueId: RundownCue['id'],
+  cueId: Cue['id'],
   runner: Runner | null,
-  sortedCueIds: RundownCue['id'][],
+  sortedCueIds: Cue['id'][],
 ): CueRunState {
   if (!runner) return CueRunState.CUE_FUTURE
   if (runner.timesnap.cueId === null) return CueRunState.CUE_PAST

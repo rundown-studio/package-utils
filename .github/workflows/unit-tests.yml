@@ -31,6 +31,12 @@ jobs:
       - name: Install Dependencies
         run: npm ci --loglevel=error
 
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
       - name: Compile Typescript
         run: npm run build
 

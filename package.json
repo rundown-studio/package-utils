@@ -27,14 +27,18 @@
     "test": "vitest",
     "test:ci": "vitest --run --no-color",
     "build": "tsup",
-    "lint": "eslint --fix"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint --max-warnings 0",
+    "lint:fix": "eslint --fix"
   },
   "devDependencies": {
     "@eslint/js": "^9.5.0",
     "@stylistic/eslint-plugin": "^5.0.0",
     "@types/lodash": "^4.17.7",
+    "@types/node": "^25.9.1",
     "eslint": "^9.5.0",
     "globals": "^16.0.0",
+    "jiti": "^2.7.0",
     "tsup": "^8.5.0",
     "typescript": "^5.4.5",
     "typescript-eslint": "^8.35.0",

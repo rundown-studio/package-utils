@@ -3,7 +3,7 @@ import {
   CueStartMode,
   getCueDefaults,
   getRunnerDefaults,
-  RundownCue,
+  Cue,
   RundownCueOrderItem,
   Runner,
   CueType
@@ -42,16 +42,31 @@ const defaultCues = [
     startTime: null,
     duration: 15 * 60000, // 15 min
   },
-] as RundownCue[]
+] as Cue[]
 const defaultCueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
+
+// Build a properly-typed timesnap, accepting Date or epoch-ms inputs for the time fields.
+const timesnap = (snap: {
+  cueId: string | null
+  running: boolean
+  kickoff: Date | number
+  lastStop: Date | number
+  deadline: Date | number
+}): Runner['timesnap'] => ({
+  cueId: snap.cueId,
+  running: snap.running,
+  kickoff: +snap.kickoff,
+  lastStop: +snap.lastStop,
+  deadline: +snap.deadline,
+})
 const defaultRunner = {
   ...getRunnerDefaults(),
   timesnap: {
     cueId: '#1',
     running: false,
-    kickoff: startTime,
-    lastStop: startTime,
-    deadline: startTime + defaultCues[0].duration,
+    kickoff: startTime.getTime(),
+    lastStop: startTime.getTime(),
+    deadline: startTime.getTime() + defaultCues[0].duration,
   },
   nextCueId: '#2',
   originalCues: {
@@ -122,13 +137,13 @@ describe('createTimestamps', () => {
       const cues = defaultCues
       const cueOrder = defaultCueOrder
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: null,
         running: false,
         kickoff: startTime,
         lastStop: startTime,
         deadline: addMinutes(startTime, 15),
-      }
+      })
       runner.elapsedCues['#3'] = {
         startTime: startTime.toISOString(),
         duration: (15 * 60000), // 15 min
@@ -174,7 +189,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
 
@@ -225,7 +240,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: null,
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
 
@@ -283,7 +298,7 @@ describe('createTimestamps', () => {
           type: 'group',
           title: 'Group',
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [
         { id: 'heading' },
         { id: '#1' },
@@ -331,13 +346,13 @@ describe('createTimestamps', () => {
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#2',
         running: true,
         kickoff: addMinutes(startTime, 10),
         lastStop: addMinutes(startTime, 10),
         deadline: addMinutes(startTime, 20),
-      }
+      })
       runner.nextCueId = '#3'
       runner.elapsedCues['#1'] ={
         startTime: startTime.toISOString(),
@@ -384,16 +399,16 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1',
         running: true,
         kickoff: addMinutes(startTime, 3),
         lastStop: addMinutes(startTime, 3),
         deadline: addMinutes(startTime, 8),
-      }
+      })
       runner.nextCueId = '#2'
       runner.originalCues['#4'] = {
         startTime: addMinutes(startTime, 60).toISOString(),
@@ -455,16 +470,16 @@ describe('createTimestamps', () => {
           title: 'Cue 5',
           duration: 10 * 60000, // 10 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }]
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1',
         running: true,
         kickoff: addMinutes(startTime, 3),
         lastStop: addMinutes(startTime, 3),
         deadline: addMinutes(startTime, 8),
-      }
+      })
       runner.nextCueId = '#2'
       runner.originalCues['#4'] = {
         startTime: addMinutes(startTime, 60).toISOString(),
@@ -472,6 +487,8 @@ describe('createTimestamps', () => {
         duration: 30 * 60000, // 30 min
       }
       runner.originalCues['#5'] = {
+        startTime: null,
+        startMode: CueStartMode.FLEXIBLE,
         duration: 10 * 60000, // 10 min
       }
 
@@ -529,16 +546,16 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 20 * 60000, // 20 min
         }
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1',
         running: true,
         kickoff: startTime,
         lastStop: startTime,
         deadline: addMinutes(startTime, 5),
-      }
+      })
       runner.nextCueId = '#2'
       runner.originalCues['#4'] = {
         startTime: addMinutes(startTime, 30).toISOString(),
@@ -593,16 +610,16 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#2',
         running: true,
         kickoff: new Date('2024-07-26T09:05:00.000Z'),
         lastStop: new Date('2024-07-26T09:05:00.000Z'),
         deadline: new Date('2024-07-26T09:15:00.000Z'),
-      }
+      })
       runner.nextCueId = '#3'
       runner.originalCues['#4'] = {
         startTime: addMinutes(startTime, 60).toISOString(),
@@ -655,13 +672,13 @@ describe('createTimestamps', () => {
       cues[1].duration = (14 * 60000)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#2',
         running: true,
         kickoff: new Date('2024-07-26T09:01:00.000Z'),
         lastStop: new Date('2024-07-26T09:01:00.000Z'),
         deadline: new Date('2024-07-26T09:15:00.000Z'),
-      }
+      })
       runner.nextCueId = '#3'
       runner.elapsedCues['#1'] ={
         startTime: '2024-07-26T08:58:00.000Z',
@@ -701,13 +718,13 @@ describe('createTimestamps', () => {
       cues[2].duration = (19 * 60000)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#2',
         running: true,
         kickoff: new Date('2024-07-26T09:01:00.000Z'),
         lastStop: new Date('2024-07-26T09:01:00.000Z'),
         deadline: new Date('2024-07-26T09:11:00.000Z'),
-      }
+      })
       runner.nextCueId = '#3'
       runner.elapsedCues['#1'] ={
         startTime: '2024-07-26T08:58:00.000Z',
@@ -747,13 +764,13 @@ describe('createTimestamps', () => {
       cues[1].duration = (7 * 60000)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1',
         running: true,
         kickoff: new Date('2024-07-26T09:03:00.000Z'),
         lastStop: new Date('2024-07-26T09:03:00.000Z'),
         deadline: new Date('2024-07-26T09:08:00.000Z'),
-      }
+      })
       runner.nextCueId = '#2'
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
@@ -787,13 +804,13 @@ describe('createTimestamps', () => {
       vi.setSystemTime(new Date('2024-07-26T09:03:00.000Z'))
       const cues = _.cloneDeep(defaultCues)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1',
         running: true,
         kickoff: new Date('2024-07-26T09:00:00.000Z'),
         lastStop: new Date('2024-07-26T09:00:00.000Z'),
         deadline: new Date('2024-07-26T09:05:00.000Z'),
-      }
+      })
       runner.nextCueId = '#2'
       cues.push({
         ...getCueDefaults(),
@@ -802,7 +819,7 @@ describe('createTimestamps', () => {
         title: 'Cue 2b',
         startTime: null,
         duration: 5 * 60000,
-      } as RundownCue)
+      } as Cue)
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#2b' }, { id: '#3' }]
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
@@ -843,13 +860,13 @@ describe('createTimestamps', () => {
       vi.setSystemTime(new Date('2024-07-26T09:08:00.000Z'))
       const cues = _.cloneDeep(defaultCues)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1b',
         running: true,
         kickoff: new Date('2024-07-26T09:05:00.000Z'),
         lastStop: new Date('2024-07-26T09:05:00.000Z'),
         deadline: new Date('2024-07-26T09:10:00.000Z'),
-      }
+      })
       runner.nextCueId = '#2'
       runner.elapsedCues['#1'] ={
         startTime: '2024-07-26T09:00:00.000Z',
@@ -862,7 +879,7 @@ describe('createTimestamps', () => {
         title: 'Cue 1b',
         startTime: null,
         duration: 5 * 60000,
-      } as RundownCue)
+      } as Cue)
       const cueOrder = [{ id: '#1' }, { id: '#1b' }, { id: '#2' }, { id: '#3' }]
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
@@ -951,7 +968,7 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
 
@@ -1004,16 +1021,16 @@ describe('createTimestamps', () => {
           startMode: CueStartMode.FIXED,
           duration: 30 * 60000, // 30 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#2',
         running: true,
         kickoff: new Date('2024-08-12T09:05:00.000Z'),
         lastStop: new Date('2024-08-12T09:05:00.000Z'),
         deadline: new Date('2024-08-12T09:15:00.000Z'),
-      }
+      })
       runner.nextCueId = '#3'
       runner.originalCues['#4'] = {
         startTime: addMinutes(startTime, 60).toISOString(),
@@ -1077,7 +1094,7 @@ describe('createTimestamps', () => {
         startDatePlus: 1,
         startMode: CueStartMode.FIXED,
         duration: 3 * 60 * 60000 // 3h
-      }
+      } as Cue
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
 
@@ -1132,28 +1149,31 @@ describe('createTimestamps', () => {
         startDatePlus: 1,
         startMode: CueStartMode.FIXED,
         duration: 3 * 60 * 60000 // 3h
-      } as RundownCue
+      } as Cue
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#4',
         running: true,
         kickoff: new Date('2024-08-13T10:12:00.000Z'),
         lastStop: new Date('2024-08-13T10:12:00.000Z'),
         deadline: new Date('2024-08-13T13:12:00.000Z'),
-      }
+      })
       runner.nextCueId = null
       runner.originalCues = {
         '#1': {
           startTime: null,
+          startMode: CueStartMode.FLEXIBLE,
           duration: 6 * 60 * 60000 // 6h
         },
         '#2': {
           startTime: null,
+          startMode: CueStartMode.FLEXIBLE,
           duration: 10 * 60 * 60000 // 8h
         },
         '#3': {
           startTime: null,
+          startMode: CueStartMode.FLEXIBLE,
           duration: 3 * 60 * 60000 // 3h
         },
         '#4': {
@@ -1255,13 +1275,13 @@ describe('createTimestamps', () => {
       const cues = defaultCues
       const cueOrder = defaultCueOrder
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#3',
         running: true,
         kickoff: new Date('2024-11-05T10:15:00.000Z'),
         lastStop: new Date('2024-11-05T10:15:00.000Z'),
         deadline: new Date('2024-11-05T10:30:00.000Z'),
-      }
+      })
       runner.nextCueId = null
       runner.elapsedCues = {
         '#1': {
@@ -1308,13 +1328,13 @@ describe('createTimestamps', () => {
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#2',
         running: true,
         kickoff: addMinutes(startTime, 5),
         lastStop: addMinutes(startTime, 5),
         deadline: addMinutes(startTime, 15),
-      }
+      })
       runner.nextCueId = '#1'
       runner.elapsedCues['#1'] = {
         startTime: startTime.toISOString(),
@@ -1353,13 +1373,13 @@ describe('createTimestamps', () => {
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1',
         running: true,
         kickoff: addMinutes(startTime, 15),
         lastStop: addMinutes(startTime, 15),
         deadline: addMinutes(startTime, 20),
-      }
+      })
       runner.nextCueId = '#2'
       runner.elapsedCues['#1'] = {
         startTime: startTime.toISOString(),
@@ -1402,13 +1422,13 @@ describe('createTimestamps', () => {
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#1',
         running: true,
         kickoff: startTime,
         lastStop: startTime,
         deadline: addMinutes(startTime, 5),
-      }
+      })
       runner.nextCueId = '#3'
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
@@ -1443,13 +1463,13 @@ describe('createTimestamps', () => {
       const cues = _.cloneDeep(defaultCues)
       const cueOrder = _.cloneDeep(defaultCueOrder)
       const runner = _.cloneDeep(defaultRunner)
-      runner.timesnap = {
+      runner.timesnap = timesnap({
         cueId: '#3',
         running: true,
         kickoff: startTime,
         lastStop: startTime,
         deadline: addMinutes(startTime, 15),
-      }
+      })
       runner.nextCueId = null
 
       const timestamps = createTimestamps(cues, cueOrder, runner, startTime)
@@ -1511,7 +1531,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 25 * 60000, // 25 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }]
       const runner = null
 
@@ -1578,7 +1598,7 @@ describe('createTimestamps', () => {
           startDatePlus: 1,
           duration: 20 * 60000, // 20 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }]
       const runner = null
 
@@ -1653,7 +1673,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 25 * 60000, // 25 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }]
       const runner = null
 
@@ -1745,7 +1765,7 @@ describe('createTimestamps', () => {
           startDatePlus: 0,
           duration: 30 * 60000, // 30 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }, { id: '#5' }, { id: '#6' }, { id: '#7' }]
       const runner = null
 
@@ -1834,7 +1854,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 15 * 60000, // 15 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
       const runner = null
 
@@ -1888,7 +1908,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 10 * 60000,
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }] as RundownCueOrderItem[]
       const runner = null
 
@@ -1927,7 +1947,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 15 * 60000,
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
       const runner = {
         ...getRunnerDefaults(),
@@ -1996,7 +2016,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 15 * 60000, // 15 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [
         { id: '#1' },
         { id: '#group', children: [{ id: '#2' }] },
@@ -2064,7 +2084,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 15 * 60000, // 15 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }, { id: '#4' }] as RundownCueOrderItem[]
       const runner = null
 
@@ -2114,7 +2134,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 15 * 60000, // 15 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
       const runner = null
 
@@ -2160,7 +2180,7 @@ describe('createTimestamps', () => {
           duration: 15 * 60000, // 15 min
           settings: { skipDuringShow: true },
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
       const runner = null
 
@@ -2199,7 +2219,7 @@ describe('createTimestamps', () => {
           duration: 10 * 60000,
           settings: { skipDuringShow: true },
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }] as RundownCueOrderItem[]
       const runner = null
 
@@ -2236,7 +2256,7 @@ describe('createTimestamps', () => {
           startTime: null,
           duration: 15 * 60000, // 15 min
         },
-      ] as RundownCue[]
+      ] as Cue[]
       const cueOrder = [{ id: '#1' }, { id: '#2' }, { id: '#3' }] as RundownCueOrderItem[]
       const runner = null
 

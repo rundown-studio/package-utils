@@ -16,8 +16,8 @@ import { Rundown, RundownCueOrderItem } from '@rundown-studio/types'
  *
  *     moveCuesAfter(
  *       cues: RundownCueOrderItem[],
- *       sourceCueIds: Array<RundownCue['id']>,
- *       targetCueId: RundownCue['id'] | null,  // null = start
+ *       sourceCueIds: Array<Cue['id']>,
+ *       targetCueId: Cue['id'] | null,  // null = start
  *     ): RundownCueOrderItem[]
  *
  * Migration:

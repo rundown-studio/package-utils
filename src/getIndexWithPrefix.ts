@@ -22,7 +22,7 @@
  * getIndexWithPrefix(72, '', 4)           // '0072'
  * getIndexWithPrefix(1000, 'ITEM-', 2)    // 'ITEM-1000'
  */
-export function getIndexWithPrefix(index: number, prefix: string, padding: number = 0): string {
+export function getIndexWithPrefix (index: number, prefix: string, padding: number = 0): string {
   const str = String(index)
   const padded = padding > 0
     ? '0'.repeat(Math.max(0, padding - str.length)) + str
