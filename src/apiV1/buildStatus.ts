@@ -1,16 +1,17 @@
-import type { Runner, RundownCue, RundownCueOrderItem } from '@rundown-studio/types'
-import { CueType, RunnerState } from '@rundown-studio/types'
+import type { Runner, RundownCueOrderItem } from '@rundown-studio/types'
+import { RunnerState } from '@rundown-studio/types'
 import type { ApiV1ControlState, ApiV1ActiveCue, ApiV1NextCue, ApiV1Status } from '@rundown-studio/types'
-import { getRunnerState } from './getRunnerState'
-import { flattenCueOrderItems } from './flattenCueOrderItems'
+import { getRunnerState } from '../utils/getRunnerState'
+import { firstPlayableCueId, type CueLite } from '../utils/firstPlayableCueId'
 
 /**
- * Pure projection of the public control-plane status (`ApiV1Status`).
+ * Projection of the public control-plane status (`ApiV1Status`).
  *
- * The single source both the Functions REST `…/status` poll and the
- * compute-engine realtime `status` event read from — one code path, no drift.
- * No I/O: it takes already-loaded runner/cues/order and returns the shape, so
- * it's fully unit-testable without Firestore.
+ * This module is api-v1's serializer: it knows the public wire vocabulary
+ * (snake_case fields, the three-state string, the active/next slices) and maps
+ * internal runner/cue data into it. The general-purpose primitives it leans on
+ * (`getRunnerState`, `firstPlayableCueId`) live in `../utils` and stay
+ * api-version-agnostic — only this layer is coupled to the v1 contract.
  *
  * State semantics:
  * - `running` — `paused_at: null`, the countdown is live.
@@ -19,9 +20,6 @@ import { flattenCueOrderItems } from './flattenCueOrderItems'
  *               first playable cue, or null on an empty rundown) and post-show
  *               (`next_cue` is null).
  */
-
-/** The slice of a cue the status projection needs (id/type/title). */
-export type CueLite = Pick<RundownCue, 'id' | 'type' | 'title'>
 
 /**
  * Map (runner, timesnap.running) → the three-state public string.
@@ -32,22 +30,6 @@ export function controlStateOf (runner: Runner | null): ApiV1ControlState {
   if (internal === RunnerState.PRESHOW || internal === RunnerState.ENDED) return 'stopped'
   // ONAIR — running vs paused is the timesnap's call.
   return runner!.timesnap.running ? 'running' : 'paused'
-}
-
-/**
- * Walk the cue-order tree and return the first `cue`-typed entry — used to
- * populate `next_cue` in the `stopped` (pre-show) state. Returns null on an
- * empty rundown or one that has only headings/groups.
- */
-export function firstPlayableCueId (
-  cueOrder: RundownCueOrderItem[],
-  cueById: Map<string, CueLite>,
-): string | null {
-  for (const id of flattenCueOrderItems(cueOrder)) {
-    const c = cueById.get(id)
-    if (c && c.type === CueType.CUE) return id
-  }
-  return null
 }
 
 /**

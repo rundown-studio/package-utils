@@ -5,4 +5,5 @@
  */
 
 export * from './utils'
+export * from './apiV1'
 export * from './consts'
