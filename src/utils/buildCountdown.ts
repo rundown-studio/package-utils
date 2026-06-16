@@ -1,12 +1,12 @@
-import type { PublicStatus, PublicCountdown } from '@rundown-studio/types'
+import type { ApiV1Status, ApiV1Countdown } from '@rundown-studio/types'
 import { formatCountdown } from '@rundown-studio/timeutils'
 
 /**
- * Project a `PublicStatus` into the `PublicCountdown` wire shape — the same pure
+ * Project a `ApiV1Status` into the `ApiV1Countdown` wire shape — the same pure
  * function the Functions REST `…/countdown` poll and the compute-engine read
  * surface both call, so the two return byte-identical countdowns.
  *
- * Pure: the caller passes a `PublicStatus` already stamped with a `server_time`,
+ * Pure: the caller passes a `ApiV1Status` already stamped with a `server_time`,
  * so a sibling `…/status` read built from the same data yields matching clock
  * values. Three states:
  * - `running` — `active_cue` populated; `remaining_ms` ticks down live.
@@ -16,7 +16,7 @@ import { formatCountdown } from '@rundown-studio/timeutils'
  * `remaining_ms` is the raw signed value — negative is overtime; consumers clamp
  * if they want to hide it. `remaining.formatted` includes the `+` prefix.
  */
-export function buildCountdown (status: PublicStatus): PublicCountdown {
+export function buildCountdown (status: ApiV1Status): ApiV1Countdown {
   const { state, server_time, active_cue } = status
 
   if (!active_cue) {

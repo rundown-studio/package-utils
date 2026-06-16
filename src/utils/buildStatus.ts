@@ -1,11 +1,11 @@
 import type { Runner, RundownCue, RundownCueOrderItem } from '@rundown-studio/types'
 import { CueType, RunnerState } from '@rundown-studio/types'
-import type { ControlState, PublicActiveCue, PublicNextCue, PublicStatus } from '@rundown-studio/types'
+import type { ApiV1ControlState, ApiV1ActiveCue, ApiV1NextCue, ApiV1Status } from '@rundown-studio/types'
 import { getRunnerState } from './getRunnerState'
 import { flattenCueOrderItems } from './flattenCueOrderItems'
 
 /**
- * Pure projection of the public control-plane status (`PublicStatus`).
+ * Pure projection of the public control-plane status (`ApiV1Status`).
  *
  * The single source both the Functions REST `…/status` poll and the
  * compute-engine realtime `status` event read from — one code path, no drift.
@@ -27,7 +27,7 @@ export type CueLite = Pick<RundownCue, 'id' | 'type' | 'title'>
  * Map (runner, timesnap.running) → the three-state public string.
  * `getRunnerState` is the canonical engine — never re-derive from raw fields.
  */
-export function controlStateOf (runner: Runner | null): ControlState {
+export function controlStateOf (runner: Runner | null): ApiV1ControlState {
   const internal = getRunnerState(runner)
   if (internal === RunnerState.PRESHOW || internal === RunnerState.ENDED) return 'stopped'
   // ONAIR — running vs paused is the timesnap's call.
@@ -60,7 +60,7 @@ export function buildStatus (params: {
   cueById: Map<string, CueLite>
   cueOrder: RundownCueOrderItem[]
   serverTime: number
-}): PublicStatus {
+}): ApiV1Status {
   const { runner, cueById, cueOrder, serverTime } = params
   const state = controlStateOf(runner)
 
@@ -80,7 +80,7 @@ export function buildStatus (params: {
   // running or paused — runner non-null, timesnap.cueId non-null.
   const ts = runner!.timesnap
   const active = ts.cueId ? cueById.get(ts.cueId) : undefined
-  const activeCue: PublicActiveCue | null = active
+  const activeCue: ApiV1ActiveCue | null = active
     ? {
       id: active.id,
       title: active.title,
@@ -92,7 +92,7 @@ export function buildStatus (params: {
 
   const nextId = runner!.nextCueId
   const next = nextId ? cueById.get(nextId) : undefined
-  const nextCue: PublicNextCue | null = next ? { id: next.id, title: next.title } : null
+  const nextCue: ApiV1NextCue | null = next ? { id: next.id, title: next.title } : null
 
   return {
     server_time: serverTime,

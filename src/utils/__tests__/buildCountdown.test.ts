@@ -1,15 +1,15 @@
 import { expect, test, describe } from 'vitest'
-import type { PublicStatus, PublicActiveCue } from '@rundown-studio/types'
+import type { ApiV1Status, ApiV1ActiveCue } from '@rundown-studio/types'
 import { buildCountdown } from '../buildCountdown'
 
-const stoppedStatus: PublicStatus = {
+const stoppedStatus: ApiV1Status = {
   server_time: 1_716_393_600_000,
   state: 'stopped',
   active_cue: null,
   next_cue: { id: 'cue_first', title: 'Opening' },
 }
 
-const runningStatus = (overrides: Partial<PublicActiveCue> = {}): PublicStatus => ({
+const runningStatus = (overrides: Partial<ApiV1ActiveCue> = {}): ApiV1Status => ({
   server_time: 1_716_393_600_000,
   state: 'running',
   active_cue: {
@@ -23,7 +23,7 @@ const runningStatus = (overrides: Partial<PublicActiveCue> = {}): PublicStatus =
   next_cue: { id: 'cue_next', title: 'Sponsor read' },
 })
 
-const pausedStatus = (overrides: Partial<PublicActiveCue> = {}): PublicStatus => ({
+const pausedStatus = (overrides: Partial<ApiV1ActiveCue> = {}): ApiV1Status => ({
   server_time: 1_716_393_600_000,
   state: 'paused',
   active_cue: {
