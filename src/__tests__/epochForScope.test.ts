@@ -1,6 +1,6 @@
 import { describe, test, expect, afterEach } from 'vitest'
-import { TOKEN_EPOCHS } from '@rundown-studio/consts'
-import { epochForScope } from '../src/epochForScope'
+import { epochForScope } from '../epochForScope'
+import { TOKEN_EPOCHS } from '../tokenEpochs'
 
 const defaults = { global: TOKEN_EPOCHS.global, teams: { ...TOKEN_EPOCHS.teams }, rundowns: { ...TOKEN_EPOCHS.rundowns } }
 

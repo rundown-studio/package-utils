@@ -1,5 +1,5 @@
-import {describe, it, expect} from 'vitest'
-import {fastDeepEqual} from '../src/fastDeepEqual'
+import { describe, it, expect } from 'vitest'
+import { fastDeepEqual } from '../fastDeepEqual'
 import npmFastDeepEqual from 'fast-deep-equal'
 
 describe('fastDeepEqual', () => {
@@ -30,8 +30,8 @@ describe('fastDeepEqual', () => {
           state: 'CUE_FUTURE',
           original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
           actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        }
-      }
+        },
+      },
     }
 
     const obj2 = {
@@ -58,8 +58,8 @@ describe('fastDeepEqual', () => {
           state: 'CUE_FUTURE',
           original: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
           actual: { start: new Date('2024-07-26T09:15:00.000Z'), duration: 15 * 60000 },
-        }
-      }
+        },
+      },
     }
 
     const start1 = performance.now()

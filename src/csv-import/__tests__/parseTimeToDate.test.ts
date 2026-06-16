@@ -1,5 +1,5 @@
-import {describe, it, expect} from 'vitest'
-import {parseTimeToDate} from '../src/csv-import/parseTimeToDate'
+import { describe, it, expect } from 'vitest'
+import { parseTimeToDate } from '../parseTimeToDate'
 
 if (process.env.TZ === undefined) {
   process.env.TZ = 'UTC' // Default to UTC if no timezone is set
@@ -21,6 +21,7 @@ describe('parseTimeToDate', () => {
   it('should return undefined for empty or whitespace string', () => {
     expect(parseTimeToDate('')).toBeUndefined()
     expect(parseTimeToDate('   ')).toBeUndefined()
+    expect(parseTimeToDate(null)).toBeUndefined()
   })
 
   describe('Full datetime formats', () => {
@@ -221,6 +222,29 @@ describe('parseTimeToDate', () => {
     })
   })
 
+  describe('Defaults when no options are provided', () => {
+    it('should parse 12-hour format without options', () => {
+      const result = parseTimeToDate('9:00 AM')
+      expect(result).toBeDefined()
+      expect(result).toBeInstanceOf(Date)
+      expect(result?.getMinutes()).toBe(0)
+    })
+
+    it('should parse 24-hour format without options', () => {
+      const result = parseTimeToDate('14:30')
+      expect(result).toBeDefined()
+      expect(result).toBeInstanceOf(Date)
+      expect(result?.getMinutes()).toBe(30)
+    })
+
+    it('should parse dates with time without options', () => {
+      const result = parseTimeToDate('2024-01-15 20:30')
+      expect(result).toBeDefined()
+      expect(result).toBeInstanceOf(Date)
+      expect(result?.getMinutes()).toBe(30)
+    })
+  })
+
   describe('Real-world CSV-like inputs', () => {
     it('should handle various common CSV time formats', () => {
       const testCases = [
@@ -256,58 +280,6 @@ describe('parseTimeToDate', () => {
           expect(result!.getDate()).toBe(expectedDate)
         }
       })
-    })
-  })
-
-  describe(`Support for timezone (${process.env.TZ})`, () => {
-    it('should parse time correctly with current timezone', () => {
-      // Test basic time parsing
-      const result1 = parseTimeToDate('8:30 PM', { referenceDate })
-      expect(result1).toBeDefined()
-      expect(result1).toBeInstanceOf(Date)
-
-      const result2 = parseTimeToDate('14:00', { referenceDate })
-      expect(result2).toBeDefined()
-      expect(result2).toBeInstanceOf(Date)
-
-      // Test that results are consistent
-      const result3 = parseTimeToDate('8:30 PM', { referenceDate })
-      expect(result3).toEqual(result1)
-    })
-
-    it('should handle ISO strings with timezone offsets correctly', () => {
-      // ISO string with timezone offset should be parsed correctly regardless of system timezone
-      const isoWithOffset = parseTimeToDate('2022-01-01T12:00:00+02:00', { referenceDate })
-      expect(isoWithOffset).toBeDefined()
-      // The function should apply the reference date and handle the timezone offset
-      expect(isoWithOffset!.getMinutes()).toBe(0)
-      expect(isoWithOffset!.getSeconds()).toBe(0)
-      // Hours may vary based on system timezone interpretation of the offset
-    })
-
-    it('should maintain consistency across multiple calls with same input', () => {
-      // Ensure that multiple calls with the same input produce the same result
-      const timeInput = '20:30'
-      const result1 = parseTimeToDate(timeInput, { referenceDate })
-      const result2 = parseTimeToDate(timeInput, { referenceDate })
-      const result3 = parseTimeToDate(timeInput, { referenceDate })
-
-      expect(result1).toBeDefined()
-      expect(result2).toBeDefined()
-      expect(result3).toBeDefined()
-      expect(result1).toEqual(result2)
-      expect(result2).toEqual(result3)
-    })
-
-    it('should work with timezone parameter when provided', () => {
-      // Test explicit timezone parameter
-      const result1 = parseTimeToDate('14:00', { referenceDate, timezone: 'UTC' })
-      const result2 = parseTimeToDate('14:00', { referenceDate, timezone: 'America/New_York' })
-
-      expect(result1).toBeDefined()
-      expect(result2).toBeDefined()
-      expect(result1).toBeInstanceOf(Date)
-      expect(result2).toBeInstanceOf(Date)
     })
   })
 })

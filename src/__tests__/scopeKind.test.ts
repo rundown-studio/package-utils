@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { ApiTokenScope } from '@rundown-studio/types'
-import { scopeKind } from '../src/scopeKind'
+import { scopeKind } from '../scopeKind'
 
 describe('scopeKind', () => {
   test('every team_* scope resolves to "team"', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { moveCues } from '../src/moveCues'
+import { moveCues } from '../moveCues'
 import { RundownCueOrderItem } from '@rundown-studio/types'
 
 /**
@@ -627,7 +627,6 @@ describe('moveCues', () => {
       { id: 'cue6' },
     ])
   })
-
 
   it('move selected cue to unexistent group position', async () => {
     const selectedCues = ['cue2']

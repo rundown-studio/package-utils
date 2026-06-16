@@ -58,7 +58,7 @@ export default [
   // Special rules for tests
   {
     name: 'eslint/tests',
-    files: ['tests/**/*.ts'],
+    files: ['**/__tests__/**/*.ts'],
     rules: {
       '@typescript-eslint/no-unused-expressions': 'off',
       '@typescript-eslint/no-explicit-any': 'off',

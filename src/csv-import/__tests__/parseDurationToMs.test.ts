@@ -7,6 +7,7 @@ describe('parseDurationToMs', () => {
       expect(parseDurationToMs('1:30')).toBe(5400000) // 1h 30m
       expect(parseDurationToMs('5:45')).toBe(20700000) // 5h 45m
       expect(parseDurationToMs('0:30')).toBe(1800000) // 30m
+      expect(parseDurationToMs('01:10')).toBe(4200000) // leading-zero hour, 1h 10m
     })
 
     it('should parse HH:MM:SS format', () => {
@@ -68,6 +69,11 @@ describe('parseDurationToMs', () => {
     it('should be case insensitive', () => {
       expect(parseDurationToMs('1H 30M 45S')).toBe(5445000)
       expect(parseDurationToMs('2 HOURS 15 MINUTES')).toBe(8100000)
+    })
+
+    it('should not range-validate units (unlike colon format)', () => {
+      expect(parseDurationToMs('2 minutes 80 seconds')).toBe(200000) // 80s accepted
+      expect(parseDurationToMs('90m60s')).toBe(5460000) // 60s accepted
     })
 
     it('should handle various spacing', () => {

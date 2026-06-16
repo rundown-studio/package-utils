@@ -1,4 +1,4 @@
-import {createTimestamps} from '../src/createTimestamps'
+import { createTimestamps } from '../createTimestamps'
 import {
   CueStartMode,
   getCueDefaults,
@@ -6,11 +6,11 @@ import {
   Cue,
   RundownCueOrderItem,
   Runner,
-  CueType
+  CueType,
 } from '@rundown-studio/types'
 import _ from 'lodash'
-import {addMinutes} from 'date-fns'
-import {vi, afterAll, beforeAll, describe, expect, it} from 'vitest'
+import { addMinutes } from 'date-fns'
+import { vi, afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * npm run test -- tests/createTimestamps.test.ts
@@ -354,7 +354,7 @@ describe('createTimestamps', () => {
         deadline: addMinutes(startTime, 20),
       })
       runner.nextCueId = '#3'
-      runner.elapsedCues['#1'] ={
+      runner.elapsedCues['#1'] = {
         startTime: startTime.toISOString(),
         duration: (10 * 60000), // 10 min
       }
@@ -545,7 +545,7 @@ describe('createTimestamps', () => {
           startTime: addMinutes(startTime, 60), // 10:00 AM
           startMode: CueStartMode.FIXED,
           duration: 20 * 60000, // 20 min
-        }
+        },
       ] as Cue[]
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
@@ -626,7 +626,7 @@ describe('createTimestamps', () => {
         startMode: CueStartMode.FIXED,
         duration: 30 * 60000, // 30 min
       }
-      runner.elapsedCues['#1'] ={
+      runner.elapsedCues['#1'] = {
         startTime: '2024-07-26T09:00:00.000Z',
         duration: (5 * 60000),
       }
@@ -680,7 +680,7 @@ describe('createTimestamps', () => {
         deadline: new Date('2024-07-26T09:15:00.000Z'),
       })
       runner.nextCueId = '#3'
-      runner.elapsedCues['#1'] ={
+      runner.elapsedCues['#1'] = {
         startTime: '2024-07-26T08:58:00.000Z',
         duration: (3 * 60000),
       }
@@ -726,7 +726,7 @@ describe('createTimestamps', () => {
         deadline: new Date('2024-07-26T09:11:00.000Z'),
       })
       runner.nextCueId = '#3'
-      runner.elapsedCues['#1'] ={
+      runner.elapsedCues['#1'] = {
         startTime: '2024-07-26T08:58:00.000Z',
         duration: (3 * 60000),
       }
@@ -868,7 +868,7 @@ describe('createTimestamps', () => {
         deadline: new Date('2024-07-26T09:10:00.000Z'),
       })
       runner.nextCueId = '#2'
-      runner.elapsedCues['#1'] ={
+      runner.elapsedCues['#1'] = {
         startTime: '2024-07-26T09:00:00.000Z',
         duration: (5 * 60000),
       }
@@ -1037,7 +1037,7 @@ describe('createTimestamps', () => {
         startMode: CueStartMode.FIXED,
         duration: 30 * 60000, // 30 min
       }
-      runner.elapsedCues['#1'] ={
+      runner.elapsedCues['#1'] = {
         startTime: '2024-08-12T09:00:00.000Z',
         duration: (5 * 60000),
       }
@@ -1093,7 +1093,7 @@ describe('createTimestamps', () => {
         startTime: new Date('2024-07-26T10:00:00.000Z'),
         startDatePlus: 1,
         startMode: CueStartMode.FIXED,
-        duration: 3 * 60 * 60000 // 3h
+        duration: 3 * 60 * 60000, // 3h
       } as Cue
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = null
@@ -1148,7 +1148,7 @@ describe('createTimestamps', () => {
         startTime: new Date('2024-07-26T10:00:00.000Z'),
         startDatePlus: 1,
         startMode: CueStartMode.FIXED,
-        duration: 3 * 60 * 60000 // 3h
+        duration: 3 * 60 * 60000, // 3h
       } as Cue
       const cueOrder = [...defaultCueOrder, { id: '#4' }]
       const runner = _.cloneDeep(defaultRunner)
@@ -1164,22 +1164,22 @@ describe('createTimestamps', () => {
         '#1': {
           startTime: null,
           startMode: CueStartMode.FLEXIBLE,
-          duration: 6 * 60 * 60000 // 6h
+          duration: 6 * 60 * 60000, // 6h
         },
         '#2': {
           startTime: null,
           startMode: CueStartMode.FLEXIBLE,
-          duration: 10 * 60 * 60000 // 8h
+          duration: 10 * 60 * 60000, // 8h
         },
         '#3': {
           startTime: null,
           startMode: CueStartMode.FLEXIBLE,
-          duration: 3 * 60 * 60000 // 3h
+          duration: 3 * 60 * 60000, // 3h
         },
         '#4': {
           startTime: '2024-07-26T10:00:00.000Z',
           startMode: CueStartMode.FIXED,
-          duration: 3 * 60 * 60000 // 3h
+          duration: 3 * 60 * 60000, // 3h
         },
       }
       runner.elapsedCues = {
