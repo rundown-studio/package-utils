@@ -1,5 +1,5 @@
 import type { ApiTokenScopeKind } from '@rundown-studio/types'
-import { TOKEN_EPOCHS } from './tokenEpochs'
+import { TOKEN_EPOCHS } from '../consts/tokenEpochs'
 
 /**
  * Resolve the current epoch for a token scope: the max of the global epoch and
@@ -8,7 +8,7 @@ import { TOKEN_EPOCHS } from './tokenEpochs'
  * Used identically by mint (stamping the `e` claim) and by auth (comparing it),
  * so the two can never disagree. A `rundown` token answers to whichever is
  * highest of global, its team's bump, and its own rundown's bump; a `team`
- * token ignores rundown bumps. See `./tokenEpochs` `TOKEN_EPOCHS` for the
+ * token ignores rundown bumps. See `../consts/tokenEpochs` `TOKEN_EPOCHS` for the
  * rotation model.
  */
 export function epochForScope (

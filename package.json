@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
-    "@rundown-studio/consts": "0.6.1",
+    "@rundown-studio/consts": "0.7.1",
     "@rundown-studio/timeutils": "0.7.1",
     "@rundown-studio/types": "1.10.3",
     "date-fns": "^4.1.0",

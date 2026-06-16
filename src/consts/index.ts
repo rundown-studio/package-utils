@@ -1,0 +1,40 @@
+// Upstream constants from @rundown-studio/consts, re-exported while that package
+// is folded into @rundown-studio/utils and phased out (see README).
+//
+// These are listed explicitly rather than via `export *` for two reasons:
+//   1. A bare `export *` from an external package does not survive tsup's ESM
+//      bundle when re-exported through a barrel like this one — esbuild can't
+//      enumerate an external module's names for ESM's static export list, so
+//      every name silently becomes `undefined` for `import` consumers. Named
+//      re-exports are statically known and bundle correctly.
+//   2. This list IS the migration checklist: as each constant moves into a
+//      local module here, strike it from this block and export the local copy
+//      instead. When the list is empty, the dependency can be dropped.
+export {
+  APIV0_CUE_KEYS,
+  APIV0_RUNDOWN_KEYS,
+  API_TOKEN_COLLECTION,
+  CELL_COLLECTION,
+  CELL_HIGHLIGHT_COLORS,
+  CELL_SELECT_COLORS,
+  CELL_TEXT_COLORS,
+  CODE_COLLECTION,
+  COLUMN_COLLECTION,
+  CUE_BACKGROUND_COLORS,
+  CUE_COLLECTION,
+  CUE_OVERLAP_TOLERANCE,
+  DEV,
+  EVENT_COLLECTION,
+  HISTORY_COLLECTION,
+  PROD,
+  PRODUCT_COLLECTION,
+  PROMPTER_COLLECTION,
+  RUNDOWN_COLLECTION,
+  RUNNER_COLLECTION,
+  SUB_COLLECTION,
+  TEAM_COLLECTION,
+  TXN_COLLECTION,
+} from '@rundown-studio/consts'
+
+// Migrated off @rundown-studio/consts — local copy is now the source of truth.
+export { TOKEN_EPOCHS } from './tokenEpochs'
