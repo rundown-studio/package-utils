@@ -3,10 +3,27 @@ import pluginJs from '@eslint/js'
 import stylistic from '@stylistic/eslint-plugin'
 import tseslint from 'typescript-eslint'
 
+// Globals that exist in the browser but NOT in Node. Banned in src/ so the
+// published package stays isomorphic (node ∩ browser). TypeScript can't catch
+// these — the `dom` lib in tsconfig declares them as valid — so eslint is the
+// only guard for the browser-only half of the intersection.
+const browserOnlyGlobals = [
+  'window',
+  'document',
+  'localStorage',
+  'sessionStorage',
+  'navigator',
+  'location',
+  'history',
+  'alert',
+  'confirm',
+  'prompt',
+  'XMLHttpRequest',
+]
+
 export default [
   {
     name: 'global/base',
-    languageOptions: { globals: globals.browser },
     plugins: {
       '@stylistic': stylistic,
     },
@@ -53,6 +70,29 @@ export default [
       '@stylistic/arrow-parens': ['warn', 'always'],
       '@stylistic/brace-style': ['warn', '1tbs'],
     },
+  },
+
+  // src/ is isomorphic: it may only use APIs present in BOTH Node and the
+  // browser. Declare just the shared-node-browser intersection as globals and
+  // ban the browser-only ones outright.
+  {
+    name: 'env/src-isomorphic',
+    files: ['src/**/*.ts', 'src/**/*.js'],
+    ignores: ['src/**/__tests__/**', 'src/**/*.test.ts', 'src/**/*.spec.ts'],
+    languageOptions: { globals: globals['shared-node-browser'] },
+    rules: {
+      'no-restricted-globals': ['error', ...browserOnlyGlobals.map((name) => ({
+        name,
+        message: `'${name}' is browser-only — src/ must use APIs available in both Node and the browser to keep the package isomorphic.`,
+      }))],
+    },
+  },
+
+  // Tests and root config files always run in Node — give them Node globals.
+  {
+    name: 'env/node',
+    files: ['**/__tests__/**/*.ts', 'src/**/*.test.ts', 'src/**/*.spec.ts', '*.config.ts'],
+    languageOptions: { globals: globals.node },
   },
 
   // Special rules for tests

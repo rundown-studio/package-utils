@@ -1,15 +1,16 @@
 // Upstream constants from @rundown-studio/consts, re-exported while that package
 // is folded into @rundown-studio/utils and phased out (see README).
 //
-// These are listed explicitly rather than via `export *` for two reasons:
-//   1. A bare `export *` from an external package does not survive tsup's ESM
-//      bundle when re-exported through a barrel like this one — esbuild can't
-//      enumerate an external module's names for ESM's static export list, so
-//      every name silently becomes `undefined` for `import` consumers. Named
-//      re-exports are statically known and bundle correctly.
-//   2. This list IS the migration checklist: as each constant moves into a
-//      local module here, strike it from this block and export the local copy
-//      instead. When the list is empty, the dependency can be dropped.
+// These are listed explicitly rather than via `export *` because this list IS
+// the migration checklist: as each constant moves into a local module here,
+// strike it from this block and export the local copy instead. When the list is
+// empty, the dependency can be dropped.
+//
+// (Under the old tsup/esbuild build, explicit listing was also *required* — a
+// bare `export *` from an external package did not survive the ESM bundle and
+// names became `undefined` for `import` consumers. The current bundler, tsdown
+// (Rolldown), handles `export *` from externals correctly, so this is no longer
+// a hard constraint — but the explicit list is kept for the checklist above.)
 export {
   APIV0_CUE_KEYS,
   APIV0_RUNDOWN_KEYS,

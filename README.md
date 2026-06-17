@@ -51,22 +51,23 @@ bridges that transition:
   `tokenEpochs.ts`) are exported from their **local** module instead and struck
   from the upstream re-export list.
 
-The upstream re-exports are listed **explicitly** rather than via `export *` for
-two reasons:
+The upstream re-exports are listed **explicitly** rather than via `export *` as a
+**migration checklist**: the explicit list doubles as the phase-out tracker — as
+each constant moves into a local module here, remove it from the upstream block
+and export the local copy instead. When the list is empty, the
+`@rundown-studio/consts` dependency can be dropped.
 
-1. **ESM bundling.** A bare `export *` from an external package does not survive
-   tsup's ESM bundle when re-exported through a barrel — esbuild cannot
-   enumerate an external module's names for ESM's static export list, so every
-   re-exported name silently becomes `undefined` for `import` consumers. Named
-   re-exports are statically known and bundle correctly.
-2. **Migration checklist.** The explicit list doubles as the phase-out tracker:
-   as each constant moves into a local module here, remove it from the upstream
-   block and export the local copy instead. When the list is empty, the
-   `@rundown-studio/consts` dependency can be dropped.
+> Historically, explicit listing was also *required* for correctness: a bare
+> `export *` from an external package did not survive **tsup**'s esbuild ESM
+> bundle through a barrel — esbuild could not enumerate an external module's
+> names for ESM's static export list, so every re-exported name silently became
+> `undefined` for `import` consumers. The current bundler, **tsdown** (Rolldown),
+> handles `export *` from externals correctly, so this is no longer a constraint
+> — but the explicit list is kept for the checklist above.
 
 ## Commands
 
-- **Build:** `npm run build` (tsup → CJS + ESM + types in `dist/`)
+- **Build:** `npm run build` (tsdown → CJS + ESM + types in `dist/`)
 - **Test:** `npm test` (watch), `npm run test:ci` (single run)
 - **Typecheck:** `npm run typecheck`
 - **Lint:** `npm run lint` (`npm run lint:fix` to auto-fix)

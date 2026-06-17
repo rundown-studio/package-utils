@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["node"]
+  },
+  "include": [
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts",
+    "src/**/__tests__/**/*.ts",
+    "*.config.ts"
+  ],
+  // Override the src test/config exclude inherited via `extends`; here the
+  // tests and config files ARE the inputs. Without this, the inherited exclude
+  // cancels the include globs above and tsc fails with TS18003 (no inputs).
+  "exclude": []
+}
+
