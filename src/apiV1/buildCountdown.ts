@@ -1,5 +1,5 @@
-import type { ApiV1Status, ApiV1Countdown } from '@rundown-studio/types'
-import { formatCountdown } from '@rundown-studio/timeutils'
+import { formatCountdown, millisecondsToDhms } from '@rundown-studio/timeutils'
+import type { ApiV1Countdown, ApiV1Status } from '@rundown-studio/types'
 
 /**
  * Project a `ApiV1Status` into the `ApiV1Countdown` wire shape — the same pure
@@ -13,10 +13,15 @@ import { formatCountdown } from '@rundown-studio/timeutils'
  * - `paused`  — `active_cue` populated; `remaining_ms` frozen at the pause.
  * - `stopped` — `active_cue` null (no countdown when no runner is active).
  *
+ * This layer owns the `ApiV1CountdownParts` wire shape: the numeric parts come
+ * from `millisecondsToDhms(ms, Math.ceil)` (ceil = countdown semantics) and the
+ * `formatted` string from `formatCountdown` — timeutils stays wire-agnostic.
+ *
  * `remaining_ms` is the raw signed value — negative is overtime; consumers clamp
- * if they want to hide it. `remaining.formatted` includes the `+` prefix.
+ * if they want to hide it. `overtimePrefix` (default `'+'`) feeds both the
+ * `prefix` field and `remaining.formatted`, which already includes it.
  */
-export function buildCountdown (status: ApiV1Status): ApiV1Countdown {
+export function buildCountdown(status: ApiV1Status, overtimePrefix: string = '+'): ApiV1Countdown {
   const { state, server_time, active_cue } = status
 
   if (!active_cue) {
@@ -29,6 +34,9 @@ export function buildCountdown (status: ApiV1Status): ApiV1Countdown {
   const anchor = active_cue.paused_at ?? server_time
   const remainingMs = deadline - anchor
 
+  const dhms = millisecondsToDhms(remainingMs, Math.ceil)
+  const isOvertime = remainingMs < 0
+
   return {
     state,
     server_time,
@@ -37,7 +45,15 @@ export function buildCountdown (status: ApiV1Status): ApiV1Countdown {
       title: active_cue.title,
       duration_ms: active_cue.duration_ms,
       remaining_ms: remainingMs,
-      remaining: formatCountdown(remainingMs),
+      remaining: {
+        is_overtime: isOvertime,
+        prefix: isOvertime ? overtimePrefix : '',
+        days: dhms.days,
+        hours: dhms.hours,
+        minutes: dhms.minutes,
+        seconds: dhms.seconds,
+        formatted: formatCountdown(remainingMs, { overtimePrefix }),
+      },
     },
   }
 }

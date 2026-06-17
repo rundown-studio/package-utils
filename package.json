@@ -49,7 +49,7 @@
   "dependencies": {
     "@date-fns/tz": "^1.2.0",
     "@rundown-studio/consts": "0.7.1",
-    "@rundown-studio/timeutils": "0.7.1",
+    "@rundown-studio/timeutils": "1.0.0",
     "date-fns": "^4.1.0",
     "lodash": "^4.17.21"
   },

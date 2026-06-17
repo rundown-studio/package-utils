@@ -1,5 +1,5 @@
-import { expect, test, describe } from 'vitest'
-import type { ApiV1Status, ApiV1ActiveCue } from '@rundown-studio/types'
+import type { ApiV1ActiveCue, ApiV1Status } from '@rundown-studio/types'
+import { describe, expect, test } from 'vitest'
 import { buildCountdown } from '../buildCountdown'
 
 const stoppedStatus: ApiV1Status = {
@@ -105,10 +105,12 @@ describe('buildCountdown', () => {
 
   test('running — long cue formats with hours band', () => {
     // started 1m ago, 1h 25m duration → 1h 24m remaining
-    const out = buildCountdown(runningStatus({
-      started_at: 1_716_393_540_000,
-      duration_ms: 5_100_000, // 1h 25m
-    }))
+    const out = buildCountdown(
+      runningStatus({
+        started_at: 1_716_393_540_000,
+        duration_ms: 5_100_000, // 1h 25m
+      }),
+    )
     expect(out.active_cue!.remaining).toMatchObject({
       hours: 1,
       minutes: 24,
@@ -117,11 +119,33 @@ describe('buildCountdown', () => {
     })
   })
 
+  test('overtime — custom overtimePrefix feeds prefix + formatted', () => {
+    // started 75s ago, 60s duration → -15s remaining (overtime)
+    const out = buildCountdown(runningStatus({ started_at: 1_716_393_525_000 }), '-')
+    expect(out.active_cue!.remaining).toMatchObject({
+      is_overtime: true,
+      prefix: '-',
+      seconds: 15,
+      formatted: '-00:15',
+    })
+  })
+
+  test('overtimePrefix is ignored when not in overtime', () => {
+    const out = buildCountdown(runningStatus(), 'OVER ')
+    expect(out.active_cue!.remaining).toMatchObject({
+      is_overtime: false,
+      prefix: '',
+      formatted: '00:42',
+    })
+  })
+
   test('running — remaining exactly zero is NOT overtime', () => {
-    const out = buildCountdown(runningStatus({
-      started_at: 1_716_393_540_000, // 60s ago
-      duration_ms: 60_000, // exact deadline
-    }))
+    const out = buildCountdown(
+      runningStatus({
+        started_at: 1_716_393_540_000, // 60s ago
+        duration_ms: 60_000, // exact deadline
+      }),
+    )
     expect(out.active_cue!.remaining_ms).toBe(0)
     expect(out.active_cue!.remaining.is_overtime).toBe(false)
     expect(out.active_cue!.remaining.formatted).toBe('00:00')
