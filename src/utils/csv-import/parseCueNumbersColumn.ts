@@ -4,7 +4,7 @@
  * @param {unknown} cell - The cell value to sanitize
  * @returns {string} A trimmed string or empty string if input is not a string
  */
-function sanitizeCellValue (cell: unknown): string {
+function sanitizeCellValue(cell: unknown): string {
   // Ensure cell is a trimmed string, otherwise return empty string
   return typeof cell === 'string' ? cell.trim() : ''
 }
@@ -27,7 +27,7 @@ function sanitizeCellValue (cell: unknown): string {
  * @param {string} [previousCueNumber] - The previous normalized cue number
  * @returns {string} The normalized cue number
  */
-function normalizeCueNumber (cell: unknown, previousCueNumber?: string) {
+function normalizeCueNumber(cell: unknown, previousCueNumber?: string) {
   if (!previousCueNumber) return '1'
 
   const cellValue = sanitizeCellValue(cell)
@@ -39,14 +39,14 @@ function normalizeCueNumber (cell: unknown, previousCueNumber?: string) {
     // Always group with the previous cue, regardless of whether previous was a group
     if (prevGroup) {
       // Continue group
-      return `${prevCue}.${parseInt(prevGroup) + 1}`
+      return `${prevCue}.${parseInt(prevGroup, 10) + 1}`
     }
     // Start new group
     return `${prevCue}.1`
   }
 
   // Not a group, increment main cue
-  return `${parseInt(prevCue) + 1}`
+  return `${parseInt(prevCue, 10) + 1}`
 }
 
 /**
@@ -71,9 +71,7 @@ function normalizeCueNumber (cell: unknown, previousCueNumber?: string) {
  * @param {Record<string, unknown>} column - Object containing row IDs as keys and cell values as values
  * @returns {Record<string, string>} Object with row IDs as keys and normalized cue numbers as values
  */
-export function parseCueNumbersColumn (
-  column: Record<string, unknown>,
-): Record<string, string> {
+export function parseCueNumbersColumn(column: Record<string, unknown>): Record<string, string> {
   const cueNumbers = new Map<string, string>()
   const rowIds = Object.keys(column)
 

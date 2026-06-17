@@ -11,11 +11,7 @@ import { TOKEN_EPOCHS } from '../consts/tokenEpochs'
  * token ignores rundown bumps. See `../consts/tokenEpochs` `TOKEN_EPOCHS` for the
  * rotation model.
  */
-export function epochForScope (
-  kind: ApiTokenScopeKind,
-  teamId: string,
-  rundownId: string | null,
-): number {
+export function epochForScope(kind: ApiTokenScopeKind, teamId: string, rundownId: string | null): number {
   return Math.max(
     TOKEN_EPOCHS.global,
     TOKEN_EPOCHS.teams[teamId] ?? 0,

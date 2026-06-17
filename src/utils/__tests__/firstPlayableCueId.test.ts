@@ -1,9 +1,11 @@
-import { expect, test, describe } from 'vitest'
 import { CueType, type RundownCue, type RundownCueOrderItem } from '@rundown-studio/types'
+import { describe, expect, test } from 'vitest'
 import { firstPlayableCueId } from '../firstPlayableCueId'
 
 const cueRow = (id: string, type: CueType, title: string): Pick<RundownCue, 'id' | 'type' | 'title'> => ({
-  id, type, title,
+  id,
+  type,
+  title,
 })
 
 describe('firstPlayableCueId', () => {
@@ -15,20 +17,12 @@ describe('firstPlayableCueId', () => {
   ])
 
   test('skips headings and groups, returns first cue', () => {
-    const order: RundownCueOrderItem[] = [
-      { id: 'h1' },
-      { id: 'g1' },
-      { id: 'c1' },
-      { id: 'c2' },
-    ]
+    const order: RundownCueOrderItem[] = [{ id: 'h1' }, { id: 'g1' }, { id: 'c1' }, { id: 'c2' }]
     expect(firstPlayableCueId(order, map)).toBe('c1')
   })
 
   test('descends into group children', () => {
-    const order: RundownCueOrderItem[] = [
-      { id: 'h1' },
-      { id: 'g1', children: [{ id: 'c1' }] },
-    ]
+    const order: RundownCueOrderItem[] = [{ id: 'h1' }, { id: 'g1', children: [{ id: 'c1' }] }]
     expect(firstPlayableCueId(order, map)).toBe('c1')
   })
 

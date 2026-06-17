@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
-import { fastDeepEqual } from '../fastDeepEqual'
 import npmFastDeepEqual from 'fast-deep-equal'
+import { describe, expect, it } from 'vitest'
+import { fastDeepEqual } from '../fastDeepEqual'
 
 describe('fastDeepEqual', () => {
   it('performance comparison (informational only)', () => {

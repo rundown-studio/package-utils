@@ -12,9 +12,9 @@
 // (Rolldown), handles `export *` from externals correctly, so this is no longer
 // a hard constraint — but the explicit list is kept for the checklist above.)
 export {
+  API_TOKEN_COLLECTION,
   APIV0_CUE_KEYS,
   APIV0_RUNDOWN_KEYS,
-  API_TOKEN_COLLECTION,
   CELL_COLLECTION,
   CELL_HIGHLIGHT_COLORS,
   CELL_SELECT_COLORS,

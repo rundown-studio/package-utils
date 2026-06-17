@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { parseTimeToDate } from '../parseTimeToDate'
-import { parseDurationToMs } from '../parseDurationToMs'
+import { describe, expect, it } from 'vitest'
 import { parseCueNumbersColumn } from '../parseCueNumbersColumn'
+import { parseDurationToMs } from '../parseDurationToMs'
+import { parseTimeToDate } from '../parseTimeToDate'
 
 // Simple integration tests to verify the utilities work together
 // without getting into timezone complexities
@@ -26,7 +26,7 @@ describe('CSV Import Utilities Integration', () => {
       expect(parseDurationToMs('1:30')).toBe(5400000) // 1h 30m
       expect(parseDurationToMs('1:30:45')).toBe(5445000) // 1h 30m 45s
       expect(parseDurationToMs('90m')).toBe(5400000) // 90 minutes
-      expect(parseDurationToMs('90\'')).toBe(5400000) // 90 minutes
+      expect(parseDurationToMs("90'")).toBe(5400000) // 90 minutes
       expect(parseDurationToMs('90')).toBe(5400000) // 90 minutes
     })
 

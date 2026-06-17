@@ -1,8 +1,12 @@
-import { describe, test, expect, afterEach } from 'vitest'
-import { epochForScope } from '../epochForScope'
+import { afterEach, describe, expect, test } from 'vitest'
 import { TOKEN_EPOCHS } from '../../consts/tokenEpochs'
+import { epochForScope } from '../epochForScope'
 
-const defaults = { global: TOKEN_EPOCHS.global, teams: { ...TOKEN_EPOCHS.teams }, rundowns: { ...TOKEN_EPOCHS.rundowns } }
+const defaults = {
+  global: TOKEN_EPOCHS.global,
+  teams: { ...TOKEN_EPOCHS.teams },
+  rundowns: { ...TOKEN_EPOCHS.rundowns },
+}
 
 afterEach(() => {
   TOKEN_EPOCHS.global = defaults.global
@@ -16,14 +20,14 @@ describe('epochForScope', () => {
     expect(epochForScope('rundown', 'team-a', 'rnd-1')).toBe(TOKEN_EPOCHS.global)
   })
 
-  test('a team bump rotates team tokens and that team\'s rundown tokens', () => {
+  test("a team bump rotates team tokens and that team's rundown tokens", () => {
     TOKEN_EPOCHS.teams['team-a'] = 3
     expect(epochForScope('team', 'team-a', null)).toBe(3)
     expect(epochForScope('rundown', 'team-a', 'rnd-1')).toBe(3)
     expect(epochForScope('team', 'team-b', null)).toBe(TOKEN_EPOCHS.global)
   })
 
-  test('a rundown bump rotates only that rundown\'s tokens, not the team scope', () => {
+  test("a rundown bump rotates only that rundown's tokens, not the team scope", () => {
     TOKEN_EPOCHS.rundowns['rnd-1'] = 2
     expect(epochForScope('rundown', 'team-a', 'rnd-1')).toBe(2)
     expect(epochForScope('rundown', 'team-a', 'rnd-2')).toBe(TOKEN_EPOCHS.global)

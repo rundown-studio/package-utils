@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
 import { addMilliseconds } from 'date-fns'
+import { describe, expect, it } from 'vitest'
+import type { Timestamp } from '..'
 import { getTimestampSpanDuration } from '../getTimestampSpanDuration'
-import { Timestamp } from '..'
 
 /**
  * npm run test -- tests/getTimestampSpanDuration.test.js

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { parseTimeToDate } from '../parseTimeToDate'
 
 /**
@@ -225,7 +225,9 @@ describe('parseTimeToDate - Timezone Handling', () => {
           referenceDate,
           timezone: 'Invalid/Timezone',
         })
-      }).toThrow('Invalid timezone "Invalid/Timezone". Please use a valid IANA timezone identifier (e.g., "America/New_York", "Europe/Berlin", "UTC").')
+      }).toThrow(
+        'Invalid timezone "Invalid/Timezone". Please use a valid IANA timezone identifier (e.g., "America/New_York", "Europe/Berlin", "UTC").',
+      )
     })
   })
 })

@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest'
+import type { RundownCueOrderItem } from '@rundown-studio/types'
+import { describe, expect, it } from 'vitest'
 import { moveCues } from '../moveCues'
-import { RundownCueOrderItem } from '@rundown-studio/types'
 
 /**
  * npm run test -- tests/moveCues.test.js
@@ -11,18 +11,12 @@ const cueOrder: RundownCueOrderItem[] = [
   { id: 'cue2' },
   {
     id: 'group3',
-    children: [
-      { id: 'cue3.1' },
-      { id: 'cue3.2' },
-    ],
+    children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
   },
   { id: 'cue4' },
   {
     id: 'group5',
-    children: [
-      { id: 'cue5.1' },
-      { id: 'cue5.2' },
-    ],
+    children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
   },
   { id: 'cue6' },
 ]
@@ -39,17 +33,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -66,17 +54,11 @@ describe('moveCues', () => {
       { id: 'cue4' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -92,17 +74,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
       { id: 'cue4' },
@@ -119,17 +95,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
       { id: 'cue4' },
@@ -146,18 +116,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue4' },
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue4' }, { id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -173,18 +136,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue4' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue4' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -200,18 +156,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-          { id: 'cue4' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }, { id: 'cue4' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -227,18 +176,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-          { id: 'cue4' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }, { id: 'cue4' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -256,17 +198,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
     ])
   })
@@ -279,10 +215,7 @@ describe('moveCues', () => {
     expect(newCueOrder).to.deep.equal([
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       { id: 'cue4' },
       { id: 'cue1' },
@@ -290,10 +223,7 @@ describe('moveCues', () => {
       { id: 'cue6' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
     ])
   })
@@ -306,17 +236,11 @@ describe('moveCues', () => {
     expect(newCueOrder).to.deep.equal([
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
       { id: 'cue1' },
@@ -333,17 +257,11 @@ describe('moveCues', () => {
     expect(newCueOrder).to.deep.equal([
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
       { id: 'cue1' },
@@ -360,20 +278,14 @@ describe('moveCues', () => {
     expect(newCueOrder).to.deep.equal([
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       { id: 'cue1' },
       { id: 'cue2' },
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -387,20 +299,14 @@ describe('moveCues', () => {
     expect(newCueOrder).to.deep.equal([
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       { id: 'cue1' },
       { id: 'cue2' },
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -416,17 +322,11 @@ describe('moveCues', () => {
       { id: 'cue2' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       { id: 'cue4' },
       { id: 'cue6' },
@@ -444,18 +344,12 @@ describe('moveCues', () => {
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
     ])
   })
@@ -471,17 +365,11 @@ describe('moveCues', () => {
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       { id: 'cue6' },
     ])
@@ -514,10 +402,7 @@ describe('moveCues', () => {
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -540,10 +425,7 @@ describe('moveCues', () => {
       { id: 'cue3.2' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])
@@ -564,10 +446,7 @@ describe('moveCues', () => {
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
       { id: 'cue3.1' },
@@ -590,10 +469,7 @@ describe('moveCues', () => {
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
       { id: 'cue3.1' },
@@ -613,16 +489,11 @@ describe('moveCues', () => {
       { id: 'cue4' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-        ],
+        children: [{ id: 'cue3.1' }],
       },
       { id: 'cue6' },
     ])
@@ -637,19 +508,13 @@ describe('moveCues', () => {
       { id: 'cue1' },
       {
         id: 'group3',
-        children: [
-          { id: 'cue3.1' },
-          { id: 'cue3.2' },
-        ],
+        children: [{ id: 'cue3.1' }, { id: 'cue3.2' }],
       },
       { id: 'cue4' },
       { id: 'cue2' },
       {
         id: 'group5',
-        children: [
-          { id: 'cue5.1' },
-          { id: 'cue5.2' },
-        ],
+        children: [{ id: 'cue5.1' }, { id: 'cue5.2' }],
       },
       { id: 'cue6' },
     ])

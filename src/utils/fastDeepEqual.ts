@@ -18,12 +18,13 @@
  * - Functions are compared by reference, not by their string representation.
  * - `NaN` is considered equal to itself, unlike in standard equality comparisons.
  */
-export function fastDeepEqual (value1: any, value2: any): boolean {
+export function fastDeepEqual(value1: any, value2: any): boolean {
   // Quick equality check for primitives or same reference
   if (value1 === value2) return true
 
   // Specifically check for NaN
-  if (typeof value1 === 'number' && isNaN(value1)) return value1 !== value1 && value2 !== value2
+  // biome-ignore lint/suspicious/noSelfCompare: NaN is the only value not equal to itself; this is the intended NaN-equality check
+  if (typeof value1 === 'number' && Number.isNaN(value1)) return value1 !== value1 && value2 !== value2
 
   // Check for null or non-objects
   if (value1 == null || value2 == null || typeof value1 !== 'object' || typeof value2 !== 'object') {
@@ -35,7 +36,7 @@ export function fastDeepEqual (value1: any, value2: any): boolean {
 
   // Special handling for Date objects
   if (value1 instanceof Date) {
-    return (value2 instanceof Date) && value1.getTime() === value2.getTime()
+    return value2 instanceof Date && value1.getTime() === value2.getTime()
   }
 
   // Handle arrays

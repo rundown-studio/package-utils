@@ -1,5 +1,5 @@
-import { expect, test, describe } from 'vitest'
 import type { RundownCueOrderItem } from '@rundown-studio/types'
+import { describe, expect, test } from 'vitest'
 import { flattenCueOrderItems } from '../flattenCueOrderItems'
 
 describe('flattenCueOrderItems', () => {
@@ -9,10 +9,7 @@ describe('flattenCueOrderItems', () => {
   })
 
   test('descends into children, parent before its children', () => {
-    const order: RundownCueOrderItem[] = [
-      { id: 'g1', children: [{ id: 'c1' }, { id: 'c2' }] },
-      { id: 'c3' },
-    ]
+    const order: RundownCueOrderItem[] = [{ id: 'g1', children: [{ id: 'c1' }, { id: 'c2' }] }, { id: 'c3' }]
     expect(flattenCueOrderItems(order)).toEqual(['g1', 'c1', 'c2', 'c3'])
   })
 

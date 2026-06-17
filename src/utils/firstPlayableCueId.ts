@@ -10,10 +10,7 @@ export type CueLite = Pick<RundownCue, 'id' | 'type' | 'title'>
  * populate `next_cue` in the pre-show state. Returns null on an empty rundown
  * or one that has only headings/groups.
  */
-export function firstPlayableCueId (
-  cueOrder: RundownCueOrderItem[],
-  cueById: Map<string, CueLite>,
-): string | null {
+export function firstPlayableCueId(cueOrder: RundownCueOrderItem[], cueById: Map<string, CueLite>): string | null {
   for (const id of flattenCueOrderItems(cueOrder)) {
     const c = cueById.get(id)
     if (c && c.type === CueType.CUE) return id

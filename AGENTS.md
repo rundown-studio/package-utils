@@ -14,7 +14,7 @@ Published to GitHub Packages npm registry. Depends on sibling packages: `@rundow
 - **Test:** `npm test` (vitest in watch mode), `npm run test:ci` (single run)
 - **Single test:** `npx vitest run src/utils/__tests__/createTimestamps.test.ts`
 - **Typecheck:** `npm run typecheck`
-- **Lint:** `npm run lint` (eslint with auto-fix)
+- **Lint/format:** `npm run lint` (biome check), `npm run lint:fix` (`biome check --write` to auto-fix)
 
 ## Architecture
 
@@ -34,8 +34,8 @@ Key types come from `@rundown-studio/types`: `RundownCue`, `RundownCueOrderItem`
 - Single quotes, no semicolons, 2-space indent
 - Trailing commas in multiline, space before function parens
 - 1TBS brace style, arrow parens always
-- `@typescript-eslint/no-explicit-any` is off
-- Unused vars prefixed with `_`
+- Enforced by Biome (`biome.json`): formatter + recommended lint rules, line width 120
+- `noExplicitAny` is off; tests disable `noUnusedExpressions`
 
 ## Test Layout
 

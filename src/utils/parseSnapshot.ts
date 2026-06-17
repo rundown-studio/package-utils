@@ -1,4 +1,4 @@
-import { DocumentSnapshot, DocumentSnapshotId } from '@rundown-studio/types'
+import type { DocumentSnapshot, DocumentSnapshotId } from '@rundown-studio/types'
 import _ from 'lodash'
 
 export type ParsedDocument = {
@@ -24,14 +24,9 @@ export type parseSnapshotOptions = {
  * @param {string[]} options.dateKeys
  * @return {ParsedDocument}
  */
-export function parseSnapshot (
+export function parseSnapshot(
   snapshot: DocumentSnapshot,
-  {
-    defaults = {},
-    overwrite = {},
-    pick = [],
-    dateKeys = [],
-  }: parseSnapshotOptions = {},
+  { defaults = {}, overwrite = {}, pick = [], dateKeys = [] }: parseSnapshotOptions = {},
 ): ParsedDocument {
   const data = snapshot.data() || {}
   for (const key of dateKeys) {
@@ -50,8 +45,16 @@ export function parseSnapshot (
     id: snapshot.id,
     ...data,
     ...overwrite,
-    createdAt: data?.createdAt?.toDate?.() ?? _parseDate(data?.createdAt) ?? snapshot.createTime?.toDate() ?? defaults?.createdAt,
-    updatedAt: data?.updatedAt?.toDate?.() ?? _parseDate(data?.updatedAt) ?? snapshot.updateTime?.toDate() ?? defaults?.updatedAt,
+    createdAt:
+      data?.createdAt?.toDate?.() ??
+      _parseDate(data?.createdAt) ??
+      snapshot.createTime?.toDate() ??
+      defaults?.createdAt,
+    updatedAt:
+      data?.updatedAt?.toDate?.() ??
+      _parseDate(data?.updatedAt) ??
+      snapshot.updateTime?.toDate() ??
+      defaults?.updatedAt,
   }
   return pick.length ? _.pick(parsed, pick) : parsed
 }
@@ -61,7 +64,7 @@ export function parseSnapshot (
  * @param {any} date
  * @return {Date | undefined}
  */
-function _parseDate (date: any): Date | undefined {
+function _parseDate(date: any): Date | undefined {
   if (!date) return undefined
   const parsed = new Date(date)
   if (_isValidDate(parsed)) return parsed
@@ -73,6 +76,6 @@ function _parseDate (date: any): Date | undefined {
  * @param {any} date
  * @return {boolean}
  */
-function _isValidDate (date: any): boolean {
-  return date instanceof Date && !isNaN(date?.getTime())
+function _isValidDate(date: any): boolean {
+  return date instanceof Date && !Number.isNaN(date?.getTime())
 }

@@ -1,8 +1,14 @@
-import type { Runner, RundownCueOrderItem } from '@rundown-studio/types'
+import type {
+  ApiV1ActiveCue,
+  ApiV1ControlState,
+  ApiV1NextCue,
+  ApiV1Status,
+  RundownCueOrderItem,
+  Runner,
+} from '@rundown-studio/types'
 import { RunnerState } from '@rundown-studio/types'
-import type { ApiV1ControlState, ApiV1ActiveCue, ApiV1NextCue, ApiV1Status } from '@rundown-studio/types'
+import { type CueLite, firstPlayableCueId } from '../utils/firstPlayableCueId'
 import { getRunnerState } from '../utils/getRunnerState'
-import { firstPlayableCueId, type CueLite } from '../utils/firstPlayableCueId'
 
 /**
  * Projection of the public control-plane status (`ApiV1Status`).
@@ -25,7 +31,7 @@ import { firstPlayableCueId, type CueLite } from '../utils/firstPlayableCueId'
  * Map (runner, timesnap.running) → the three-state public string.
  * `getRunnerState` is the canonical engine — never re-derive from raw fields.
  */
-export function controlStateOf (runner: Runner | null): ApiV1ControlState {
+export function controlStateOf(runner: Runner | null): ApiV1ControlState {
   const internal = getRunnerState(runner)
   if (internal === RunnerState.PRESHOW || internal === RunnerState.ENDED) return 'stopped'
   // ONAIR — running vs paused is the timesnap's call.
@@ -37,7 +43,7 @@ export function controlStateOf (runner: Runner | null): ApiV1ControlState {
  * caller supplies `serverTime` so the response and any embedded side-effects
  * share one wall-clock reading.
  */
-export function buildStatus (params: {
+export function buildStatus(params: {
   runner: Runner | null
   cueById: Map<string, CueLite>
   cueOrder: RundownCueOrderItem[]
@@ -64,12 +70,12 @@ export function buildStatus (params: {
   const active = ts.cueId ? cueById.get(ts.cueId) : undefined
   const activeCue: ApiV1ActiveCue | null = active
     ? {
-      id: active.id,
-      title: active.title,
-      started_at: ts.kickoff,
-      paused_at: ts.running ? null : ts.lastStop,
-      duration_ms: ts.deadline - ts.kickoff,
-    }
+        id: active.id,
+        title: active.title,
+        started_at: ts.kickoff,
+        paused_at: ts.running ? null : ts.lastStop,
+        duration_ms: ts.deadline - ts.kickoff,
+      }
     : null
 
   const nextId = runner!.nextCueId

@@ -20,7 +20,7 @@ const RESIZE_SUFFIX = '_500x500.webp'
  * @param {string} originalSrc - The original image URL.
  * @returns {string} - The modified URL pointing to the resized image.
  */
-export function getResizedImageURL (originalSrc: string): string {
+export function getResizedImageURL(originalSrc: string): string {
   // SVG files don't have resized versions - return original URL
   if (originalSrc.toLowerCase().endsWith('.svg')) {
     return originalSrc

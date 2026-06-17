@@ -1,8 +1,8 @@
-import { parse, isValid, parseISO } from 'date-fns'
-import { getStartOfDay, parse as timeutilsParse, format, getTimezoneOffset } from '@rundown-studio/timeutils' // Helper function to validate date components
+import { format, getStartOfDay, getTimezoneOffset, parse as timeutilsParse } from '@rundown-studio/timeutils' // Helper function to validate date components
+import { isValid, parse, parseISO } from 'date-fns'
 
 // Helper function to validate date components
-function isValidDate (year: number, month: number, day: number): boolean {
+function isValidDate(year: number, month: number, day: number): boolean {
   if (month < 1 || month > 12) return false
   if (day < 1 || day > 31) return false
 
@@ -12,12 +12,12 @@ function isValidDate (year: number, month: number, day: number): boolean {
 }
 
 // Helper function to validate time components
-function isValidTime (hour: number, minute: number, second: number): boolean {
+function isValidTime(hour: number, minute: number, second: number): boolean {
   return hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59 && second >= 0 && second <= 59
 }
 
 // Helper function to convert 12-hour to 24-hour format
-function convertTo24Hour (hour: number, ampm: string): number | undefined {
+function convertTo24Hour(hour: number, ampm: string): number | undefined {
   if (hour < 1 || hour > 12) return undefined
 
   const isAM = ampm.toUpperCase() === 'AM'
@@ -31,7 +31,14 @@ function convertTo24Hour (hour: number, ampm: string): number | undefined {
 }
 
 // Helper function to create a date with validation
-function createValidatedDate (year: number, month: number, day: number, hour: number, minute: number, second: number): Date | undefined {
+function createValidatedDate(
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
+  second: number,
+): Date | undefined {
   if (!isValidDate(year, month, day)) return undefined
   if (!isValidTime(hour, minute, second)) return undefined
 
@@ -40,7 +47,7 @@ function createValidatedDate (year: number, month: number, day: number, hour: nu
 }
 
 // Helper function to validate timezone
-function validateTimezone (timezone: string): { isValid: boolean, error?: string } {
+function validateTimezone(timezone: string): { isValid: boolean; error?: string } {
   try {
     // Test the timezone by attempting to get offset for current time
     getTimezoneOffset(timezone, new Date())
@@ -58,7 +65,13 @@ function validateTimezone (timezone: string): { isValid: boolean, error?: string
 }
 
 // Helper function to set time on today's date
-function setTimeOnDate (baseDate: Date, hour: number, minute: number, second: number, timezone?: string): Date | undefined {
+function setTimeOnDate(
+  baseDate: Date,
+  hour: number,
+  minute: number,
+  second: number,
+  timezone?: string,
+): Date | undefined {
   if (!isValidTime(hour, minute, second)) return undefined
 
   // Format the time components into a parseable string
@@ -118,10 +131,7 @@ type Options = {
  * parseTimeToDate('20:60')                          // Invalid minute
  * parseTimeToDate('13:30 PM')                       // Invalid 12-hour format
  */
-export function parseTimeToDate (input?: unknown, {
-  referenceDate,
-  timezone,
-}: Options = {}): Date | undefined {
+export function parseTimeToDate(input?: unknown, { referenceDate, timezone }: Options = {}): Date | undefined {
   if (!input || typeof input !== 'string') {
     return undefined
   }
@@ -148,13 +158,7 @@ export function parseTimeToDate (input?: unknown, {
 
       if (isValid(parsedISO)) {
         if (referenceDate) {
-          return setTimeOnDate(
-            today,
-            parsedISO.getHours(),
-            parsedISO.getMinutes(),
-            parsedISO.getSeconds(),
-            timezone,
-          )
+          return setTimeOnDate(today, parsedISO.getHours(), parsedISO.getMinutes(), parsedISO.getSeconds(), timezone)
         }
 
         return parsedISO
@@ -164,7 +168,9 @@ export function parseTimeToDate (input?: unknown, {
     }
 
     // Pattern 1: YYYY-MM-DD HH:MM[:SS] [AM/PM]
-    const isoMatch = normalized.match(/^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i)
+    const isoMatch = normalized.match(
+      /^(\d{4})-(\d{1,2})-(\d{1,2})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i,
+    )
     if (isoMatch) {
       const year = parseInt(isoMatch[1], 10)
       const month = parseInt(isoMatch[2], 10)
@@ -184,7 +190,9 @@ export function parseTimeToDate (input?: unknown, {
     }
 
     // Pattern 2: MM/DD/YYYY HH:MM[:SS] [AM/PM]
-    const usMatch = normalized.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i)
+    const usMatch = normalized.match(
+      /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i,
+    )
     if (usMatch) {
       const month = parseInt(usMatch[1], 10)
       const day = parseInt(usMatch[2], 10)
@@ -204,7 +212,9 @@ export function parseTimeToDate (input?: unknown, {
     }
 
     // Pattern 3: MM-DD-YYYY HH:MM[:SS] [AM/PM]
-    const dashMatch = normalized.match(/^(\d{1,2})-(\d{1,2})-(\d{4})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i)
+    const dashMatch = normalized.match(
+      /^(\d{1,2})-(\d{1,2})-(\d{4})\s+(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?(?:\s*(AM|PM))?$/i,
+    )
     if (dashMatch) {
       const month = parseInt(dashMatch[1], 10)
       const day = parseInt(dashMatch[2], 10)
@@ -292,11 +302,12 @@ export function parseTimeToDate (input?: unknown, {
         const parsed = parse(normalized, formatStr, today)
         if (isValid(parsed)) {
           // For time-only formats, use today's date
-          const isTimeOnlyFormat = !formatStr.includes('yyyy')
-            && !formatStr.includes('MM/dd')
-            && !formatStr.includes('dd/MM')
-            && !formatStr.includes('MM-dd')
-            && !formatStr.includes('dd-MM')
+          const isTimeOnlyFormat =
+            !formatStr.includes('yyyy') &&
+            !formatStr.includes('MM/dd') &&
+            !formatStr.includes('dd/MM') &&
+            !formatStr.includes('MM-dd') &&
+            !formatStr.includes('dd-MM')
 
           if (isTimeOnlyFormat) {
             return setTimeOnDate(today, parsed.getHours(), parsed.getMinutes(), parsed.getSeconds(), timezone)
@@ -310,20 +321,14 @@ export function parseTimeToDate (input?: unknown, {
 
     const date = Date.parse(input)
 
-    if (!isNaN(date)) {
+    if (!Number.isNaN(date)) {
       const parsedDate = new Date(date)
 
       // Check if the parsed date might be just a time (year is 1970 or some other default)
       // If so, apply the time to the reference date instead
       if (referenceDate) {
         // This is likely just a time, so use the reference date
-        return setTimeOnDate(
-          today,
-          parsedDate.getHours(),
-          parsedDate.getMinutes(),
-          parsedDate.getSeconds(),
-          timezone,
-        )
+        return setTimeOnDate(today, parsedDate.getHours(), parsedDate.getMinutes(), parsedDate.getSeconds(), timezone)
       }
 
       return parsedDate

@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { parseDurationToMs } from '../parseDurationToMs'
 
 describe('parseDurationToMs', () => {
@@ -30,14 +30,14 @@ describe('parseDurationToMs', () => {
 
   describe('Single quote notation', () => {
     it('should parse minutes with single quote', () => {
-      expect(parseDurationToMs('90\'')).toBe(5400000) // 90 minutes
-      expect(parseDurationToMs('5\'')).toBe(300000) // 5 minutes
-      expect(parseDurationToMs('120\'')).toBe(7200000) // 120 minutes
+      expect(parseDurationToMs("90'")).toBe(5400000) // 90 minutes
+      expect(parseDurationToMs("5'")).toBe(300000) // 5 minutes
+      expect(parseDurationToMs("120'")).toBe(7200000) // 120 minutes
     })
 
     it('should handle whitespace around single quote', () => {
-      expect(parseDurationToMs('90 \'')).toBeUndefined() // Space before quote should fail
-      expect(parseDurationToMs('90\'  ')).toBe(5400000) // Space after quote is trimmed
+      expect(parseDurationToMs("90 '")).toBeUndefined() // Space before quote should fail
+      expect(parseDurationToMs("90'  ")).toBe(5400000) // Space after quote is trimmed
     })
   })
 
@@ -151,7 +151,7 @@ describe('parseDurationToMs', () => {
 
     it('should handle various user input styles', () => {
       expect(parseDurationToMs('90')).toBe(5400000) // User types "90" meaning 90 minutes
-      expect(parseDurationToMs('90\'')).toBe(5400000) // User types "90'"
+      expect(parseDurationToMs("90'")).toBe(5400000) // User types "90'"
       expect(parseDurationToMs('1 min 32 sec')).toBe(92000) // Verbose format
       expect(parseDurationToMs('1m 32s')).toBe(92000) // Short format
     })

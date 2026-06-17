@@ -1,9 +1,11 @@
-import { expect, test, describe } from 'vitest'
-import { CueType, type Runner, type RundownCue, type RundownCueOrderItem } from '@rundown-studio/types'
+import { CueType, type RundownCue, type RundownCueOrderItem, type Runner } from '@rundown-studio/types'
+import { describe, expect, test } from 'vitest'
 import { buildStatus, controlStateOf } from '../buildStatus'
 
 const cueRow = (id: string, type: CueType, title: string): Pick<RundownCue, 'id' | 'type' | 'title'> => ({
-  id, type, title,
+  id,
+  type,
+  title,
 })
 
 const mkRunner = (over: Partial<Runner> & { timesnap: Runner['timesnap'] }): Runner => ({

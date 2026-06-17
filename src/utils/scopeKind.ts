@@ -1,5 +1,5 @@
-import { ApiTokenScope } from '@rundown-studio/types'
 import type { ApiTokenScopeKind } from '@rundown-studio/types'
+import { ApiTokenScope } from '@rundown-studio/types'
 
 /**
  * Coarse scope kind of an API token: `team` for the `team_*` scopes, `rundown`
@@ -10,7 +10,7 @@ import type { ApiTokenScopeKind } from '@rundown-studio/types'
  * surface (compute-engine auth). Both verify paths use it to resolve the epoch
  * scope and the rundown pin, so a single source is the only way they can't drift.
  */
-export function scopeKind (scope: ApiTokenScope): ApiTokenScopeKind {
+export function scopeKind(scope: ApiTokenScope): ApiTokenScopeKind {
   switch (scope) {
     case ApiTokenScope.TEAM_OWNER:
     case ApiTokenScope.TEAM_SHOWCALLER:

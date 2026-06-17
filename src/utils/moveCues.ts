@@ -1,4 +1,4 @@
-import { Rundown, RundownCueOrderItem } from '@rundown-studio/types'
+import type { Rundown, RundownCueOrderItem } from '@rundown-studio/types'
 
 /**
  * Moves selected cues to a new position within the rundown's cue order.
@@ -32,7 +32,7 @@ import { Rundown, RundownCueOrderItem } from '@rundown-studio/types'
  * @throws {Error} If a group header is moved inside another group.
  * @returns The reordered cue array.
  */
-export function moveCues (
+export function moveCues(
   cueOrder: RundownCueOrderItem[],
   selectedCues: Array<Rundown['id']>,
   destination: string,
@@ -62,7 +62,7 @@ export function moveCues (
 
       // Edge case of wrong input, adding a subIndex in a normal cue number
       // Instead of removing the cue, it will be added after
-      if (currentIndex == mainIndex && subIndex !== undefined) {
+      if (currentIndex === mainIndex && subIndex !== undefined) {
         newCueOrder.push(...selectedItems)
       }
     } else {
@@ -120,10 +120,7 @@ export function moveCues (
  * @param {Set<Rundown['id']>} selectedCues - IDs of the cues to select.
  * @return {RundownCueOrderItem[]} - The selected cue items.
  */
-function selectCueItems (
-  cueOrder: RundownCueOrderItem[],
-  selectedCues: Set<Rundown['id']>,
-): RundownCueOrderItem[] {
+function selectCueItems(cueOrder: RundownCueOrderItem[], selectedCues: Set<Rundown['id']>): RundownCueOrderItem[] {
   return cueOrder.flatMap((item) => {
     if (selectedCues.has(item.id)) return [item]
     if (!item.children) return []

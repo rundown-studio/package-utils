@@ -1,5 +1,5 @@
-import { RundownCueOrderItem, DocumentSnapshotId } from '@rundown-studio/types'
-import { Timestamps, Timestamp } from './createTimestamps'
+import type { DocumentSnapshotId, RundownCueOrderItem } from '@rundown-studio/types'
+import type { Timestamp, Timestamps } from './createTimestamps'
 
 /**
  * Retrieves the timestamps of children cues associated with a given parent cue ID.
@@ -9,7 +9,7 @@ import { Timestamps, Timestamp } from './createTimestamps'
  * @param {RundownCueOrderItem[]} cueOrder - An array representing the ordered list of cues, including child cues.
  * @return {Timestamp[]} An array of timestamps corresponding to the children of the specified parent cue.
  */
-export function getChildrenTimestamps (
+export function getChildrenTimestamps(
   parentCueId: DocumentSnapshotId,
   timestamps: Timestamps,
   cueOrder: RundownCueOrderItem[],

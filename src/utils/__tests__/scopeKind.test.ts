@@ -1,5 +1,5 @@
-import { describe, test, expect } from 'vitest'
 import { ApiTokenScope } from '@rundown-studio/types'
+import { describe, expect, test } from 'vitest'
 import { scopeKind } from '../scopeKind'
 
 describe('scopeKind', () => {

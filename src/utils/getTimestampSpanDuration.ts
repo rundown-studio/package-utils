@@ -1,5 +1,5 @@
 import { addMilliseconds, differenceInMilliseconds } from 'date-fns'
-import { Timestamp } from './createTimestamps'
+import type { Timestamp } from './createTimestamps'
 
 /**
  * Calculates the total duration of a given span of timestamps, optionally adjusted based on a moment object.
@@ -13,9 +13,9 @@ import { Timestamp } from './createTimestamps'
  * @return {number|undefined} Returns the calculated duration in milliseconds. If `spanTimestamps` is empty,
  * returns `undefined`.
  */
-export function getTimestampSpanDuration (
+export function getTimestampSpanDuration(
   spanTimestamps: Timestamp[],
-  moment?: { cueId: string, left: number },
+  moment?: { cueId: string; left: number },
 ): number | undefined {
   const [firstTimestamp] = spanTimestamps
 
@@ -30,9 +30,6 @@ export function getTimestampSpanDuration (
 
   return differenceInMilliseconds(
     firstTimestamp.actual.start,
-    addMilliseconds(
-      firstTimestamp.actual.start,
-      totalGroupDuration,
-    ),
+    addMilliseconds(firstTimestamp.actual.start, totalGroupDuration),
   )
 }

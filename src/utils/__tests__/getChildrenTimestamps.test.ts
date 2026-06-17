@@ -1,7 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import { getChildrenTimestamps } from '../getChildrenTimestamps'
+import type { RundownCueOrderItem } from '@rundown-studio/types'
+import { describe, expect, it } from 'vitest'
 import { CueRunState } from '..'
-import { RundownCueOrderItem } from '@rundown-studio/types'
+import { getChildrenTimestamps } from '../getChildrenTimestamps'
 
 /**
  * npm run test -- tests/getChildrenTimestamps.test.js
@@ -47,17 +47,11 @@ describe('getChildrenTimestamps', () => {
   const mockCueOrder = [
     {
       id: 'parent1',
-      children: [
-        { id: 'child1' },
-        { id: 'child2' },
-        { id: 'child3' },
-      ],
+      children: [{ id: 'child1' }, { id: 'child2' }, { id: 'child3' }],
     },
     {
       id: 'parent2',
-      children: [
-        { id: 'otherChild1' },
-      ],
+      children: [{ id: 'otherChild1' }],
     },
     {
       id: 'parent3',
@@ -73,11 +67,7 @@ describe('getChildrenTimestamps', () => {
 
     // Should return timestamps for all three children of parent1
     expect(result).toHaveLength(3)
-    expect(result).toEqual([
-      mockTimestamps.cues['child1'],
-      mockTimestamps.cues['child2'],
-      mockTimestamps.cues['child3'],
-    ])
+    expect(result).toEqual([mockTimestamps.cues.child1, mockTimestamps.cues.child2, mockTimestamps.cues.child3])
   })
 
   it('should return an empty array when parent has no children', () => {
@@ -98,7 +88,7 @@ describe('getChildrenTimestamps', () => {
   it('should handle a parent with only one child', () => {
     const result = getChildrenTimestamps('parent2', mockTimestamps, mockCueOrder)
     expect(result).toHaveLength(1)
-    expect(result).toEqual([mockTimestamps.cues['otherChild1']])
+    expect(result).toEqual([mockTimestamps.cues.otherChild1])
   })
 
   it('should handle an empty cue order array', () => {
@@ -112,15 +102,15 @@ describe('getChildrenTimestamps', () => {
       ...mockTimestamps,
       cues: mockTimestamps.cues,
     }
-    delete (incompleteTimestamps.cues as never)['child2']
+    delete (incompleteTimestamps.cues as never).child2
 
     // Should not throw but will include undefined in the result
     const result = getChildrenTimestamps('parent1', incompleteTimestamps, mockCueOrder)
 
     // Still returns 3 items, but one is undefined
     expect(result).toHaveLength(3)
-    expect(result[0]).toBe(incompleteTimestamps.cues['child1'])
+    expect(result[0]).toBe(incompleteTimestamps.cues.child1)
     expect(result[1]).toBeUndefined() // child2's timestamp is missing
-    expect(result[2]).toBe(incompleteTimestamps.cues['child3'])
+    expect(result[2]).toBe(incompleteTimestamps.cues.child3)
   })
 })

@@ -39,7 +39,7 @@ import { hmsToMilliseconds } from '@rundown-studio/timeutils'
  * parseDurationToMs(undefined) // undefined
  * parseDurationToMs(123)       // undefined (not a string)
  */
-export function parseDurationToMs (input?: unknown): number | undefined {
+export function parseDurationToMs(input?: unknown): number | undefined {
   if (!input || typeof input !== 'string') {
     return undefined
   }
@@ -53,7 +53,7 @@ export function parseDurationToMs (input?: unknown): number | undefined {
     // Pattern 1: Colon-separated formats (HH:MM:SS, HH:MM)
     const colonMatch = normalized.match(/^(\d{1,2}):(\d{1,2})(?::(\d{1,2}))?$/)
     if (colonMatch) {
-      const [, hours = 0, minutes = 0, seconds] = colonMatch.map((x) => x ? parseInt(x, 10) : undefined)
+      const [, hours = 0, minutes = 0, seconds] = colonMatch.map((x) => (x ? parseInt(x, 10) : undefined))
 
       if (seconds !== undefined) {
         // HH:MM:SS format
@@ -97,8 +97,7 @@ export function parseDurationToMs (input?: unknown): number | undefined {
         hours: textComponents.hours ?? 0,
         minutes: textComponents.minutes ?? 0,
         seconds: textComponents.seconds ?? 0,
-      },
-      )
+      })
     }
 
     // Pattern 4: Single unit formats (90m, 45s, 2h)
@@ -142,7 +141,7 @@ export function parseDurationToMs (input?: unknown): number | undefined {
  * @returns The extracted numeric value, or null if no match is found.
  * @private
  */
-function extractTimeComponent (text: string, unitPatterns: string[]) {
+function extractTimeComponent(text: string, unitPatterns: string[]) {
   for (const pattern of unitPatterns) {
     const regex = new RegExp(`(\\d+)\\s*${pattern}`, 'i')
     const match = text.match(regex)
