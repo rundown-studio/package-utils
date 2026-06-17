@@ -7,8 +7,8 @@ import type {
   Runner,
 } from '@rundown-studio/types'
 import { RunnerState } from '@rundown-studio/types'
-import { type CueLite, firstPlayableCueId } from '../utils/firstPlayableCueId'
-import { getRunnerState } from '../utils/getRunnerState'
+import { type CueLite, firstPlayableCueId } from '../firstPlayableCueId'
+import { getRunnerState } from '../getRunnerState'
 
 /**
  * Projection of the public control-plane status (`ApiV1Status`).

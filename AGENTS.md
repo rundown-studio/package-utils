@@ -20,7 +20,7 @@ Published to GitHub Packages npm registry. Depends on sibling packages: `@rundow
 
 `src/index.ts` is the entry; it re-exports two barrels into a single flat namespace:
 
-- `src/utils/` — utility functions, one util per file, barreled by `src/utils/index.ts`. CSV helpers live in `src/utils/csv-import/`.
+- `src/utils/` — utility functions, one util per file, barreled by `src/utils/index.ts`. CSV helpers live in `src/utils/csv-import/`; the v1 API wire-format projections (`buildStatus`, `buildCountdown`) live in `src/utils/api-v1/`.
 - `src/consts/` — constants, barreled by `src/consts/index.ts`.
 
 **Consts and the `@rundown-studio/consts` phase-out:** constants are being consolidated into this package and the standalone `@rundown-studio/consts` package is being retired. `src/consts/index.ts` re-exports the upstream constants **explicitly by name** (not `export *`) and bridges the transition — constants already migrated locally (e.g. `TOKEN_EPOCHS` in `tokenEpochs.ts`) are exported from their local module and struck from the upstream list. The explicit listing is deliberate: it doubles as the migration checklist. (Historically it was also *required* — a bare `export *` from an external package did **not** survive tsup's esbuild ESM bundle through a barrel, so names became `undefined` for `import` consumers; tsdown/Rolldown handles `export *` from externals correctly, so that's no longer a constraint, but the explicit list is kept for the checklist.) When migrating a const, move it local, export it from `src/consts/`, and remove it from the upstream block; when the block is empty the dependency can be dropped.
