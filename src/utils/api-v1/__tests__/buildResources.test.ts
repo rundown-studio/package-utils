@@ -8,26 +8,26 @@ import {
 } from '@rundown-studio/types'
 import { describe, expect, test } from 'vitest'
 import {
-  buildCell,
-  buildColumn,
-  buildCue,
-  buildOrderTree,
-  buildRundownShallow,
-  buildSettings,
   publicColumnIdSet,
+  toPublicCell,
+  toPublicColumn,
+  toPublicCue,
+  toPublicOrderTree,
+  toPublicRundownShallow,
+  toPublicSettings,
 } from '../buildResources'
 
 const EPOCH = new Date('2026-06-17T10:00:00.000Z')
 const EPOCH_MS = EPOCH.getTime()
 
-describe('buildOrderTree', () => {
+describe('toPublicOrderTree', () => {
   test('omits children when empty/absent', () => {
     const tree: RundownCueOrderItem[] = [
       { id: 'cue_a' },
       { id: 'cue_b', children: [] },
       { id: 'cue_c', children: [{ id: 'cue_d' }] },
     ]
-    expect(buildOrderTree(tree)).toEqual([
+    expect(toPublicOrderTree(tree)).toEqual([
       { id: 'cue_a' },
       { id: 'cue_b' },
       { id: 'cue_c', children: [{ id: 'cue_d' }] },
@@ -36,14 +36,14 @@ describe('buildOrderTree', () => {
 
   test('projects children as leaf ids only — groups cannot nest', () => {
     const tree: RundownCueOrderItem[] = [{ id: 'g1', children: [{ id: 'g2', children: [{ id: 'leaf' }] }] }]
-    expect(buildOrderTree(tree)).toEqual([{ id: 'g1', children: [{ id: 'g2' }] }])
+    expect(toPublicOrderTree(tree)).toEqual([{ id: 'g1', children: [{ id: 'g2' }] }])
   })
 })
 
-describe('buildSettings', () => {
+describe('toPublicSettings', () => {
   test('projects the deliberate public subset (cue_numbering + tod_display_format)', () => {
     expect(
-      buildSettings({
+      toPublicSettings({
         cueIndexStartFrom: 5,
         cueIndexPrefix: 'A',
         cueIndexPadding: 2,
@@ -56,7 +56,7 @@ describe('buildSettings', () => {
   })
 
   test('drops internal-only fields (palette, highlight, outputConfig, outputMessage)', () => {
-    const out = buildSettings({
+    const out = toPublicSettings({
       cueIndexStartFrom: 1,
       cueIndexPrefix: '',
       cueIndexPadding: 1,
@@ -69,7 +69,7 @@ describe('buildSettings', () => {
   })
 
   test('defensive defaults when the whole settings object is missing (legacy doc)', () => {
-    expect(buildSettings(undefined)).toEqual({
+    expect(toPublicSettings(undefined)).toEqual({
       cue_numbering: { start_from: 1, prefix: '', padding: 1 },
       tod_display_format: null,
     })
@@ -93,9 +93,9 @@ function cue(overrides: Partial<RundownCue> = {}): RundownCue {
   } as RundownCue
 }
 
-describe('buildCue', () => {
+describe('toPublicCue', () => {
   test('projects a cue to the public wire shape', () => {
-    expect(buildCue(cue())).toEqual({
+    expect(toPublicCue(cue())).toEqual({
       id: 'cue_1',
       type: 'cue',
       title: 'Opening',
@@ -110,20 +110,20 @@ describe('buildCue', () => {
   })
 
   test('start_time is null when the cue is unscheduled', () => {
-    expect(buildCue(cue({ startTime: null })).start_time).toBeNull()
+    expect(toPublicCue(cue({ startTime: null })).start_time).toBeNull()
   })
 
   test('prevent_edits reads settings.preventEdits', () => {
-    expect(buildCue(cue({ settings: { preventEdits: true } } as Partial<RundownCue>)).prevent_edits).toBe(true)
+    expect(toPublicCue(cue({ settings: { preventEdits: true } } as Partial<RundownCue>)).prevent_edits).toBe(true)
   })
 
   test('prevent_edits falls back to the legacy locked flag', () => {
-    expect(buildCue(cue({ locked: true } as unknown as Partial<RundownCue>)).prevent_edits).toBe(true)
+    expect(toPublicCue(cue({ locked: true } as unknown as Partial<RundownCue>)).prevent_edits).toBe(true)
   })
 
   test('passes heading / group types through', () => {
-    expect(buildCue(cue({ type: CueType.HEADING })).type).toBe('heading')
-    expect(buildCue(cue({ type: CueType.GROUP })).type).toBe('group')
+    expect(toPublicCue(cue({ type: CueType.HEADING })).type).toBe('heading')
+    expect(toPublicCue(cue({ type: CueType.GROUP })).type).toBe('group')
   })
 })
 
@@ -140,9 +140,9 @@ function column(overrides: Partial<Column> = {}): Column {
   } as Column
 }
 
-describe('buildColumn', () => {
+describe('toPublicColumn', () => {
   test('projects a column to the public wire shape', () => {
-    expect(buildColumn(column())).toEqual({
+    expect(toPublicColumn(column())).toEqual({
       id: 'col_1',
       name: 'Notes',
       created_at: '2026-06-17T10:00:00.000Z',
@@ -151,7 +151,7 @@ describe('buildColumn', () => {
   })
 
   test('falls back to "Unnamed column" for a blank name', () => {
-    expect(buildColumn(column({ name: '' })).name).toBe('Unnamed column')
+    expect(toPublicColumn(column({ name: '' })).name).toBe('Unnamed column')
   })
 })
 
@@ -168,9 +168,9 @@ function cell(overrides: Partial<Cell> = {}): Cell {
   } as Cell
 }
 
-describe('buildCell', () => {
+describe('toPublicCell', () => {
   test('projects a richtext cell to the public wire shape', () => {
-    expect(buildCell(cell(), column({ type: 'richtext' } as Partial<Column>))).toEqual({
+    expect(toPublicCell(cell(), column({ type: 'richtext' } as Partial<Column>))).toEqual({
       cue_id: 'cue_1',
       column_id: 'col_1',
       content: 'Track 01',
@@ -184,7 +184,7 @@ describe('buildCell', () => {
     const c = cell({
       content: { text: '<p>hi <custom-mention data-mention-id="m1" data-fallback-name="Bob"></custom-mention></p>' },
     } as Partial<Cell>)
-    const out = buildCell(c, column({ type: 'richtext' } as Partial<Column>))
+    const out = toPublicCell(c, column({ type: 'richtext' } as Partial<Column>))
     expect(out.content).toBe('hi @Bob')
     // content_html renames the legacy storage tag to the public `rs-mention`.
     expect(out.content_html).toContain('<rs-mention')
@@ -193,7 +193,7 @@ describe('buildCell', () => {
 
   test('select column: content is the option label, content_html is empty', () => {
     const c = cell({ content: { selected: 'Option A' } } as Partial<Cell>)
-    expect(buildCell(c, column({ type: 'select' } as Partial<Column>))).toMatchObject({
+    expect(toPublicCell(c, column({ type: 'select' } as Partial<Column>))).toMatchObject({
       content: 'Option A',
       content_html: '',
     })
@@ -201,7 +201,7 @@ describe('buildCell', () => {
 
   test('null timestamps project to null', () => {
     const c = cell({ createdAt: null, updatedAt: null } as unknown as Partial<Cell>)
-    const out = buildCell(c, column({ type: 'richtext' } as Partial<Column>))
+    const out = toPublicCell(c, column({ type: 'richtext' } as Partial<Column>))
     expect(out.created_at).toBeNull()
     expect(out.updated_at).toBeNull()
   })
@@ -242,11 +242,11 @@ function rundown(overrides: Partial<Rundown> = {}): Rundown {
   } as Rundown
 }
 
-describe('buildRundownShallow', () => {
+describe('toPublicRundownShallow', () => {
   const publicIds = new Set(['col_1'])
 
   test('projects a rundown to the public shallow wire shape', () => {
-    expect(buildRundownShallow(rundown(), publicIds)).toEqual({
+    expect(toPublicRundownShallow(rundown(), publicIds)).toEqual({
       id: 'rd_1',
       title: 'Morning Show',
       timezone: 'America/New_York',
@@ -265,11 +265,11 @@ describe('buildRundownShallow', () => {
   })
 
   test('column_order excludes ids not in the public set (no private leak)', () => {
-    expect(buildRundownShallow(rundown(), publicIds).column_order).toEqual(['col_1'])
+    expect(toPublicRundownShallow(rundown(), publicIds).column_order).toEqual(['col_1'])
   })
 
   test('omitting the public set passes column_order through unfiltered', () => {
-    expect(buildRundownShallow(rundown()).column_order).toEqual(['col_1', 'col_priv'])
+    expect(toPublicRundownShallow(rundown()).column_order).toEqual(['col_1', 'col_priv'])
   })
 
   test('surfaces configured cue-numbering + tod format', () => {
@@ -281,7 +281,7 @@ describe('buildRundownShallow', () => {
         todDisplayFormat: '24h',
       },
     } as Partial<Rundown>)
-    expect(buildRundownShallow(r, publicIds).settings).toEqual({
+    expect(toPublicRundownShallow(r, publicIds).settings).toEqual({
       cue_numbering: { start_from: 10, prefix: 'A', padding: 2 },
       tod_display_format: '24h',
     })

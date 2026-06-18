@@ -1,6 +1,6 @@
 import { CueType, type RundownCue, type RundownCueOrderItem, type Runner } from '@rundown-studio/types'
 import { describe, expect, test } from 'vitest'
-import { buildStatus, controlStateOf } from '../buildStatus'
+import { controlStateOf, toPublicStatus } from '../buildStatus'
 
 const cueRow = (id: string, type: CueType, title: string): Pick<RundownCue, 'id' | 'type' | 'title'> => ({
   id,
@@ -41,7 +41,7 @@ describe('controlStateOf', () => {
   })
 })
 
-describe('buildStatus', () => {
+describe('toPublicStatus', () => {
   const cueById = new Map([
     ['c1', cueRow('c1', CueType.CUE, 'Opening')],
     ['c2', cueRow('c2', CueType.CUE, 'Guest intro')],
@@ -49,7 +49,7 @@ describe('buildStatus', () => {
   const cueOrder: RundownCueOrderItem[] = [{ id: 'c1' }, { id: 'c2' }]
 
   test('null runner → stopped, next_cue is first playable', () => {
-    const status = buildStatus({ runner: null, cueById, cueOrder, serverTime: 999 })
+    const status = toPublicStatus({ runner: null, cueById, cueOrder, serverTime: 999 })
     expect(status).toEqual({
       server_time: 999,
       state: 'stopped',
@@ -60,7 +60,7 @@ describe('buildStatus', () => {
 
   test('ENDED runner → stopped, next_cue is null', () => {
     const runner = mkRunner({ timesnap: { cueId: null, running: false, kickoff: 0, lastStop: 0, deadline: 0 } })
-    const status = buildStatus({ runner, cueById, cueOrder, serverTime: 999 })
+    const status = toPublicStatus({ runner, cueById, cueOrder, serverTime: 999 })
     expect(status).toEqual({
       server_time: 999,
       state: 'stopped',
@@ -74,7 +74,7 @@ describe('buildStatus', () => {
       timesnap: { cueId: 'c1', running: true, kickoff: 1000, lastStop: 1000, deadline: 61000 },
       nextCueId: 'c2',
     })
-    const status = buildStatus({ runner, cueById, cueOrder, serverTime: 2000 })
+    const status = toPublicStatus({ runner, cueById, cueOrder, serverTime: 2000 })
     expect(status.state).toBe('running')
     expect(status.active_cue).toEqual({
       id: 'c1',
@@ -91,7 +91,7 @@ describe('buildStatus', () => {
       timesnap: { cueId: 'c1', running: false, kickoff: 1000, lastStop: 1500, deadline: 61000 },
       nextCueId: 'c2',
     })
-    const status = buildStatus({ runner, cueById, cueOrder, serverTime: 2000 })
+    const status = toPublicStatus({ runner, cueById, cueOrder, serverTime: 2000 })
     expect(status.state).toBe('paused')
     expect(status.active_cue).toEqual({
       id: 'c1',
@@ -106,7 +106,7 @@ describe('buildStatus', () => {
     const runner = mkRunner({
       timesnap: { cueId: 'c1', running: false, kickoff: 1000, lastStop: 1500, deadline: 61000 },
     })
-    const status = buildStatus({ runner, cueById, cueOrder, serverTime: 9999 })
+    const status = toPublicStatus({ runner, cueById, cueOrder, serverTime: 9999 })
     const remaining = status.active_cue!.started_at + status.active_cue!.duration_ms - status.active_cue!.paused_at!
     expect(remaining).toBe(59500) // 1000 + 60000 - 1500
   })
@@ -116,7 +116,7 @@ describe('buildStatus', () => {
       timesnap: { cueId: 'c2', running: true, kickoff: 1000, lastStop: 1000, deadline: 2000 },
       nextCueId: null,
     })
-    const status = buildStatus({ runner, cueById, cueOrder, serverTime: 1500 })
+    const status = toPublicStatus({ runner, cueById, cueOrder, serverTime: 1500 })
     expect(status.next_cue).toBe(null)
   })
 
@@ -125,7 +125,7 @@ describe('buildStatus', () => {
       timesnap: { cueId: 'c1', running: true, kickoff: 1000, lastStop: 1000, deadline: 2000 },
       nextCueId: 'cghost',
     })
-    const status = buildStatus({ runner, cueById, cueOrder, serverTime: 1500 })
+    const status = toPublicStatus({ runner, cueById, cueOrder, serverTime: 1500 })
     expect(status.next_cue).toBe(null)
   })
 })

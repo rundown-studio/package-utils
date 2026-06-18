@@ -20,11 +20,11 @@ import sanitizeHtml from 'sanitize-html'
  *     denylisting XSS vectors leaks (open-ended `on*` handlers,
  *     `javascript:`/`url()` values, encoding bypasses). Fails closed — an
  *     unknown tag/attr is dropped, not passed.
- *   - `cellHtmlToPublic` — the READ projection. Renames the legacy storage tags
+ *   - `toPublicCellHtml` — the READ projection. Renames the legacy storage tags
  *     up to the public vocabulary. Run on already-trusted stored content.
  *   - `plainTextToHtml` — escape + `<p>`-wrap for the `content` WRITE path, so a
  *     plaintext write produces well-formed `content_html` on the next read.
- *   - `cellContentFromWrite` — the single write touchpoint that turns API input
+ *   - `fromPublicCellContent` — the single write touchpoint that turns API input
  *     into storage shape.
  *
  * The adapter exists so the public wire vocabulary can ship NOW while the
@@ -203,7 +203,7 @@ export function sanitizeCellHtml(html: string): string {
  * the dashboard editor or `sanitizeCellHtml`); re-running the allowlist here is a
  * no-op on valid content and a cheap defense-in-depth on the PDF-renderer egress.
  */
-export function cellHtmlToPublic(html: string): string {
+export function toPublicCellHtml(html: string): string {
   return sanitizeHtml(html, CELL_HTML_TO_PUBLIC_OPTIONS)
 }
 
@@ -226,7 +226,7 @@ export function plainTextToHtml(text: string): string {
  * `content_html` wins if (defensively) both arrive. The single touchpoint that
  * turns API input into storage shape — replaces the old `valueToContent`.
  */
-export function cellContentFromWrite(input: { content?: string; content_html?: string }): { text: string } {
+export function fromPublicCellContent(input: { content?: string; content_html?: string }): { text: string } {
   if (typeof input.content_html === 'string') return { text: sanitizeCellHtml(input.content_html) }
   return { text: plainTextToHtml(input.content ?? '') }
 }

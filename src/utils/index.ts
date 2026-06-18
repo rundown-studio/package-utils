@@ -1,11 +1,14 @@
 // Version-coupled public-API projections live under one namespace so they stay
 // delimited from the version-agnostic primitives below and a future v2 slots in
-// cleanly as `export * as ApiV2`. Consumers: `import { ApiV1 }` → `ApiV1.buildCue`.
-export * as ApiV1 from './api-v1'
+// cleanly as `export * as ApiV2Utils`. The `Utils` suffix matches the repo's
+// `import * as FooUtils` idiom and keeps the value-namespace visibly distinct
+// from the `ApiV1*` wire-type family (which lives in @rundown-studio/types).
+// Consumers: `import { ApiV1Utils }` → `ApiV1Utils.toPublicCue`.
+export * as ApiV1Utils from './api-v1'
 // `cellHtmlToPlainText` flattens stored cell HTML to plain text. Not tied to any
 // API version — shared by the v0/v1 APIs, the realtime SSE body, AND CSV export —
-// so it lives flat here, NOT under ApiV1. (The public-vocabulary cell helpers in
-// api-v1/cellHtml.ts — the transitional `rs-*` adapter — stay namespaced.)
+// so it lives flat here, NOT under ApiV1Utils. (The public-vocabulary cell helpers
+// in api-v1/cellHtml.ts — the transitional `rs-*` adapter — stay namespaced.)
 export * from './cellHtmlToPlainText'
 export * from './createTimestamps'
 export * from './csv-import/parseCueNumbersColumn'

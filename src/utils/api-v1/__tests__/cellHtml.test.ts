@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { cellContentFromWrite, cellHtmlToPublic, plainTextToHtml, sanitizeCellHtml } from '../cellHtml'
+import { fromPublicCellContent, plainTextToHtml, sanitizeCellHtml, toPublicCellHtml } from '../cellHtml'
 
 // A real production cell in its PUBLIC wire form (api-v1-must-have §2 canonical
 // fixture) — what a consumer sends on `content_html`. Exercises every edge in
@@ -93,11 +93,11 @@ describe('sanitizeCellHtml — safety (XSS vectors stripped)', () => {
   })
 })
 
-describe('cellHtmlToPublic — projects storage tags up to the public vocabulary', () => {
+describe('toPublicCellHtml — projects storage tags up to the public vocabulary', () => {
   // Storage form (what Firestore actually holds): legacy node tags.
   const STORED =
     '<p>by <custom-mention data-type="mention" data-mention-id="RH0" data-fallback-name="Marty"></custom-mention> at <variable data-variable-key="venue" data-fallback-value="Circus"></variable> <img-component src="https://cdn.example/x.png"></img-component> <file-component filename="a.pdf" url="https://cdn.example/a.pdf"></file-component></p>'
-  const out = cellHtmlToPublic(STORED)
+  const out = toPublicCellHtml(STORED)
 
   test('renames the four storage tags to rs-mention/rs-variable/img/rs-file', () => {
     expect(out).toContain('<rs-mention')
@@ -123,7 +123,7 @@ describe('cellHtmlToPublic — projects storage tags up to the public vocabulary
   })
 
   test('empty string stays empty (cleared / non-richtext cell)', () => {
-    expect(cellHtmlToPublic('')).toBe('')
+    expect(toPublicCellHtml('')).toBe('')
   })
 })
 
@@ -133,7 +133,7 @@ describe('task-list markup (TipTap TaskList/TaskItem) survives both directions',
     '<ul data-type="taskList"><li data-checked="true" data-type="taskItem"><label><input type="checkbox" checked="checked"><span></span></label><div><p>check audio</p></div></li></ul>'
 
   test('read projection keeps the label/input/div wrappers and checked state', () => {
-    const out = cellHtmlToPublic(STORED_TASKLIST)
+    const out = toPublicCellHtml(STORED_TASKLIST)
     expect(out).toContain('<label>')
     expect(out).toContain('type="checkbox"')
     expect(out).toContain('checked')
@@ -143,7 +143,7 @@ describe('task-list markup (TipTap TaskList/TaskItem) survives both directions',
   })
 
   test('write path preserves the markup (read → write-back is not lossy)', () => {
-    const out = sanitizeCellHtml(cellHtmlToPublic(STORED_TASKLIST))
+    const out = sanitizeCellHtml(toPublicCellHtml(STORED_TASKLIST))
     expect(out).toContain('<label>')
     expect(out).toContain('type="checkbox"')
     expect(out).toContain('data-checked="true"')
@@ -154,9 +154,9 @@ describe('task-list markup (TipTap TaskList/TaskItem) survives both directions',
 describe('write → read round-trips through the adapter', () => {
   test('public → storage → public is stable and never leaks storage tags', () => {
     const stored = sanitizeCellHtml(PUBLIC_FIXTURE)
-    const back = cellHtmlToPublic(stored)
+    const back = toPublicCellHtml(stored)
     // a second lap is a no-op
-    expect(cellHtmlToPublic(sanitizeCellHtml(back))).toBe(back)
+    expect(toPublicCellHtml(sanitizeCellHtml(back))).toBe(back)
     // the wire form carries the public vocabulary, not the storage tags
     expect(back).toContain('<rs-mention')
     expect(back).toContain('<rs-variable')
@@ -193,23 +193,23 @@ describe('plainTextToHtml', () => {
   })
 })
 
-describe('cellContentFromWrite', () => {
+describe('fromPublicCellContent', () => {
   test('plaintext content → escaped + wrapped', () => {
-    expect(cellContentFromWrite({ content: 'a < b' })).toEqual({ text: '<p>a &lt; b</p>' })
+    expect(fromPublicCellContent({ content: 'a < b' })).toEqual({ text: '<p>a &lt; b</p>' })
   })
 
   test('content_html → sanitized + adapted to storage tags', () => {
-    expect(cellContentFromWrite({ content_html: '<p>hi<script>x</script></p>' })).toEqual({ text: '<p>hi</p>' })
-    expect(cellContentFromWrite({ content_html: '<rs-mention data-mention-id="A"></rs-mention>' })).toEqual({
+    expect(fromPublicCellContent({ content_html: '<p>hi<script>x</script></p>' })).toEqual({ text: '<p>hi</p>' })
+    expect(fromPublicCellContent({ content_html: '<rs-mention data-mention-id="A"></rs-mention>' })).toEqual({
       text: '<custom-mention data-mention-id="A"></custom-mention>',
     })
   })
 
   test('content_html wins if both are present (schema normally forbids this)', () => {
-    expect(cellContentFromWrite({ content: 'plain', content_html: '<p>rich</p>' })).toEqual({ text: '<p>rich</p>' })
+    expect(fromPublicCellContent({ content: 'plain', content_html: '<p>rich</p>' })).toEqual({ text: '<p>rich</p>' })
   })
 
   test('empty content_html clears to empty content', () => {
-    expect(cellContentFromWrite({ content_html: '' })).toEqual({ text: '' })
+    expect(fromPublicCellContent({ content_html: '' })).toEqual({ text: '' })
   })
 })

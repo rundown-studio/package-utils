@@ -1,6 +1,6 @@
 import type { ApiV1ActiveCue, ApiV1Status } from '@rundown-studio/types'
 import { describe, expect, test } from 'vitest'
-import { buildCountdown } from '../buildCountdown'
+import { toPublicCountdown } from '../buildCountdown'
 
 const stoppedStatus: ApiV1Status = {
   server_time: 1_716_393_600_000,
@@ -37,9 +37,9 @@ const pausedStatus = (overrides: Partial<ApiV1ActiveCue> = {}): ApiV1Status => (
   next_cue: null,
 })
 
-describe('buildCountdown', () => {
+describe('toPublicCountdown', () => {
   test('stopped → active_cue null, state + server_time pass through', () => {
-    expect(buildCountdown(stoppedStatus)).toEqual({
+    expect(toPublicCountdown(stoppedStatus)).toEqual({
       state: 'stopped',
       server_time: 1_716_393_600_000,
       active_cue: null,
@@ -48,7 +48,7 @@ describe('buildCountdown', () => {
 
   test('running — remaining = started + duration - server_time', () => {
     // started 18s ago, 60s duration → 42s remaining
-    const out = buildCountdown(runningStatus())
+    const out = toPublicCountdown(runningStatus())
     expect(out.state).toBe('running')
     expect(out.server_time).toBe(1_716_393_600_000)
     expect(out.active_cue).toMatchObject({
@@ -70,7 +70,7 @@ describe('buildCountdown', () => {
 
   test('paused — remaining = started + duration - paused_at (server_time ignored)', () => {
     // started 20s before pause, paused 15s in, 60s duration → 45s frozen remaining
-    const out = buildCountdown(pausedStatus())
+    const out = toPublicCountdown(pausedStatus())
     expect(out.state).toBe('paused')
     expect(out.active_cue).toMatchObject({
       remaining_ms: 45_000,
@@ -83,14 +83,14 @@ describe('buildCountdown', () => {
   })
 
   test('paused — server_time advancing further does NOT change remaining_ms', () => {
-    const a = buildCountdown(pausedStatus())
-    const b = buildCountdown({ ...pausedStatus(), server_time: 1_716_393_600_000 + 5 * 60_000 })
+    const a = toPublicCountdown(pausedStatus())
+    const b = toPublicCountdown({ ...pausedStatus(), server_time: 1_716_393_600_000 + 5 * 60_000 })
     expect(a.active_cue!.remaining_ms).toBe(b.active_cue!.remaining_ms)
   })
 
   test('running overtime — remaining_ms negative, is_overtime true, + prefix', () => {
     // started 75s ago, 60s duration → -15s remaining (overtime)
-    const out = buildCountdown(runningStatus({ started_at: 1_716_393_525_000 }))
+    const out = toPublicCountdown(runningStatus({ started_at: 1_716_393_525_000 }))
     expect(out.active_cue!.remaining_ms).toBe(-15_000)
     expect(out.active_cue!.remaining).toEqual({
       is_overtime: true,
@@ -105,7 +105,7 @@ describe('buildCountdown', () => {
 
   test('running — long cue formats with hours band', () => {
     // started 1m ago, 1h 25m duration → 1h 24m remaining
-    const out = buildCountdown(
+    const out = toPublicCountdown(
       runningStatus({
         started_at: 1_716_393_540_000,
         duration_ms: 5_100_000, // 1h 25m
@@ -121,7 +121,7 @@ describe('buildCountdown', () => {
 
   test('overtime — custom overtimePrefix feeds prefix + formatted', () => {
     // started 75s ago, 60s duration → -15s remaining (overtime)
-    const out = buildCountdown(runningStatus({ started_at: 1_716_393_525_000 }), '-')
+    const out = toPublicCountdown(runningStatus({ started_at: 1_716_393_525_000 }), '-')
     expect(out.active_cue!.remaining).toMatchObject({
       is_overtime: true,
       prefix: '-',
@@ -131,7 +131,7 @@ describe('buildCountdown', () => {
   })
 
   test('overtimePrefix is ignored when not in overtime', () => {
-    const out = buildCountdown(runningStatus(), 'OVER ')
+    const out = toPublicCountdown(runningStatus(), 'OVER ')
     expect(out.active_cue!.remaining).toMatchObject({
       is_overtime: false,
       prefix: '',
@@ -140,7 +140,7 @@ describe('buildCountdown', () => {
   })
 
   test('running — remaining exactly zero is NOT overtime', () => {
-    const out = buildCountdown(
+    const out = toPublicCountdown(
       runningStatus({
         started_at: 1_716_393_540_000, // 60s ago
         duration_ms: 60_000, // exact deadline

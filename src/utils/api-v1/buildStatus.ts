@@ -43,7 +43,7 @@ export function controlStateOf(runner: Runner | null): ApiV1ControlState {
  * caller supplies `serverTime` so the response and any embedded side-effects
  * share one wall-clock reading.
  */
-export function buildStatus(params: {
+export function toPublicStatus(params: {
   runner: Runner | null
   cueById: Map<string, CueLite>
   cueOrder: RundownCueOrderItem[]

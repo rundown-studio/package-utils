@@ -12,12 +12,12 @@ import type {
   RundownCueOrderItem,
 } from '@rundown-studio/types'
 import { cellHtmlToPlainText } from '../cellHtmlToPlainText'
-import { cellHtmlToPublic } from './cellHtml'
+import { toPublicCellHtml } from './cellHtml'
 
 /**
  * Internal → public projections for the v1 resource surface.
  *
- * One `build*` family shared by both halves of the v1 API:
+ * One `toPublic*` family shared by both halves of the v1 API:
  *   - the Functions REST projections (`GET /rundowns/:id`, `…/cues/:id`,
  *     `…/columns/:id`, `…/cells`), whose `Public*` Zod schemas pin these wire
  *     shapes structurally (`_wireConformance`); and
@@ -50,7 +50,7 @@ function toEpochMs(d: Date | null | undefined): number | null {
  * The internal type is recursive, but deeper nesting cannot exist — every write
  * path (dashboard, v1 create, v1 reorder) rejects nested groups.
  */
-export function buildOrderTree(items: RundownCueOrderItem[]): ApiV1OrderItem[] {
+export function toPublicOrderTree(items: RundownCueOrderItem[]): ApiV1OrderItem[] {
   return items.map((item) => {
     if (item.children && item.children.length > 0) {
       return { id: item.id, children: item.children.map((child) => ({ id: child.id })) }
@@ -65,7 +65,7 @@ export function buildOrderTree(items: RundownCueOrderItem[]): ApiV1OrderItem[] {
  * `outputConfig` slot, and live `outputMessage` state are intentionally omitted.
  * Defensive defaults cover legacy rundowns that predate a numbering field.
  */
-export function buildSettings(s: Rundown['settings'] | undefined): ApiV1RundownSettings {
+export function toPublicSettings(s: Rundown['settings'] | undefined): ApiV1RundownSettings {
   return {
     cue_numbering: {
       start_from: s?.cueIndexStartFrom ?? 1,
@@ -84,7 +84,7 @@ export function buildSettings(s: Rundown['settings'] | undefined): ApiV1RundownS
  * Per product convention the flag guards *cell* edits, not the cue's existence
  * or position — it surfaces here as a read-only signal.
  */
-export function buildCue(cue: RundownCue): ApiV1Cue {
+export function toPublicCue(cue: RundownCue): ApiV1Cue {
   return {
     id: cue.id,
     type: cue.type,
@@ -104,7 +104,7 @@ export function buildCue(cue: RundownCue): ApiV1Cue {
  * docs with a blank name. The caller filters private/soft-deleted columns before
  * emitting, so this only ever sees public columns.
  */
-export function buildColumn(column: Column): ApiV1Column {
+export function toPublicColumn(column: Column): ApiV1Column {
   return {
     id: column.id,
     name: column.name || 'Unnamed column',
@@ -119,7 +119,7 @@ export function buildColumn(column: Column): ApiV1Column {
  *     mentions/variables rendered from their write-time fallback strings (no
  *     live resolution — `cellHtmlToPlainText` is a pure function of the HTML);
  *     `content_html` is the stored HTML with the legacy node tags adapted up to
- *     the public vocabulary (`cellHtmlToPublic`) — the lossless, round-trippable
+ *     the public vocabulary (`toPublicCellHtml`) — the lossless, round-trippable
  *     form that still carries the live mention-id/variable-key.
  *   - select   → `{ selected: '<option>' }` — the option label as `content`;
  *     `content_html` is empty (select cells carry no rich text).
@@ -128,12 +128,12 @@ export function buildColumn(column: Column): ApiV1Column {
  * The caller filters to the public grid (visible cue + public column) before
  * emitting, so a private/orphan coordinate never reaches here.
  */
-export function buildCell(cell: Cell, column: Column): ApiV1Cell {
+export function toPublicCell(cell: Cell, column: Column): ApiV1Cell {
   let content = ''
   let contentHtml = ''
   if (column.type === 'richtext') {
     const storedHtml = cell.content?.text || ''
-    contentHtml = cellHtmlToPublic(storedHtml)
+    contentHtml = toPublicCellHtml(storedHtml)
     content = cellHtmlToPlainText(storedHtml)
   } else if (column.type === 'select') {
     content = cell.content?.selected || ''
@@ -158,7 +158,7 @@ export function buildCell(cell: Cell, column: Column): ApiV1Cell {
  * the field is stripped downstream (list items) or every id is known public
  * (fresh create).
  */
-export function buildRundownShallow(rundown: Rundown, publicColumnIds?: ReadonlySet<string>): ApiV1RundownShallow {
+export function toPublicRundownShallow(rundown: Rundown, publicColumnIds?: ReadonlySet<string>): ApiV1RundownShallow {
   return {
     id: rundown.id,
     title: rundown.name,
@@ -166,8 +166,8 @@ export function buildRundownShallow(rundown: Rundown, publicColumnIds?: Readonly
     start_time: toEpochMs(rundown.startTime),
     end_time: toEpochMs(rundown.endTime),
     status: rundown.status,
-    settings: buildSettings(rundown.settings),
-    cue_order: buildOrderTree(rundown.cues),
+    settings: toPublicSettings(rundown.settings),
+    cue_order: toPublicOrderTree(rundown.cues),
     column_order: publicColumnIds ? rundown.columns.filter((id) => publicColumnIds.has(id)) : rundown.columns,
     created_at: toIso(rundown.createdAt),
     updated_at: toIso(rundown.updatedAt),
@@ -176,7 +176,7 @@ export function buildRundownShallow(rundown: Rundown, publicColumnIds?: Readonly
 
 /**
  * Public column ids: drop private (`privateUid != null`) and soft-deleted
- * columns. The Set form a `buildRundownShallow` caller passes as `publicColumnIds`.
+ * columns. The Set form a `toPublicRundownShallow` caller passes as `publicColumnIds`.
  */
 export function publicColumnIdSet(columns: Iterable<Column>): Set<string> {
   const ids = new Set<string>()

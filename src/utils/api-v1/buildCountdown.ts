@@ -21,7 +21,7 @@ import type { ApiV1Countdown, ApiV1Status } from '@rundown-studio/types'
  * if they want to hide it. `overtimePrefix` (default `'+'`) feeds both the
  * `prefix` field and `remaining.formatted`, which already includes it.
  */
-export function buildCountdown(status: ApiV1Status, overtimePrefix: string = '+'): ApiV1Countdown {
+export function toPublicCountdown(status: ApiV1Status, overtimePrefix: string = '+'): ApiV1Countdown {
   const { state, server_time, active_cue } = status
 
   if (!active_cue) {
