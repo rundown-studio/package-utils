@@ -15,7 +15,7 @@ import { Features } from '@rundown-studio/types'
  * deploy. Do NOT collapse this into a `free`/`paid` plan-name check — that would
  * re-bake a gate we deliberately keep in the feature flags.
  */
-export const APIV1_RATE_LIMIT = {
+export const RATE_LIMIT = {
   windowMs: 60_000,
   redisPrefix: 'rl:apiv1:',
   // Teams that skip the limiter entirely — the shared e2e team (one token,
@@ -29,9 +29,9 @@ export const APIV1_RATE_LIMIT = {
 
 /**
  * api-v1 rate-limit bucket. Driven by the `API` product feature flag, NOT by
- * plan name — see `APIV1_RATE_LIMIT`.
+ * plan name — see `RATE_LIMIT`.
  */
-export type ApiRateBucket = keyof typeof APIV1_RATE_LIMIT.limits
+export type ApiRateBucket = keyof typeof RATE_LIMIT.limits
 
 /**
  * Resolve the api-v1 rate-limit bucket from a team's plan features. Presence of
@@ -67,10 +67,10 @@ export function rateLimitProblem(
   detail: string
   details: Record<string, unknown>
 } {
-  const limit = APIV1_RATE_LIMIT.limits[bucket]
+  const limit = RATE_LIMIT.limits[bucket]
   const upgradeHint =
     bucket === 'restricted'
-      ? ` Upgrade for ${APIV1_RATE_LIMIT.limits.unrestricted}/min: https://rundownstudio.app/pricing.`
+      ? ` Upgrade for ${RATE_LIMIT.limits.unrestricted}/min: https://rundownstudio.app/pricing.`
       : ''
   return {
     code: 'rate_limit.exceeded',
@@ -78,7 +78,7 @@ export function rateLimitProblem(
     details: {
       bucket,
       limit,
-      window_seconds: APIV1_RATE_LIMIT.windowMs / 1000,
+      window_seconds: RATE_LIMIT.windowMs / 1000,
       retry_after_seconds: retryAfterSeconds,
     },
   }
