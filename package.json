@@ -38,7 +38,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.16",
-    "@rundown-studio/types": "1.13.0",
+    "@rundown-studio/types": "1.13.1",
     "@types/html-to-text": "9.0.4",
     "@types/lodash": "^4.17.7",
     "@types/node": "^25.9.1",
