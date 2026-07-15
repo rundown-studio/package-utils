@@ -83,8 +83,13 @@ export function toPublicSettings(s: Rundown['settings'] | undefined): ApiV1Rundo
  * deleting `locked`). Read-side fallback only — no code path writes `locked`.
  * Per product convention the flag guards *cell* edits, not the cue's existence
  * or position — it surfaces here as a read-only signal.
+ *
+ * `skipped_by` is derived — own `skipDuringShow` OR the parent group's, the same
+ * rule `ExportUtils.buildSkipMap` runs on. `opts.parentSkipped` is required
+ * because the parent lives on another document: optional would let a call site
+ * silently never emit `'group'`. Pass `false` for root cues and for groups.
  */
-export function toPublicCue(cue: RundownCue): ApiV1Cue {
+export function toPublicCue(cue: RundownCue, opts: { parentSkipped: boolean }): ApiV1Cue {
   return {
     id: cue.id,
     type: cue.type,
@@ -93,6 +98,7 @@ export function toPublicCue(cue: RundownCue): ApiV1Cue {
     duration_ms: cue.duration,
     background_color: cue.backgroundColor,
     prevent_edits: cue.settings?.preventEdits ?? (cue as { locked?: boolean }).locked ?? false,
+    skipped_by: cue.settings?.skipDuringShow ? 'self' : opts.parentSkipped ? 'group' : null,
     start_time: toEpochMs(cue.startTime),
     created_at: toIso(cue.createdAt),
     updated_at: toIso(cue.updatedAt),

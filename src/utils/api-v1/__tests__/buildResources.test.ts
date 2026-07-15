@@ -93,9 +93,12 @@ function cue(overrides: Partial<RundownCue> = {}): RundownCue {
   } as RundownCue
 }
 
+/** The common case — a root-level cue with no parent group. */
+const NO_PARENT = { parentSkipped: false }
+
 describe('toPublicCue', () => {
   test('projects a cue to the public wire shape', () => {
-    expect(toPublicCue(cue())).toEqual({
+    expect(toPublicCue(cue(), NO_PARENT)).toEqual({
       id: 'cue_1',
       type: 'cue',
       title: 'Opening',
@@ -103,6 +106,7 @@ describe('toPublicCue', () => {
       duration_ms: 60000,
       background_color: '#ff0000',
       prevent_edits: false,
+      skipped_by: null,
       start_time: EPOCH_MS,
       created_at: '2026-06-17T10:00:00.000Z',
       updated_at: '2026-06-17T10:00:00.000Z',
@@ -110,20 +114,57 @@ describe('toPublicCue', () => {
   })
 
   test('start_time is null when the cue is unscheduled', () => {
-    expect(toPublicCue(cue({ startTime: null })).start_time).toBeNull()
+    expect(toPublicCue(cue({ startTime: null }), NO_PARENT).start_time).toBeNull()
   })
 
   test('prevent_edits reads settings.preventEdits', () => {
-    expect(toPublicCue(cue({ settings: { preventEdits: true } } as Partial<RundownCue>)).prevent_edits).toBe(true)
+    expect(toPublicCue(cue({ settings: { preventEdits: true } } as Partial<RundownCue>), NO_PARENT).prevent_edits).toBe(
+      true,
+    )
   })
 
   test('prevent_edits falls back to the legacy locked flag', () => {
-    expect(toPublicCue(cue({ locked: true } as unknown as Partial<RundownCue>)).prevent_edits).toBe(true)
+    expect(toPublicCue(cue({ locked: true } as unknown as Partial<RundownCue>), NO_PARENT).prevent_edits).toBe(true)
   })
 
   test('passes heading / group types through', () => {
-    expect(toPublicCue(cue({ type: CueType.HEADING })).type).toBe('heading')
-    expect(toPublicCue(cue({ type: CueType.GROUP })).type).toBe('group')
+    expect(toPublicCue(cue({ type: CueType.HEADING }), NO_PARENT).type).toBe('heading')
+    expect(toPublicCue(cue({ type: CueType.GROUP }), NO_PARENT).type).toBe('group')
+  })
+})
+
+/** A cue with its own skip flag set either way. */
+function skippingCue(skipDuringShow: boolean): RundownCue {
+  return cue({ settings: { skipDuringShow } } as Partial<RundownCue>)
+}
+
+describe('toPublicCue — skipped_by', () => {
+  test('null when neither the cue nor its group is skipped', () => {
+    expect(toPublicCue(skippingCue(false), { parentSkipped: false }).skipped_by).toBeNull()
+  })
+
+  test("'self' when the cue's own flag is set", () => {
+    expect(toPublicCue(skippingCue(true), { parentSkipped: false }).skipped_by).toBe('self')
+  })
+
+  test("'group' when only the parent group is skipped", () => {
+    expect(toPublicCue(skippingCue(false), { parentSkipped: true }).skipped_by).toBe('group')
+  })
+
+  test("'self' wins when both apply — keeps the stored own flag recoverable", () => {
+    expect(toPublicCue(skippingCue(true), { parentSkipped: true }).skipped_by).toBe('self')
+  })
+
+  test('null for a legacy cue with no settings object at all', () => {
+    expect(toPublicCue(cue({ settings: undefined } as unknown as Partial<RundownCue>), NO_PARENT).skipped_by).toBeNull()
+  })
+
+  test('the two derivations consumers rely on', () => {
+    const child = toPublicCue(skippingCue(false), { parentSkipped: true })
+    // "will it run?" — the effective answer
+    expect(child.skipped_by !== null).toBe(true)
+    // "what is the stored own flag?" — recoverable, and false here
+    expect(child.skipped_by === 'self').toBe(false)
   })
 })
 
