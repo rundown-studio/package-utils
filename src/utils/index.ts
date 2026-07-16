@@ -9,6 +9,8 @@ export * as ApiV1Utils from './api-v1'
 // API version — shared by the v0/v1 APIs, the realtime SSE body, AND CSV export —
 // so it lives flat here, NOT under ApiV1Utils. (The public-vocabulary cell helpers
 // in api-v1/cellHtml.ts — the transitional `rs-*` adapter — stay namespaced.)
+export * from './buildParentGroupMap'
+export * from './buildParentSkipMap'
 export * from './cellHtmlToPlainText'
 export * from './createTimestamps'
 export * from './csv-import/parseCueNumbersColumn'
