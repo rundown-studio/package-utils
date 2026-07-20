@@ -1,9 +1,4 @@
-import {
-  type Cue,
-  CueStartMode,
-  getCueDefaults,
-  type RundownCueOrderItem,
-} from '@rundown-studio/types'
+import { type Cue, CueStartMode, getCueDefaults, type RundownCueOrderItem } from '@rundown-studio/types'
 import { describe, expect, it } from 'vitest'
 import {
   type BacktimeContext,
@@ -68,8 +63,9 @@ describe('computeBacktime — single hard start (screenshot scenario)', () => {
   })
 
   it('returns no_gap for a flexible cue', () => {
-    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue2', strategy: 'move_hard_start' }))
-      .toEqual({ error: 'no_gap' })
+    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue2', strategy: 'move_hard_start' })).toEqual({
+      error: 'no_gap',
+    })
   })
 
   it('move_hard_start pulls the anchor to 16:11', () => {
@@ -118,8 +114,9 @@ describe('computeBacktime — single hard start (screenshot scenario)', () => {
   })
 
   it('absorb_into_cue requires absorb_cue_id', () => {
-    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'absorb_into_cue' }))
-      .toEqual({ error: 'absorb_cue_id_required' })
+    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'absorb_into_cue' })).toEqual({
+      error: 'absorb_cue_id_required',
+    })
   })
 
   it('absorb_into_cue rejects a cue below the anchor', () => {
@@ -186,8 +183,10 @@ describe('computeBacktime — multiple hard starts above the anchor', () => {
 
   it('segment is scoped to cueC..cueD, excluding cueA/cueB', () => {
     const anchor = resolveBacktimeAnchor(multiCtx(), 'cueE')
-    expect(backtimeSegment(multiCtx(), 'cueE', anchor?.governingCueId ?? null).map((c) => c.id))
-      .toEqual(['cueC', 'cueD'])
+    expect(backtimeSegment(multiCtx(), 'cueE', anchor?.governingCueId ?? null).map((c) => c.id)).toEqual([
+      'cueC',
+      'cueD',
+    ])
   })
 
   it('absorb into a cue above the governing hard start is rejected', () => {
@@ -238,7 +237,8 @@ describe('planBacktime — overlap guards', () => {
     const anchor = resolveBacktimeAnchor(ctx, 'c3')
     expect(anchor?.differenceMs).toBeLessThan(0)
     // c2 is 2m; overlap is 7m → would go negative.
-    expect(planBacktime({ ctx, anchorCueId: 'c3', anchor: anchor!, strategy: 'absorb_into_cue', absorbCueId: 'c2' }))
-      .toEqual({ error: 'absorb_would_go_negative' })
+    expect(
+      planBacktime({ ctx, anchorCueId: 'c3', anchor: anchor!, strategy: 'absorb_into_cue', absorbCueId: 'c2' }),
+    ).toEqual({ error: 'absorb_would_go_negative' })
   })
 })

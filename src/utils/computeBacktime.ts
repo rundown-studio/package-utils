@@ -66,21 +66,14 @@ export interface BacktimeAnchor {
  * governing hard start. Returns null when the anchor isn't a FIXED cue that has
  * a gap/overlap (nothing to fix).
  */
-export function resolveBacktimeAnchor(
-  ctx: BacktimeContext,
-  anchorCueId: string,
-): BacktimeAnchor | null {
+export function resolveBacktimeAnchor(ctx: BacktimeContext, anchorCueId: string): BacktimeAnchor | null {
   const anchor = ctx.cues.find((c) => c.id === anchorCueId)
   if (!anchor || anchor.type !== CueType.CUE) return null
   if (anchor.startMode !== CueStartMode.FIXED) return null
 
-  const timestamps = createTimestamps(
-    ctx.cues,
-    ctx.cueOrder,
-    ctx.runner ?? null,
-    ctx.rundownStartTime,
-    { timezone: ctx.timezone ?? 'UTC' },
-  )
+  const timestamps = createTimestamps(ctx.cues, ctx.cueOrder, ctx.runner ?? null, ctx.rundownStartTime, {
+    timezone: ctx.timezone ?? 'UTC',
+  })
   const anchorTs = timestamps.cues[anchorCueId]
   if (!anchorTs) return null
 
@@ -136,11 +129,7 @@ export function resolveBacktimeAnchor(
  * governing hard start can't affect the anchor, so absorbing into them would be
  * a silent no-op — they're excluded here.
  */
-export function backtimeSegment(
-  ctx: BacktimeContext,
-  anchorCueId: string,
-  governingCueId: string | null,
-): Cue[] {
+export function backtimeSegment(ctx: BacktimeContext, anchorCueId: string, governingCueId: string | null): Cue[] {
   const orderedIds = flattenCueOrderItems(ctx.cueOrder)
   const anchorIndex = orderedIds.indexOf(anchorCueId)
   if (anchorIndex <= 0) return []
