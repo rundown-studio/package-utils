@@ -63,13 +63,13 @@ describe('computeBacktime — single hard start (screenshot scenario)', () => {
   })
 
   it('returns no_gap for a flexible cue', () => {
-    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue2', strategy: 'move_hard_start' })).toEqual({
+    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue2', strategy: 'move_this_hard_start' })).toEqual({
       error: 'no_gap',
     })
   })
 
-  it('move_hard_start pulls the anchor to 16:11', () => {
-    const res = computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'move_hard_start' })
+  it('move_this_hard_start pulls the anchor to 16:11', () => {
+    const res = computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'move_this_hard_start' })
     expect('write' in res && res.write).toEqual({
       kind: 'cue_start_time',
       cueId: 'cue4',
@@ -78,8 +78,8 @@ describe('computeBacktime — single hard start (screenshot scenario)', () => {
     })
   })
 
-  it('move_show_start moves the first cue to 16:49 (durations unchanged)', () => {
-    const res = computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'move_show_start' })
+  it('move_preceding_hard_start moves the first cue to 16:49 (durations unchanged)', () => {
+    const res = computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'move_preceding_hard_start' })
     expect('write' in res && res.write).toEqual({
       kind: 'cue_start_time',
       cueId: 'cue1',
@@ -88,21 +88,21 @@ describe('computeBacktime — single hard start (screenshot scenario)', () => {
     })
   })
 
-  it('move_show_start anchors on the resolved start, not a drifted rundownStartTime', () => {
+  it('move_preceding_hard_start anchors on the resolved start, not a drifted rundownStartTime', () => {
     const res = computeBacktime({
       ctx: baseCtx({ rundownStartTime: new Date('2026-07-19T17:38:00.000Z') }),
       anchorCueId: 'cue4',
-      strategy: 'move_show_start',
+      strategy: 'move_preceding_hard_start',
     })
     // Still 16:49: the engine pins cue1's FIXED 16:00 regardless of rundownStartTime.
     expect('write' in res && res.write.startTime).toEqual(new Date('2026-07-19T16:49:00.000Z'))
   })
 
-  it('absorb_into_cue stretches cue2 from 10m to 59m', () => {
+  it('adjust_cue_duration stretches cue2 from 10m to 59m', () => {
     const res = computeBacktime({
       ctx: baseCtx(),
       anchorCueId: 'cue4',
-      strategy: 'absorb_into_cue',
+      strategy: 'adjust_cue_duration',
       absorbCueId: 'cue2',
     })
     expect('write' in res && res.write).toEqual({
@@ -113,21 +113,21 @@ describe('computeBacktime — single hard start (screenshot scenario)', () => {
     })
   })
 
-  it('absorb_into_cue requires absorb_cue_id', () => {
-    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'absorb_into_cue' })).toEqual({
-      error: 'absorb_cue_id_required',
+  it('adjust_cue_duration requires absorb_cue_id', () => {
+    expect(computeBacktime({ ctx: baseCtx(), anchorCueId: 'cue4', strategy: 'adjust_cue_duration' })).toEqual({
+      error: 'adjust_cue_id_required',
     })
   })
 
-  it('absorb_into_cue rejects a cue below the anchor', () => {
+  it('adjust_cue_duration rejects a cue below the anchor', () => {
     expect(
       computeBacktime({
         ctx: baseCtx(),
         anchorCueId: 'cue4',
-        strategy: 'absorb_into_cue',
+        strategy: 'adjust_cue_duration',
         absorbCueId: 'cue5',
       }),
-    ).toEqual({ error: 'absorb_cue_not_in_segment' })
+    ).toEqual({ error: 'adjust_cue_not_in_segment' })
   })
 })
 
@@ -171,8 +171,8 @@ describe('computeBacktime — multiple hard starts above the anchor', () => {
     expect(anchor?.differenceMs).toBe(50 * MIN)
   })
 
-  it('move_show_start moves the governing cue (cueC → 17:50), not cueA', () => {
-    const res = computeBacktime({ ctx: multiCtx(), anchorCueId: 'cueE', strategy: 'move_show_start' })
+  it('move_preceding_hard_start moves the governing cue (cueC → 17:50), not cueA', () => {
+    const res = computeBacktime({ ctx: multiCtx(), anchorCueId: 'cueE', strategy: 'move_preceding_hard_start' })
     expect('write' in res && res.write).toEqual({
       kind: 'cue_start_time',
       cueId: 'cueC',
@@ -194,17 +194,17 @@ describe('computeBacktime — multiple hard starts above the anchor', () => {
       computeBacktime({
         ctx: multiCtx(),
         anchorCueId: 'cueE',
-        strategy: 'absorb_into_cue',
+        strategy: 'adjust_cue_duration',
         absorbCueId: 'cueB',
       }),
-    ).toEqual({ error: 'absorb_cue_not_in_segment' })
+    ).toEqual({ error: 'adjust_cue_not_in_segment' })
   })
 
   it('absorb into a cue within the segment works (cueD 5m → 55m)', () => {
     const res = computeBacktime({
       ctx: multiCtx(),
       anchorCueId: 'cueE',
-      strategy: 'absorb_into_cue',
+      strategy: 'adjust_cue_duration',
       absorbCueId: 'cueD',
     })
     expect('write' in res && res.write.cueDuration).toBe(55 * MIN)
@@ -238,7 +238,7 @@ describe('planBacktime — overlap guards', () => {
     expect(anchor?.differenceMs).toBeLessThan(0)
     // c2 is 2m; overlap is 7m → would go negative.
     expect(
-      planBacktime({ ctx, anchorCueId: 'c3', anchor: anchor!, strategy: 'absorb_into_cue', absorbCueId: 'c2' }),
-    ).toEqual({ error: 'absorb_would_go_negative' })
+      planBacktime({ ctx, anchorCueId: 'c3', anchor: anchor!, strategy: 'adjust_cue_duration', absorbCueId: 'c2' }),
+    ).toEqual({ error: 'adjust_would_go_negative' })
   })
 })

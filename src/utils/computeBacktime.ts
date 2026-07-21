@@ -13,19 +13,19 @@ import { flattenCueOrderItems } from './flattenCueOrderItems'
  * where `differenceMs = anchor.start − previousCueEnd`. Three strategies each
  * collapse that difference to zero via a different lever the engine respects:
  *
- *   - `move_show_start` — move the GOVERNING hard start so the run it feeds lands
+ *   - `move_preceding_hard_start` — move the GOVERNING hard start so the run it feeds lands
  *     exactly on the anchor. The governing cue is the nearest FIXED cue above the
  *     anchor (the first cue when none) — NOT always the first cue: an intervening
  *     hard start pins the clock, so cues above it can't affect this gap.
- *   - `move_hard_start` — move the anchor cue itself to meet the cues above.
- *   - `absorb_into_cue` — stretch/shrink one chosen cue in the governing segment.
+ *   - `move_this_hard_start` — move the anchor cue itself to meet the cues above.
+ *   - `adjust_cue_duration` — stretch/shrink one chosen cue in the governing segment.
  *
  * This module is the single source of truth shared by the client "Fix" menu and
  * the v1 `close-gap` API. It is pure (no I/O): callers pass cues/order/runner and
  * receive a `BacktimeWrite` describing exactly what to persist.
  */
 
-export type BacktimeStrategy = 'move_show_start' | 'move_hard_start' | 'absorb_into_cue'
+export type BacktimeStrategy = 'move_preceding_hard_start' | 'move_this_hard_start' | 'adjust_cue_duration'
 
 /** A single field write a fix performs, as plain data. */
 export type BacktimeWrite =
@@ -36,9 +36,9 @@ export type BacktimeWrite =
 export type BacktimeError =
   | 'no_gap'
   | 'no_governing_cue'
-  | 'absorb_cue_id_required'
-  | 'absorb_cue_not_in_segment'
-  | 'absorb_would_go_negative'
+  | 'adjust_cue_id_required'
+  | 'adjust_cue_not_in_segment'
+  | 'adjust_would_go_negative'
 
 export interface BacktimeContext {
   cues: Cue[]
@@ -55,7 +55,7 @@ export interface BacktimeAnchor {
   anchorStartMs: number
   /** The governing hard start's resolved start (epoch ms). */
   governingStartMs: number
-  /** Governing hard-start cue id (the one `move_show_start` moves), or null. */
+  /** Governing hard-start cue id (the one `move_preceding_hard_start` moves), or null. */
   governingCueId: string | null
   /** Whether the governing cue is the first cue (→ write also syncs rundown start). */
   governingIsFirstCue: boolean
@@ -175,7 +175,7 @@ export function planBacktime(params: {
   const { differenceMs, governingStartMs } = anchor
   const timezone = ctx.timezone ?? 'UTC'
 
-  if (strategy === 'move_hard_start') {
+  if (strategy === 'move_this_hard_start') {
     const anchorCue = ctx.cues.find((c) => c.id === anchorCueId)
     // Anchor is FIXED (resolveBacktimeAnchor gated), so startTime is non-null.
     const startTime = moveHardStartInstant({
@@ -189,7 +189,7 @@ export function planBacktime(params: {
     return { write: { kind: 'cue_start_time', cueId: anchorCueId, startTime, isFirstCue: false } }
   }
 
-  if (strategy === 'move_show_start') {
+  if (strategy === 'move_preceding_hard_start') {
     if (!anchor.governingCueId) return { error: 'no_governing_cue' }
     return {
       write: {
@@ -201,13 +201,13 @@ export function planBacktime(params: {
     }
   }
 
-  // absorb_into_cue
-  if (!absorbCueId) return { error: 'absorb_cue_id_required' }
+  // adjust_cue_duration
+  if (!absorbCueId) return { error: 'adjust_cue_id_required' }
   const segment = backtimeSegment(ctx, anchorCueId, anchor.governingCueId)
   const target = segment.find((c) => c.id === absorbCueId)
-  if (!target) return { error: 'absorb_cue_not_in_segment' }
+  if (!target) return { error: 'adjust_cue_not_in_segment' }
   const cueDuration = target.duration + differenceMs
-  if (cueDuration < 0) return { error: 'absorb_would_go_negative' }
+  if (cueDuration < 0) return { error: 'adjust_would_go_negative' }
   return {
     write: {
       kind: 'cue_duration',
